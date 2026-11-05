@@ -123,7 +123,7 @@
   },
   {
    "owner": "Steve",
-   "pct": 73.7
+   "pct": 73.6
   },
   {
    "owner": "Mark",
@@ -157,7 +157,7 @@
    "a": "Sam",
    "pa": 88.2,
    "b": "Steve",
-   "pb": 93.8
+   "pb": 93.4
   },
   {
    "a": "Mark",
@@ -218,14 +218,17 @@
   }
  ],
  "elimnote": "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive.",
+ "clinch": [],
+ "clinchnote": "",
  "brackets": {
+  "projected": true,
   "bwb": [
    {
     "m": 1,
     "r": 1,
     "week": 15,
     "label": "Quarterfinal",
-    "t1": "Cliff",
+    "t1": "Bob",
     "t2": "Steve",
     "s1": null,
     "s2": null,
@@ -236,8 +239,8 @@
     "r": 1,
     "week": 15,
     "label": "Quarterfinal",
-    "t1": "Martin",
-    "t2": "Austin",
+    "t1": "Lerch",
+    "t2": "Martin",
     "s1": null,
     "s2": null,
     "w": null
@@ -247,7 +250,7 @@
     "r": 2,
     "week": 16,
     "label": "Semifinal",
-    "t1": "Bob",
+    "t1": "Austin",
     "t2": "Winner of M1",
     "s1": null,
     "s2": null,
@@ -258,7 +261,7 @@
     "r": 2,
     "week": 16,
     "label": "Semifinal",
-    "t1": "Lerch",
+    "t1": "Cliff",
     "t2": "Winner of M2",
     "s1": null,
     "s2": null,
@@ -305,7 +308,7 @@
     "week": 15,
     "label": "Round 1",
     "t1": "Luke",
-    "t2": "Clancy",
+    "t2": "Mark",
     "s1": null,
     "s2": null,
     "w": null
@@ -315,7 +318,7 @@
     "r": 1,
     "week": 15,
     "label": "Round 1",
-    "t1": "Mark",
+    "t1": "Clancy",
     "t2": "Sam",
     "s1": null,
     "s2": null,
@@ -327,7 +330,7 @@
     "week": 16,
     "label": "Round 2",
     "t1": "Timmy",
-    "t2": "Winner of M1",
+    "t2": "Loser of M1",
     "s1": null,
     "s2": null,
     "w": null
@@ -338,7 +341,7 @@
     "week": 16,
     "label": "Round 2",
     "t1": "Will",
-    "t2": "Winner of M2",
+    "t2": "Loser of M2",
     "s1": null,
     "s2": null,
     "w": null
@@ -348,8 +351,8 @@
     "r": 2,
     "week": 16,
     "label": "Place game",
-    "t1": "Loser of M1",
-    "t2": "Loser of M2",
+    "t1": "Winner of M1",
+    "t2": "Winner of M2",
     "s1": null,
     "s2": null,
     "w": null
@@ -359,8 +362,8 @@
     "r": 3,
     "week": 17,
     "label": "Lerch Cup game",
-    "t1": "Winner of M3",
-    "t2": "Winner of M4",
+    "t1": "Loser of M3",
+    "t2": "Loser of M4",
     "s1": null,
     "s2": null,
     "w": null
@@ -370,13 +373,12 @@
     "r": 3,
     "week": 17,
     "label": "Place game",
-    "t1": "Loser of M3",
-    "t2": "Loser of M4",
+    "t1": "Winner of M3",
+    "t2": "Winner of M4",
     "s1": null,
     "s2": null,
     "w": null
    }
-  ],
-  "projected": true
+  ]
  }
 }

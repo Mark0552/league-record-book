@@ -202,6 +202,7 @@ else:
     N = 1
     for t in TEAMS:
         status[t] = "clinched" if t in field else "out"
+    status[w1] = status[w2] = "bye"
     try:
         wb_raw = json.load(open(yr_dir / "winners_bracket.json"))
         if any(isinstance(mt.get("t1"), int) for mt in wb_raw):
@@ -323,7 +324,51 @@ def alive(x, wins_now, h2h_now, future_games):
             return True
     return False
 
+def factor_conditions(combos, games_list):
+    """Factor winner-combos into readable conditions: constant winners as AND lines,
+    the remainder minimized into an OR-of-ANDs clause."""
+    needs = []
+    residual_idx = []
+    for i, (a, b) in enumerate(games_list):
+        winners_i = {c[i] for c in combos}
+        if len(winners_i) == 1:
+            wteam = winners_i.pop()
+            needs.append(f"{OWNER[wteam]} beats {OWNER[b if wteam == a else a]}")
+        else:
+            residual_idx.append(i)
+    if residual_idx:
+        variants = {tuple(c[i] for i in residual_idx) for c in combos}
+        if len(variants) < 2 ** len(residual_idx):
+            terms, changed = set(variants), True
+            while changed:
+                changed = False
+                tl = sorted(terms, key=str); new, used = set(), set()
+                for ii in range(len(tl)):
+                    for jj in range(ii + 1, len(tl)):
+                        a_, b_ = tl[ii], tl[jj]
+                        diff = [k for k in range(len(a_)) if a_[k] != b_[k]]
+                        if len(diff) == 1:
+                            m = tuple(None if k == diff[0] else a_[k] for k in range(len(a_)))
+                            new.add(m); used.add(a_); used.add(b_); changed = True
+                terms = (terms - used) | new
+            alts = []
+            for v in sorted(terms, key=str):
+                parts = []
+                for i, wteam in zip(residual_idx, v):
+                    if wteam is None:
+                        continue
+                    a, b = games_list[i]
+                    parts.append(f"{OWNER[wteam]} beats {OWNER[b if wteam == a else a]}")
+                if parts:
+                    alts.append(" AND ".join(parts))
+            if alts and len(alts) <= 4:
+                needs.append("Plus one of: " + "  |  ".join(alts))
+            elif alts:
+                needs.append("Plus specific combinations of the other games")
+    return needs
+
 elim_cards = []
+clinch_cards = []
 elimnote = ""
 if not FAST and future.get(cur_week):
     print("running elimination solver ...")
@@ -347,61 +392,24 @@ if not FAST and future.get(cur_week):
             if not alive(x, w9, hh, FUTA):
                 combos.append(combo)
         if combos:
-            # factor: constant winners -> AND lines; the rest listed as alternatives
-            needs = [f"Loses to {OWNER[opp]}"]
-            residual_idx = []
-            for i, (a, b) in enumerate(other):
-                winners_i = {c[i] for c in combos}
-                if len(winners_i) == 1:
-                    wteam = winners_i.pop()
-                    needs.append(f"{OWNER[wteam]} beats {OWNER[b if wteam == a else a]}")
-                else:
-                    residual_idx.append(i)
-            if residual_idx:
-                variants = {tuple(c[i] for i in residual_idx) for c in combos}
-                full = 2 ** len(residual_idx)
-                if len(variants) < full:
-                    # merge terms that differ in one position into wildcards (sound minimization)
-                    terms, changed = set(variants), True
-                    while changed:
-                        changed = False
-                        tl = sorted(terms, key=str); new, used = set(), set()
-                        for ii in range(len(tl)):
-                            for jj in range(ii + 1, len(tl)):
-                                a_, b_ = tl[ii], tl[jj]
-                                diff = [k for k in range(len(a_)) if a_[k] != b_[k]]
-                                if len(diff) == 1:
-                                    m = tuple(None if k == diff[0] else a_[k] for k in range(len(a_)))
-                                    new.add(m); used.add(a_); used.add(b_); changed = True
-                        terms = (terms - used) | new
-                    alts = []
-                    for v in sorted(terms, key=str):
-                        parts = []
-                        for i, wteam in zip(residual_idx, v):
-                            if wteam is None:
-                                continue
-                            a, b = other[i]
-                            parts.append(f"{OWNER[wteam]} beats {OWNER[b if wteam == a else a]}")
-                        if parts:
-                            alts.append(" AND ".join(parts))
-                    if alts and len(alts) <= 4:
-                        needs.append("Plus one of: " + "  |  ".join(alts))
-                    elif alts:
-                        needs.append("Plus specific combinations of the other games")
+            needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(combos, other)
             elim_cards.append(dict(owner=OWNER[x], needs=needs))
     elimnote = "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive."
 
 # ---------------- 4a. clinched / eliminated right now ----------------
-def can_miss(x):
+def can_miss(x, wins_now=None, h2h_now=None, future_games=None):
     """Does ANY remaining outcome leave x out of the playoffs? (x loses out = worst case)"""
-    allg = [g for w in sorted(future) for g in future[w]]
-    M = wins0[x]
+    wins_now = wins_now or wins0
+    h2h_now = h2h_now or h2h0
+    future_games = future_games or future
+    allg = [g for w in sorted(future_games) for g in future_games[w]]
+    M = wins_now[x]
     others = [t for t in TEAMS if t != x]
     owndiv = [t for t in others if division[t] == division[x]]
     # threshold to finish above x (adversary-optimistic on ties)
     thresh = {}
     for y in others:
-        xw, g = h2h0[x][y]
+        xw, g = h2h_now[x][y]
         fm = sum(1 for a, b in allg if {a, b} == {x, y})   # x loses these
         x_strictly_ahead = xw * 2 > (g + fm)
         thresh[y] = M + 1 if x_strictly_ahead else M
@@ -414,7 +422,7 @@ def can_miss(x):
         for y in T:
             free_wins = sum(1 for a, b in allg if (a == y) != (b == y)
                             and not (a in Tset and b in Tset))
-            k = thresh[y] - (wins0[y] + free_wins)
+            k = thresh[y] - (wins_now[y] + free_wins)
             if k > len([1 for a, b in glist if y in (a, b)]):
                 return False
             kk[y] = max(0, k)
@@ -453,13 +461,56 @@ def can_miss(x):
             return True
     return False
 
+def can_lose_division(x, wins_now, h2h_now, future_games):
+    """Can any division rival still finish above x? (x loses out; rival optimism on ties)"""
+    allg = [g for w in sorted(future_games) for g in future_games[w]]
+    M = wins_now[x]
+    for y in (t for t in TEAMS if t != x and division[t] == division[x]):
+        xw, g = h2h_now[x][y]
+        fm = sum(1 for a, b in allg if {a, b} == {x, y})
+        thresh = M + 1 if xw * 2 > (g + fm) else M
+        max_y = wins_now[y] + sum(1 for a, b in allg if y in (a, b))
+        if max_y >= thresh:
+            return True
+    return False
+
 if weeks_left:
     print("computing clinch/elimination status ...")
     for x in TEAMS:
         if not alive(x, wins0, h2h0, future):
             status[x] = "out"
+        elif not can_lose_division(x, wins0, h2h0, future):
+            status[x] = "bye"
         elif not can_miss(x):
             status[x] = "clinched"
+
+    # clinch scenarios: can any combination of this week's results LOCK a playoff spot?
+    if not FAST and future.get(cur_week):
+        print("running clinch-scenario solver ...")
+        week_games = future[cur_week]
+        futa_c = {w: future[w] for w in future if w > cur_week}
+        for x in TEAMS:
+            if status.get(x) in ("bye", "out"):
+                continue
+            spot_combos, bye_combos = [], []
+            for combo in itertools.product(*[[a, b] for a, b in week_games]):
+                wC = dict(wins0)
+                hh = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
+                for wt, (a, b) in zip(combo, week_games):
+                    wC[wt] += 1
+                    lt = b if wt == a else a
+                    hh[wt][lt][1] += 1; hh[lt][wt][1] += 1; hh[wt][lt][0] += 1
+                if not can_lose_division(x, wC, hh, futa_c):
+                    bye_combos.append(combo)
+                elif status.get(x) != "clinched" and not can_miss(x, wC, hh, futa_c):
+                    spot_combos.append(combo)
+            if bye_combos:
+                clinch_cards.append(dict(owner=OWNER[x], kind="bye",
+                                         div=DIVNAME[division[x]],
+                                         needs=factor_conditions(bye_combos, week_games)))
+            elif spot_combos:
+                clinch_cards.append(dict(owner=OWNER[x], kind="spot",
+                                         needs=factor_conditions(spot_combos, week_games)))
 
 # ---------------- 4b. playoff brackets (appear automatically once seeded) ----------------
 def bracket_view(bracket, final_label):
@@ -475,10 +526,11 @@ def bracket_view(bracket, final_label):
             if isinstance(v, int):
                 return OWNER.get(v, "?")
             fr = mt.get(side + "_from") or {}
+            # toilet bowl: Sleeper's "w" (advancer) is the game's score LOSER
             if "w" in fr:
-                return f"Winner of M{fr['w']}"
+                return f"Loser of M{fr['w']}" if final_label == "lerch" else f"Winner of M{fr['w']}"
             if "l" in fr:
-                return f"Loser of M{fr['l']}"
+                return f"Winner of M{fr['l']}" if final_label == "lerch" else f"Loser of M{fr['l']}"
             return "TBD"
         s1 = s2 = None
         if isinstance(mt.get("t1"), int) and isinstance(mt.get("t2"), int):
@@ -504,23 +556,48 @@ def bracket_view(bracket, final_label):
                         t1=ref("t1"), t2=ref("t2"), s1=s1, s2=s2, w=disp_w))
     return out
 
-brackets = None
-try:
-    wb_raw = json.load(open(yr_dir / "winners_bracket.json"))
-    lb_raw = json.load(open(yr_dir / "losers_bracket.json"))
-    seeded = any(isinstance(mt.get("t1"), int) or isinstance(mt.get("t2"), int)
-                 for mt in (wb_raw or []) + (lb_raw or []))
-    if seeded:
-        brackets = dict(bwb=bracket_view(wb_raw, "bwb"), lerch=bracket_view(lb_raw, "lerch"),
-                        projected=bool(weeks_left))
-except Exception as ex:
-    print("bracket build skipped:", ex)
-
 # ---------------- 5. write now.json ----------------
 order = contextual_rank(TEAMS, wins0, pf0, h2h0)
 leaders = {contextual_rank(D[dn], wins0, pf0, h2h0)[0] for dn in (1, 2)}
 nonw = contextual_rank([t for t in TEAMS if t not in leaders], wins0, pf0, h2h0)
 seed_order = sorted(leaders, key=lambda t: order.index(t)) + nonw
+
+brackets = None
+if weeks_left:
+    # projected brackets seeded by OUR standings (house tiebreak rules), using the
+    # league's bracket template as verified against the actual 2025 brackets
+    S = [None] + [OWNER[t] for t in seed_order]   # S[1]..S[12]
+    def pm(m, r, wk, label, t1, t2):
+        return dict(m=m, r=r, week=wk, label=label, t1=t1, t2=t2, s1=None, s2=None, w=None)
+    W1, W2, W3 = PSTART, PSTART + 1, PSTART + 2
+    brackets = dict(projected=True, bwb=[
+        pm(1, 1, W1, "Quarterfinal", S[4], S[5]),
+        pm(2, 1, W1, "Quarterfinal", S[3], S[6]),
+        pm(3, 2, W2, "Semifinal", S[1], "Winner of M1"),
+        pm(4, 2, W2, "Semifinal", S[2], "Winner of M2"),
+        pm(5, 2, W2, "Place game", "Loser of M1", "Loser of M2"),
+        pm(6, 3, W3, "Buck Wong Bowl", "Winner of M3", "Winner of M4"),
+        pm(7, 3, W3, "Place game", "Loser of M3", "Loser of M4"),
+    ], lerch=[
+        pm(1, 1, W1, "Round 1", S[9], S[7]),
+        pm(2, 1, W1, "Round 1", S[8], S[10]),
+        pm(3, 2, W2, "Round 2", S[12], "Loser of M1"),
+        pm(4, 2, W2, "Round 2", S[11], "Loser of M2"),
+        pm(5, 2, W2, "Place game", "Winner of M1", "Winner of M2"),
+        pm(6, 3, W3, "Lerch Cup game", "Loser of M3", "Loser of M4"),
+        pm(7, 3, W3, "Place game", "Winner of M3", "Winner of M4"),
+    ])
+else:
+    try:
+        wb_raw = json.load(open(yr_dir / "winners_bracket.json"))
+        lb_raw = json.load(open(yr_dir / "losers_bracket.json"))
+        seeded = any(isinstance(mt.get("t1"), int) or isinstance(mt.get("t2"), int)
+                     for mt in (wb_raw or []) + (lb_raw or []))
+        if seeded:
+            brackets = dict(bwb=bracket_view(wb_raw, "bwb"), lerch=bracket_view(lb_raw, "lerch"),
+                            projected=False)
+    except Exception as ex:
+        print("bracket build skipped:", ex)
 standings = []
 for i, t in enumerate(seed_order, 1):
     standings.append(dict(seed=i, owner=OWNER[t], team=teamname[t],
@@ -543,6 +620,8 @@ now = dict(
     matchups=matchup_cards,
     elim=elim_cards,
     elimnote=elimnote,
+    clinch=clinch_cards,
+    clinchnote="Lock up a playoff spot no matter what happens the rest of the season." if clinch_cards else "",
     brackets=brackets,
 )
 json.dump(now, open("data/now.json", "w", encoding="utf-8"), indent=1)
