@@ -53,6 +53,11 @@ def load(season, name):
 # 2026 games from Sleeper (live source of truth for current season)
 lg26 = load(2026, "league")
 playoff_start_26 = lg26["settings"]["playoff_week_start"]
+wb26 = load(2026, "winners_bracket") or []
+po_pairs = set()
+for mt in wb26:
+    if isinstance(mt.get("t1"), int) and isinstance(mt.get("t2"), int):
+        po_pairs.add((playoff_start_26 + (mt.get("r", 1) - 1), frozenset((mt["t1"], mt["t2"]))))
 sleeper_2026 = []
 for w in range(1, 19):
     m = load(2026, f"matchups_{w}")
@@ -68,7 +73,12 @@ for w in range(1, 19):
         x, y = xs
         if x["points"] == 0 and y["points"] == 0:
             continue
-        gtype = "Regular" if w < playoff_start_26 else "Playoff"
+        if w < playoff_start_26:
+            gtype = "Regular"
+        elif (w, frozenset((x["roster_id"], y["roster_id"]))) in po_pairs:
+            gtype = "Playoff"
+        else:
+            gtype = "Consolation"
         sleeper_2026.append(dict(year=2026, week=w, type=gtype,
                                  a=ROSTER_OWNER_2026[x["roster_id"]], sa=round(x["points"], 2),
                                  b=ROSTER_OWNER_2026[y["roster_id"]], sb=round(y["points"], 2)))
@@ -200,6 +210,13 @@ for y in sorted(hof):
     if c.get("Owner"):
         champs.append(dict(year=y, owner=canon(c["Owner"]), team=c.get("Team Name", ""),
                            record=c.get("Record", ""), roster=champ_roster.get(y, [])))
+# current-season champion straight from the bracket, the moment the final is scored
+if CUR_SEASON not in {c["year"] for c in champs}:
+    final = next((mt for mt in wb26 if mt.get("p") == 1 and isinstance(mt.get("w"), int)), None)
+    if final:
+        champs.append(dict(year=CUR_SEASON, owner=ROSTER_OWNER_2026[final["w"]],
+                           team=team.get(final["w"], ""), record="", roster=[]))
+champs.sort(key=lambda c: c["year"])
 titles = defaultdict(int)
 for c in champs:
     titles[c["owner"]] += 1
@@ -720,6 +737,14 @@ for y in sorted(shame_raw, reverse=True):
         shame.append(dict(year=y, owner=canon(c["Owner"]),
                           team=c.get("Team Name", ""), record=c.get("Record", ""),
                           roster=shame_roster.get(y, [])))
+# current-season Lerch Cup from the losers bracket, once its last-place game is scored
+if CUR_SEASON not in {s["year"] for s in shame}:
+    lb26 = load(2026, "losers_bracket") or []
+    placed = [mt for mt in lb26 if isinstance(mt.get("l"), int) and mt.get("p")]
+    if placed:
+        bottom = max(placed, key=lambda mt: mt["p"])
+        shame.insert(0, dict(year=CUR_SEASON, owner=ROSTER_OWNER_2026[bottom["l"]],
+                             team=team.get(bottom["l"], ""), record="", roster=[]))
 
 # worst-game notes from the sheet
 worst_notes = {}

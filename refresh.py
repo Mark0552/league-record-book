@@ -33,7 +33,7 @@ lg = api(f"league/{LEAGUE_ID}")
 season = lg["season"]
 yr_dir = RAW / "sleeper" / season
 get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}", yr_dir / "league.json")
-for name in ("users", "rosters", "winners_bracket"):
+for name in ("users", "rosters", "winners_bracket", "losers_bracket"):
     get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/{name}", yr_dir / f"{name}.json")
 for w in range(1, 19):
     get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/matchups/{w}", yr_dir / f"matchups_{w}.json")
