@@ -119,23 +119,23 @@
   },
   {
    "owner": "Martin",
-   "pct": 76.0
+   "pct": 75.9
   },
   {
    "owner": "Steve",
-   "pct": 73.2
+   "pct": 73.7
   },
   {
    "owner": "Mark",
-   "pct": 53.1
+   "pct": 53.0
   },
   {
    "owner": "Clancy",
-   "pct": 25.4
+   "pct": 25.2
   },
   {
    "owner": "Luke",
-   "pct": 4.1
+   "pct": 4.2
   },
   {
    "owner": "Will",
@@ -155,39 +155,39 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 90.1,
+   "pa": 88.2,
    "b": "Steve",
-   "pb": 93.7
+   "pb": 93.8
   },
   {
    "a": "Mark",
-   "pa": 107.4,
+   "pa": 107.2,
    "b": "Timmy",
-   "pb": 84.1
+   "pb": 84.3
   },
   {
    "a": "Will",
    "pa": 96.2,
    "b": "Bob",
-   "pb": 100.8
+   "pb": 101.4
   },
   {
    "a": "Lerch",
-   "pa": 95.3,
+   "pa": 95.2,
    "b": "Austin",
    "pb": 92.3
   },
   {
    "a": "Clancy",
-   "pa": 91.2,
+   "pa": 90.8,
    "b": "Luke",
-   "pb": 93.5
+   "pb": 93.4
   },
   {
    "a": "Martin",
-   "pa": 97.9,
+   "pa": 97.7,
    "b": "Cliff",
-   "pb": 93.2
+   "pb": 92.9
   }
  ],
  "elim": [
@@ -217,5 +217,165 @@
    ]
   }
  ],
- "elimnote": "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive."
+ "elimnote": "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive.",
+ "brackets": {
+  "bwb": [
+   {
+    "m": 1,
+    "r": 1,
+    "week": 15,
+    "label": "Quarterfinal",
+    "t1": "Cliff",
+    "t2": "Steve",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 2,
+    "r": 1,
+    "week": 15,
+    "label": "Quarterfinal",
+    "t1": "Martin",
+    "t2": "Austin",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 3,
+    "r": 2,
+    "week": 16,
+    "label": "Semifinal",
+    "t1": "Bob",
+    "t2": "Winner of M1",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 4,
+    "r": 2,
+    "week": 16,
+    "label": "Semifinal",
+    "t1": "Lerch",
+    "t2": "Winner of M2",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 5,
+    "r": 2,
+    "week": 16,
+    "label": "Place game",
+    "t1": "Loser of M1",
+    "t2": "Loser of M2",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 6,
+    "r": 3,
+    "week": 17,
+    "label": "Buck Wong Bowl",
+    "t1": "Winner of M3",
+    "t2": "Winner of M4",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 7,
+    "r": 3,
+    "week": 17,
+    "label": "Place game",
+    "t1": "Loser of M3",
+    "t2": "Loser of M4",
+    "s1": null,
+    "s2": null,
+    "w": null
+   }
+  ],
+  "lerch": [
+   {
+    "m": 1,
+    "r": 1,
+    "week": 15,
+    "label": "Round 1",
+    "t1": "Luke",
+    "t2": "Clancy",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 2,
+    "r": 1,
+    "week": 15,
+    "label": "Round 1",
+    "t1": "Mark",
+    "t2": "Sam",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 3,
+    "r": 2,
+    "week": 16,
+    "label": "Round 2",
+    "t1": "Timmy",
+    "t2": "Winner of M1",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 4,
+    "r": 2,
+    "week": 16,
+    "label": "Round 2",
+    "t1": "Will",
+    "t2": "Winner of M2",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 5,
+    "r": 2,
+    "week": 16,
+    "label": "Place game",
+    "t1": "Loser of M1",
+    "t2": "Loser of M2",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 6,
+    "r": 3,
+    "week": 17,
+    "label": "Lerch Cup game",
+    "t1": "Winner of M3",
+    "t2": "Winner of M4",
+    "s1": null,
+    "s2": null,
+    "w": null
+   },
+   {
+    "m": 7,
+    "r": 3,
+    "week": 17,
+    "label": "Place game",
+    "t1": "Loser of M3",
+    "t2": "Loser of M4",
+    "s1": null,
+    "s2": null,
+    "w": null
+   }
+  ]
+ }
 }
