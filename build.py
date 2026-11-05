@@ -295,12 +295,16 @@ for (y, w), lst in sorted(byweek.items()):
     weekly_top[y].append(dict(week=w, owner=o, pts=round(pts, 2)))
 topcounts = Counter(e["owner"] for y in weekly_top for e in weekly_top[y])
 
+SEAT_LABELS = {"Luke/Auggie/Ski": "Luke / Austin / Alex (one seat)",
+               "Neville/Auggie2.0": "Neville / Austin (one seat)"}
 payout_rows = []
 with open(RAW / "sheet" / "payouts.csv", encoding="utf-8") as f:
     for r in csv.DictReader(f):
-        o = canon((r.get("Owner") or "").strip())
-        if o and o in alltime:
-            payout_rows.append(dict(owner=o, paid=r.get("Total Paid In", ""),
+        raw_o = (r.get("Owner") or "").strip()
+        o = canon(raw_o)
+        label = o if o in alltime else SEAT_LABELS.get(raw_o)
+        if label:
+            payout_rows.append(dict(owner=label, paid=r.get("Total Paid In", ""),
                                     earned=r.get("Total Earned", ""), net=r.get("Net", "")))
 
 money = dict(
@@ -524,6 +528,24 @@ for season in SLEEPER_SEASONS:
         draft_data.append(dict(season=season, pick=p.get("pick_no"), owner=ro[rid],
                                player=info.get("full_name", pid), pos=info.get("position", "?"),
                                pts=round(total, 1)))
+# ESPN-era picks (2015-2019) with TRUE season totals under that year's league scoring
+for yr in range(2015, 2020):
+    df = espn_dir / f"{yr}_draft.json"
+    pf_ = espn_dir / f"{yr}_players.json"
+    tf = espn_dir / f"{yr}_season_totals.json"
+    if not (df.exists() and pf_.exists()):
+        continue
+    pmap = json.load(open(pf_, encoding="utf-8"))
+    totals = json.load(open(tf, encoding="utf-8")) if tf.exists() else {}
+    for p in json.load(open(df, encoding="utf-8")).get("picks") or []:
+        pid = str(p.get("playerId"))
+        info = pmap.get(pid) or {}
+        draft_data.append(dict(season=yr, pick=p.get("overallPickNumber"),
+                               owner=espn_owner.get((yr, p.get("teamId")), "?"),
+                               player=info.get("n") or f"player {pid}",
+                               pos=ESPN_POS.get(info.get("p"), "?"),
+                               pts=totals.get(pid, 0.0)))
+
 # expected points: same season, same position, same round neighborhood
 # (within-season comparison keeps a half-played season fair; within-position stops
 #  late-round QBs from beating all-position slot averages on raw points)
@@ -544,36 +566,9 @@ for d in draft_data:
 grades = defaultdict(lambda: defaultdict(float))
 for d in draft_data:
     grades[d["owner"]][d["season"]] += d["value"]
-# full ESPN-era draft lists (2015-2019)
-espn_started_pts = defaultdict(float)  # (year, player name) -> sum of started points
-for yr in range(2015, 2020):
-    for w in range(1, 17):
-        f = espn_dir / f"{yr}_box_{w}.json"
-        if not f.exists():
-            continue
-        for row in json.load(open(f, encoding="utf-8")):
-            for side in ("home", "away"):
-                for p in (row.get(side) or {}).get("players") or []:
-                    if p.get("name") and p.get("pts"):
-                        espn_started_pts[(yr, p["name"])] += p["pts"]
-espn_draft_data = []
-for yr in range(2015, 2020):
-    df = espn_dir / f"{yr}_draft.json"
-    pf = espn_dir / f"{yr}_players.json"
-    if not df.exists() or not pf.exists():
-        continue
-    pmap = json.load(open(pf, encoding="utf-8"))
-    for p in json.load(open(df, encoding="utf-8")).get("picks") or []:
-        info = pmap.get(str(p.get("playerId"))) or {}
-        nm = info.get("n") or f"player {p.get('playerId')}"
-        espn_draft_data.append(dict(season=yr, pick=p.get("overallPickNumber"),
-                                    owner=espn_owner.get((yr, p.get("teamId")), "?"),
-                                    player=nm, pos=ESPN_POS.get(info.get("p"), "?"),
-                                    pts=round(espn_started_pts.get((yr, nm), 0.0), 1)))
-all_picks = sorted(espn_draft_data + [dict(season=d["season"], pick=d["pick"], owner=d["owner"],
-                                           player=d["player"], pos=d["pos"], pts=d["pts"],
-                                           value=d["value"]) for d in draft_data],
-                   key=lambda d: (d["season"], d["pick"]))
+all_picks = sorted([dict(season=d["season"], pick=d["pick"], owner=d["owner"],
+                         player=d["player"], pos=d["pos"], pts=d["pts"], value=d["value"])
+                    for d in draft_data], key=lambda d: (d["season"], d["pick"]))
 
 draft_payload = dict(
     grades=[dict(owner=o, years={str(y): round(v, 0) for y, v in ys.items()},
@@ -599,6 +594,43 @@ with open(RAW / "sheet" / "worst.csv", encoding="utf-8") as f:
     for r in csv.reader(f):
         if len(r) > 6 and r[3].strip().isdigit():
             worst_notes[(int(r[3]), int(r[4]), canon(r[2].strip()))] = r[6].strip()
+
+# ================= STARTING LINEUPS for every game =================
+lineups = {}  # "year|week|owner" -> [[name, pos, pts], ...]
+for yr in range(2015, 2020):
+    for w in range(1, 17):
+        f = espn_dir / f"{yr}_box_{w}.json"
+        if not f.exists():
+            continue
+        for row in json.load(open(f, encoding="utf-8")):
+            for side in ("home", "away"):
+                s_ = row.get(side) or {}
+                o = espn_owner.get((yr, s_.get("teamId")))
+                pls = s_.get("players") or []
+                if o and pls:
+                    lineups[f"{yr}|{row.get('matchupPeriodId')}|{o}"] = [
+                        [p.get("name") or "?", ESPN_POS.get(p.get("pos"), "?"), round(p.get("pts") or 0, 1)]
+                        for p in pls]
+for season in SLEEPER_SEASONS:
+    ro = season_ro.get(season)
+    if not ro:
+        continue
+    for w in range(1, 19):
+        m = load(season, f"matchups_{w}")
+        if not m:
+            continue
+        for x in m:
+            starters = x.get("starters") or []
+            pp = x.get("players_points") or {}
+            if not starters or not x.get("points"):
+                continue
+            o = ro.get(x["roster_id"])
+            lu = []
+            for pid in starters:
+                info = players.get(pid) or {}
+                lu.append([info.get("full_name") or info.get("last_name") or pid,
+                           info.get("position", "?"), round(pp.get(pid, 0) or 0, 1)])
+            lineups[f"{season}|{w}|{o}"] = lu
 
 # ---------------- 2026 "now" data ----------------
 now = json.load(open("data/now.json", encoding="utf-8")) if Path("data/now.json").exists() else {}
@@ -635,6 +667,7 @@ payload = dict(
     moves=moves,
     draft=draft_payload,
     shame=shame,
+    lineups=lineups,
     now=now,
 )
 

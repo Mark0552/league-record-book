@@ -12,7 +12,7 @@ trades, and the halls of fame & shame.
   championship simulation, and the elimination solver, then calls `build.py`.
 - `build.py` merges everything (including static ESPN 2015-2019 history in
   `data/raw/espn/`) and renders `site/index.html` from `template.html`.
-- `.github/workflows/update.yml` runs the whole thing every Wednesday 6am ET
+- `.github/workflows/update.yml` runs the whole thing every Tuesday 5am ET
   and publishes automatically. No secrets required.
 
 ## Season rollover
