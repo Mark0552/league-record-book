@@ -504,7 +504,61 @@ for season in SLEEPER_SEASONS:
                                        pos=info.get("position", "?"), year=season, week=w,
                                        pts=round(pts, 1), bid=bid))
 steals.sort(key=lambda s: -s["pts"])
-moves = dict(trades=trade_list, waivers=steals[:15])
+
+# ---- ESPN-era forensic reconstruction: who played for a team that didn't draft them ----
+espn_pickups, espn_swaps = [], []
+for yr in range(2015, 2020):
+    df = espn_dir / f"{yr}_draft.json"
+    pf_ = espn_dir / f"{yr}_players.json"
+    if not (df.exists() and pf_.exists()):
+        continue
+    pmap = json.load(open(pf_, encoding="utf-8"))
+    drafted_by = {}
+    for p in json.load(open(df, encoding="utf-8")).get("picks") or []:
+        info = pmap.get(str(p.get("playerId"))) or {}
+        if info.get("n"):
+            drafted_by[info["n"]] = espn_owner.get((yr, p.get("teamId")), "?")
+    starts = defaultdict(list)  # (name, pos, owner) -> [(week, pts)]
+    for w in range(1, 17):
+        f = espn_dir / f"{yr}_box_{w}.json"
+        if not f.exists():
+            continue
+        for row in json.load(open(f, encoding="utf-8")):
+            for side in ("home", "away"):
+                s_ = row.get(side) or {}
+                o = espn_owner.get((yr, s_.get("teamId")))
+                for p in s_.get("players") or []:
+                    if p.get("name") and o:
+                        starts[(p["name"], ESPN_POS.get(p.get("pos"), "?"), o)].append((w, p.get("pts") or 0))
+    for (nm, pos, o), wk in starts.items():
+        src = drafted_by.get(nm)
+        if src == o:
+            continue
+        first = min(w for w, _ in wk)
+        pts = round(sum(x for _, x in wk), 1)
+        entry = dict(year=yr, player=nm, pos=pos, owner=o, week=first, pts=pts,
+                     games=len(wk), src=src or "")
+        (espn_swaps if src else espn_pickups).append(entry)
+# classify swaps: sheet-confirmed trade > reciprocal-swap heuristic > unknown
+def normname(s):
+    return _re.sub(r"[^a-z]", "", s.lower())
+sheet_trade_gets = set()
+for t in trade_list:
+    for side in t["sides"]:
+        for pname in side["got"]:
+            sheet_trade_gets.add((t["year"], side["owner"], normname(pname)))
+for e in espn_swaps:
+    if (e["year"], e["owner"], normname(e["player"])) in sheet_trade_gets:
+        e["how"] = "trade"
+    elif any(o["year"] == e["year"] and o["src"] == e["owner"] and o["owner"] == e["src"]
+             and abs(o["week"] - e["week"]) <= 2 for o in espn_swaps if o is not e):
+        e["how"] = "likely trade"
+    else:
+        e["how"] = "trade or waiver"
+espn_pickups.sort(key=lambda e: -e["pts"])
+espn_swaps.sort(key=lambda e: -e["pts"])
+moves = dict(trades=trade_list, waivers=steals[:15],
+             espn_pickups=espn_pickups[:15], espn_swaps=espn_swaps[:15])
 
 # ================= DRAFT REPORT CARDS (2020+) =================
 draft_data = []
