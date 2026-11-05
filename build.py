@@ -50,16 +50,19 @@ def load(season, name):
     p = RAW / "sleeper" / str(season) / f"{name}.json"
     return json.load(open(p, encoding="utf-8")) if p.exists() else None
 
-# 2026 games from Sleeper (live source of truth for current season)
+# 2026 games from Sleeper (live source of truth for current season).
+# Only fully-scored weeks count: mid-week partial scores (some players played,
+# some not) must never enter the record book.
 lg26 = load(2026, "league")
 playoff_start_26 = lg26["settings"]["playoff_week_start"]
+last_scored_26 = lg26["settings"].get("last_scored_leg") or 0
 wb26 = load(2026, "winners_bracket") or []
 po_pairs = set()
 for mt in wb26:
     if isinstance(mt.get("t1"), int) and isinstance(mt.get("t2"), int):
         po_pairs.add((playoff_start_26 + (mt.get("r", 1) - 1), frozenset((mt["t1"], mt["t2"]))))
 sleeper_2026 = []
-for w in range(1, 19):
+for w in range(1, min(18, last_scored_26) + 1):
     m = load(2026, f"matchups_{w}")
     if not m:
         continue
@@ -429,7 +432,8 @@ for season in SLEEPER_SEASONS:
         ro[r["roster_id"]] = owner
     season_ro[season] = ro
     pw = defaultdict(dict)
-    for w in range(1, 19):
+    season_maxw = min(18, last_scored_26) if season == CUR_SEASON else 18
+    for w in range(1, season_maxw + 1):
         m = load(season, f"matchups_{w}")
         if not m:
             continue
@@ -463,7 +467,8 @@ for season in SLEEPER_SEASONS:
     slots = [s for s in lgs["roster_positions"] if s != "BN"]
     pstart = lgs["settings"]["playoff_week_start"]
     ro = season_ro[season]
-    for w in range(1, pstart):
+    bench_maxw = min(pstart - 1, last_scored_26) if season == CUR_SEASON else pstart - 1
+    for w in range(1, bench_maxw + 1):
         m = load(season, f"matchups_{w}")
         if not m:
             continue
@@ -790,7 +795,8 @@ for season in SLEEPER_SEASONS:
     ro = season_ro.get(season)
     if not ro:
         continue
-    for w in range(1, 19):
+    lu_maxw = min(18, last_scored_26) if season == CUR_SEASON else 18
+    for w in range(1, lu_maxw + 1):
         m = load(season, f"matchups_{w}")
         if not m:
             continue
