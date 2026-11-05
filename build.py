@@ -175,11 +175,31 @@ def read_transposed(path):
     return out
 
 hof = read_transposed(RAW / "sheet" / "hall_of_fame.csv")
+# full championship rosters + the Multiple Rings table (duplicate row labels need a raw parse)
+hof_rows = list(csv.reader(open(RAW / "sheet" / "hall_of_fame.csv", encoding="utf-8")))
+hof_years = {i: int(y) for i, y in enumerate(hof_rows[0]) if y.strip().isdigit()}
+ROSTER_SLOTS = {"QB", "RB", "WR", "TE", "FLEX", "D/ST", "K", "BENCH", "BENCH/IR"}
+def roster_from_transposed(rows, years_map):
+    out = defaultdict(list)
+    for r in rows[1:]:
+        slot = (r[0] or "").strip()
+        if slot in ROSTER_SLOTS:
+            label = "BN" if slot.startswith("BENCH") else slot
+            for i, y in years_map.items():
+                if i < len(r) and r[i].strip():
+                    out[y].append([label, r[i].strip()])
+    return out
+champ_roster = roster_from_transposed(hof_rows, hof_years)
+rings = []
+for r in hof_rows:
+    if len(r) > 17 and r[15].strip() and r[15] != "Multiple Rings" and r[17].strip().isdigit():
+        rings.append(dict(player=r[15].strip(), pos=r[16].strip(), rings=int(r[17])))
 champs = []
 for y in sorted(hof):
     c = hof[y]
     if c.get("Owner"):
-        champs.append(dict(year=y, owner=canon(c["Owner"]), team=c.get("Team Name", ""), record=c.get("Record", "")))
+        champs.append(dict(year=y, owner=canon(c["Owner"]), team=c.get("Team Name", ""),
+                           record=c.get("Record", ""), roster=champ_roster.get(y, [])))
 titles = defaultdict(int)
 for c in champs:
     titles[c["owner"]] += 1
@@ -192,22 +212,21 @@ with open(RAW / "sheet" / "payouts.csv", encoding="utf-8") as f:
             payouts[o] = r["Net"]
 
 # ---------------- records ----------------
-reg_po = [g for g in games if g["type"] != "Consolation"]
+# record lists count every game played — regular, playoff, and consolation alike
+# (the league's own Best tab does: see Neville's 182.22 in the 2023 fifth-place game)
 expand = []
-for g in reg_po:
+for g in games:
     expand.append((g["sa"], g["a"], g["sb"], g["b"], g))
     expand.append((g["sb"], g["b"], g["sa"], g["a"], g))
 top_games = sorted(expand, key=lambda x: -x[0])[:10]
-expand_all = []
-for g in games:
-    expand_all.append((g["sa"], g["a"], g["sb"], g["b"], g))
-    expand_all.append((g["sb"], g["b"], g["sa"], g["a"], g))
-low_games = sorted(expand_all, key=lambda x: x[0])[:10]
-blowouts = sorted(reg_po, key=lambda g: -abs(g["sa"] - g["sb"]))[:10]
-closest = sorted([g for g in reg_po if g["sa"] != g["sb"]], key=lambda g: abs(g["sa"] - g["sb"]))[:10]
-shootouts = sorted(reg_po, key=lambda g: -(g["sa"] + g["sb"]))[:10]
+low_games = sorted(expand, key=lambda x: x[0])[:10]
+blowouts = sorted(games, key=lambda g: -abs(g["sa"] - g["sb"]))[:10]
+closest = sorted([g for g in games if g["sa"] != g["sb"]], key=lambda g: abs(g["sa"] - g["sb"]))[:10]
+shootouts = sorted(games, key=lambda g: -(g["sa"] + g["sb"]))[:10]
 win_streaks = sorted(((longest_run(streak_seq[o], "W"), o) for o in OWNERS), reverse=True)[:5]
 loss_streaks = sorted(((longest_run(streak_seq[o], "L"), o) for o in OWNERS), reverse=True)[:5]
+loss_high = sorted([e for e in expand if e[0] < e[2]], key=lambda x: -x[0])[:10]   # heartbreakers
+win_low = sorted([e for e in expand if e[0] > e[2]], key=lambda x: x[0])[:10]      # daylight robberies
 
 # ---------------- player records (Sleeper 2020+, starters only) ----------------
 players = json.load(open(RAW / "players.json", encoding="utf-8"))
@@ -383,7 +402,7 @@ for season in SLEEPER_SEASONS:
             continue
         for x in m:
             for pid, pts in (x.get("players_points") or {}).items():
-                pw[pid][w] = pts
+                pw[pid][w] = (pts, x["roster_id"])   # points + whose roster he was on
     pwk[season] = pw
 
 # ================= BENCH WASTE (2020+) =================
@@ -471,11 +490,50 @@ for r in rows[1:]:
             for pname in got:
                 pid = find_pid(pname)
                 if pid:
-                    pts += sum(v for wk2, v in pwk[year].get(pid, {}).items() if wk2 > week)
+                    pts += sum(v for wk2, (v, _) in pwk[year].get(pid, {}).items() if wk2 > week)
             pts = round(pts, 1)
         sides.append(dict(owner=o, gave=gave[o], got=got, pts=pts))
     trade_list.append(dict(year=year, week=week, sides=sides))
 trade_list.sort(key=lambda t: (-t["year"], -t["week"]))
+
+# Sleeper transactions are the authoritative trade record for 2020+ (the sheet runs behind);
+# keep the sheet only for the pre-Sleeper years it alone remembers.
+sleeper_trades = []
+for season in SLEEPER_SEASONS:
+    ro = season_ro.get(season)
+    if not ro:
+        continue
+    for w in range(1, 19):
+        tx = load(season, f"transactions_{w}")
+        if not tx:
+            continue
+        for t in tx:
+            if t.get("type") != "trade" or t.get("status") != "complete":
+                continue
+            adds = t.get("adds") or {}
+            week = t.get("leg") or w
+            sides = []
+            for r in t.get("roster_ids") or []:
+                got = []
+                pts = 0.0
+                for pid, rr in adds.items():
+                    if rr == r:
+                        info = players.get(pid) or {}
+                        got.append(info.get("full_name") or info.get("last_name") or pid)
+                        # only weeks the player was actually on the acquiring roster
+                        pts += sum(v for wk2, (v, rid2) in pwk[season].get(pid, {}).items()
+                                   if wk2 > week and rid2 == r)
+                for dp in t.get("draft_picks") or []:
+                    if dp.get("owner_id") == r:
+                        got.append(f"{dp.get('season')} round-{dp.get('round')} pick")
+                for b in t.get("waiver_budget") or []:
+                    if b.get("receiver") == r:
+                        got.append(f"${b.get('amount')} FAAB")
+                sides.append(dict(owner=ro.get(r, "?"), gave=[], got=got, pts=round(pts, 1)))
+            sleeper_trades.append(dict(year=season, week=week, sides=sides))
+trade_list = [t for t in trade_list if t["year"] < 2020] + sleeper_trades
+trade_list.sort(key=lambda t: (-t["year"], -t["week"]))
+print(f"trades: {len(trade_list)} total ({len(sleeper_trades)} from Sleeper transactions)")
 
 # ================= WAIVER STEALS (2020+) =================
 steals = []
@@ -496,7 +554,8 @@ for season in SLEEPER_SEASONS:
                 if key in seen_adds:
                     continue
                 seen_adds.add(key)
-                pts = sum(v for wk2, v in pwk[season].get(pid, {}).items() if wk2 >= w)
+                pts = sum(v for wk2, (v, rid2) in pwk[season].get(pid, {}).items()
+                          if wk2 >= w and rid2 == rid)
                 if pts > 50:
                     info = players.get(pid) or {}
                     bid = (t.get("settings") or {}).get("waiver_bid")
@@ -577,11 +636,14 @@ for season in SLEEPER_SEASONS:
         rid = p.get("roster_id")
         if not pid or rid not in ro:
             continue
-        total = sum(pwk[season].get(pid, {}).values())
+        total = sum(v for v, _ in pwk[season].get(pid, {}).values())
         info = players.get(pid) or {}
-        draft_data.append(dict(season=season, pick=p.get("pick_no"), owner=ro[rid],
-                               player=info.get("full_name", pid), pos=info.get("position", "?"),
-                               pts=round(total, 1)))
+        entry = dict(season=season, pick=p.get("pick_no"), owner=ro[rid],
+                     player=info.get("full_name", pid), pos=info.get("position", "?"),
+                     pts=round(total, 1))
+        if p.get("is_keeper"):
+            entry["keeper"] = True
+        draft_data.append(entry)
 # ESPN-era picks (2015-2019) with TRUE season totals under that year's league scoring
 for yr in range(2015, 2020):
     df = espn_dir / f"{yr}_draft.json"
@@ -620,8 +682,21 @@ for d in draft_data:
 grades = defaultdict(lambda: defaultdict(float))
 for d in draft_data:
     grades[d["owner"]][d["season"]] += d["value"]
+# keeper flags live only in the sheet's draft tab
+keeper_set = set()
+with open(RAW / "sheet" / "draft.csv", encoding="utf-8") as f:
+    for r in csv.DictReader(f):
+        if (r.get("Keeper?") or "").strip().lower() == "yes" and (r.get("Season") or "").strip().isdigit():
+            keeper_set.add((int(r["Season"]), normname(r.get("Player") or "")))
+for d in draft_data:
+    nm = normname(d["player"])
+    if any(s == d["season"] and (k == nm or k.startswith(nm) or nm.startswith(k))
+           for s, k in keeper_set):
+        d["keeper"] = True
+
 all_picks = sorted([dict(season=d["season"], pick=d["pick"], owner=d["owner"],
-                         player=d["player"], pos=d["pos"], pts=d["pts"], value=d["value"])
+                         player=d["player"], pos=d["pos"], pts=d["pts"], value=d["value"],
+                         **({"keeper": True} if d.get("keeper") else {}))
                     for d in draft_data], key=lambda d: (d["season"], d["pick"]))
 
 draft_payload = dict(
@@ -635,12 +710,16 @@ draft_payload["grades"].sort(key=lambda g: -g["total"])
 
 # ================= HALL OF SHAME =================
 shame_raw = read_transposed(RAW / "sheet" / "hall_of_shame.csv")
+shame_rows = list(csv.reader(open(RAW / "sheet" / "hall_of_shame.csv", encoding="utf-8")))
+shame_years = {i: int(y) for i, y in enumerate(shame_rows[0]) if y.strip().isdigit()}
+shame_roster = roster_from_transposed(shame_rows, shame_years)
 shame = []
 for y in sorted(shame_raw, reverse=True):
     c = shame_raw[y]
     if c.get("Owner"):
         shame.append(dict(year=y, owner=canon(c["Owner"]),
-                          team=c.get("Team Name", ""), record=c.get("Record", "")))
+                          team=c.get("Team Name", ""), record=c.get("Record", ""),
+                          roster=shame_roster.get(y, [])))
 
 # worst-game notes from the sheet
 worst_notes = {}
@@ -713,8 +792,11 @@ payload = dict(
         shootouts=[dict(total=round(g["sa"] + g["sb"], 2), **g) for g in shootouts],
         winstreaks=[dict(n=n, owner=o) for n, o in win_streaks],
         lossstreaks=[dict(n=n, owner=o) for n, o in loss_streaks],
+        loss_high=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in loss_high],
+        win_low=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in win_low],
         players=top_players,
     ),
+    rings=rings,
     money=money,
     luck=luck,
     bench=bench,

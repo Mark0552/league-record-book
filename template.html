@@ -118,6 +118,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Week-by-week scores</h2><div class="tscroll"><table id="ss_matrix"></table></div>
       <div class="note">Bold = won that week. Gold = league's top score of the week.</div></div>
     <div class="card"><h2>Playoff results</h2><div id="ss_playoffs"></div></div>
+    <div class="card"><h2>Consolation bracket</h2><div id="ss_consol"></div>
+      <div class="note">The road to the Lerch Cup.</div></div>
     <div class="card"><h2>Draft</h2><div class="tscroll"><table id="ss_draft"></table></div>
       <div class="note" id="ss_draft_note"></div></div>
     <div class="card"><h2>Trades</h2><div id="ss_trades"></div></div>
@@ -151,6 +153,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Closest finishes</h2><ol class="rec" id="r_close"></ol></div>
     <div class="card"><h2>Highest-scoring matchups</h2><ol class="rec" id="r_shoot"></ol></div>
     <div class="card"><h2>Lowest team scores</h2><ol class="rec" id="r_low"></ol></div>
+    <div class="card"><h2>Heartbreakers (most points in a loss)</h2><ol class="rec" id="r_losshi"></ol></div>
+    <div class="card"><h2>Daylight robberies (fewest points in a win)</h2><ol class="rec" id="r_winlo"></ol></div>
     <div class="card"><h2>Longest streaks</h2><div class="tiles" id="r_streaks"></div></div>
   </section>
 
@@ -201,7 +205,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="champs">
     <div class="card"><h2>The Buck Wong Bowl &mdash; Hall of Fame</h2><div id="champlist"></div>
-      <div class="note">Buck Wong Bowl champions, 2014&ndash;present.</div></div>
+      <div class="note">Buck Wong Bowl champions, 2014&ndash;present. Tap a champion for the full title-winning lineup.</div></div>
+    <div class="card"><h2>Players with multiple rings</h2><ol class="rec" id="ringlist"></ol></div>
     <div class="card"><h2>The Lerch Cup &mdash; Hall of Shame</h2><div id="shamelist"></div>
       <div class="note">Lerch Cup "winners" (last place), 2014&ndash;present.</div></div>
   </section>
@@ -304,6 +309,15 @@ function renderSeason(){
     return `<div class="meet"><span>wk${g[1]}${isFinal?' · <span style="color:var(--gold);font-weight:700">Buck Wong Bowl</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
   }).join('')
     : '<div class="note">No playoff games recorded for this season yet.</div>';
+  // consolation
+  const co = G.filter(g=>g[0]===year&&g[2]==='C');
+  const lastCOwk = Math.max(0, ...co.map(g=>g[1]));
+  $('ss_consol').innerHTML = co.length ? co.map(g=>{
+    const loser = g[4]<g[6]?g[3]:g[5];
+    const isCup = shame && g[1]===lastCOwk && loser===shame.owner;
+    return `<div class="meet"><span>wk${g[1]}${isCup?' · <span style="color:var(--red);font-weight:700">Lerch Cup</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
+  }).join('')
+    : '<div class="note">No consolation games recorded.</div>';
   // draft
   const picks = (DATA.draft.all||[]).filter(d=>d.season===year);
   if(picks.length){
@@ -422,6 +436,8 @@ $('r_low').innerHTML = R.low.map(e=>`<li><span class="v">${f2(e.pts)}</span><spa
 $('r_blow').innerHTML = R.blowouts.map(g=>`<li><span class="v">+${f2(g.margin)}</span><span><b>${esc(g.sa>g.sb?g.a:g.b)}</b> <span class="d">over ${esc(g.sa>g.sb?g.b:g.a)} (${f1(Math.max(g.sa,g.sb))}–${f1(Math.min(g.sa,g.sb))}) · ${g.year} wk${g.week}</span></span></li>`).join('');
 $('r_close').innerHTML = R.closest.map(g=>`<li><span class="v">${f2(g.margin)}</span><span><b>${esc(g.sa>g.sb?g.a:g.b)}</b> <span class="d">edged ${esc(g.sa>g.sb?g.b:g.a)} (${f2(Math.max(g.sa,g.sb))}–${f2(Math.min(g.sa,g.sb))}) · ${g.year} wk${g.week}</span></span></li>`).join('');
 $('r_shoot').innerHTML = R.shootouts.map(g=>`<li><span class="v">${f1(g.total)}</span><span><b>${esc(g.a)} ${f1(g.sa)}</b> <span class="d">vs</span> <b>${f1(g.sb)} ${esc(g.b)}</b> <span class="d">· ${g.year} wk${g.week}</span></span></li>`).join('');
+$('r_losshi').innerHTML = R.loss_high.map(e=>`<li><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">lost to ${esc(e.opp)}'s ${f2(e.opp_pts)} · ${e.year} wk${e.week}</span></span></li>`).join('');
+$('r_winlo').innerHTML = R.win_low.map(e=>`<li><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">beat ${esc(e.opp)}'s ${f2(e.opp_pts)} · ${e.year} wk${e.week}</span></span></li>`).join('');
 $('r_players').innerHTML = R.players.map(p=>`<li><span class="v">${f1(p.pts)}</span><span><b>${esc(p.name)}</b> <span class="d">${esc(p.pos)} · ${esc(p.owner)} · ${p.year} wk${p.week}</span></span></li>`).join('');
 $('r_streaks').innerHTML =
   R.winstreaks.map(s=>`<div class="tile"><div class="v">W${s.n}</div><div class="k">${esc(s.owner)}</div></div>`).join('') +
@@ -460,16 +476,18 @@ $('v_epick').innerHTML = (DATA.moves.espn_pickups||[]).map(s=>
   `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · ${esc(s.owner)} · ${s.year}, first start wk${s.week} · ${s.games} starts</span></span></li>`).join('');
 $('v_eswap').innerHTML = (DATA.moves.espn_swaps||[]).map(s=>
   `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · drafted by ${esc(s.src)}, played for ${esc(s.owner)} · ${s.year}, from wk${s.week} · <span style="color:${s.how==='trade'?'var(--accent)':s.how==='likely trade'?'var(--gold)':'var(--ink3)'}">${esc(s.how)}</span></span></span></li>`).join('');
-let tHTML = '', lastYr = null;
-DATA.moves.trades.forEach(t=>{
-  if(t.year!==lastYr){ tHTML += `<h2 style="margin:14px 0 4px">${t.year}</h2>`; lastYr = t.year; }
-  const best = Math.max(...t.sides.map(s=>s.pts==null?-1:s.pts));
-  tHTML += `<div class="elim" style="border-left-color:var(--accent)">` +
-    t.sides.map(s=>`<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${s.got.map(esc).join(', ')||'—'}` +
-      (s.pts!=null?` <span style="color:${s.pts===best?'var(--accent)':'var(--ink3)'};font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:'') + `</div>`).join('') +
-    `<div style="font-size:11.5px;color:var(--ink3)">week ${t.week}</div></div>`;
-});
-$('v_trades').innerHTML = tHTML;
+const byYr = {};
+DATA.moves.trades.forEach(t=>{ (byYr[t.year]=byYr[t.year]||[]).push(t); });
+$('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
+  const list = byYr[yr].map(t=>{
+    const best = Math.max(...t.sides.map(s=>s.pts==null?-1:s.pts));
+    return `<div class="elim" style="border-left-color:var(--accent)">` +
+      t.sides.map(s=>`<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${s.got.map(esc).join(', ')||'—'}` +
+        (s.pts!=null?` <span style="color:${s.pts===best?'var(--accent)':'var(--ink3)'};font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:'') + `</div>`).join('') +
+      `<div style="font-size:11.5px;color:var(--ink3)">week ${t.week}</div></div>`;
+  }).join('');
+  return `<details${i===0?' open':''}><summary style="cursor:pointer;font-weight:700;padding:8px 2px;font-size:15px">${yr} <span style="color:var(--ink3);font-weight:500;font-size:12.5px">· ${byYr[yr].length} trade${byYr[yr].length>1?'s':''}</span></summary>${list}</details>`;
+}).join('');
 
 /* ---------------- DRAFT ---------------- */
 const DY = [2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
@@ -488,7 +506,7 @@ function renderDraftAll(){
   let picks = (DATA.draft.all||[]).filter(d=>(!o || d.owner===o) && (!q || d.player.toLowerCase().includes(q)));
   if(!q) picks = picks.filter(d=>d.season===y);   // name search looks across ALL drafts
   $('d_all').innerHTML = `<tr><th>Pick</th><th>Player</th><th></th><th>Owner</th>${q?'<th class="num">Yr</th>':''}<th class="num">Pts</th><th class="num">Value</th></tr>` +
-    picks.map(d=>`<tr><td>${d.pick}</td><td><b>${esc(d.player)}</b></td><td style="color:var(--ink3);font-size:12px">${esc(d.pos)}</td><td>${esc(d.owner)}</td>${q?'<td class="num">'+d.season+'</td>':''}<td class="num">${d.pts!=null?d.pts.toFixed(0):''}</td><td class="num" style="color:${(d.value||0)>0?'var(--accent)':(d.value||0)<0?'var(--red)':'var(--ink3)'}">${d.value!=null?(d.value>0?'+':'')+d.value.toFixed(0):''}</td></tr>`).join('');
+    picks.map(d=>`<tr><td>${d.pick}</td><td><b>${esc(d.player)}</b>${d.keeper?' <span class="badge div">K</span>':''}</td><td style="color:var(--ink3);font-size:12px">${esc(d.pos)}</td><td>${esc(d.owner)}</td>${q?'<td class="num">'+d.season+'</td>':''}<td class="num">${d.pts!=null?d.pts.toFixed(0):''}</td><td class="num" style="color:${(d.value||0)>0?'var(--accent)':(d.value||0)<0?'var(--red)':'var(--ink3)'}">${d.value!=null?(d.value>0?'+':'')+d.value.toFixed(0):''}</td></tr>`).join('');
 }
 ['dYear','dOwnerSel'].forEach(id=>$(id).addEventListener('change', renderDraftAll));
 $('dSearch').addEventListener('input', renderDraftAll);
@@ -540,10 +558,24 @@ $('master').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="nu
   }).join('');
 
 /* ---------------- CHAMPS ---------------- */
-$('champlist').innerHTML = DATA.champs.map(c=>
-  `<div class="champ"><div class="yr">${c.year}</div><div><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div></div></div>`).join('');
-$('shamelist').innerHTML = DATA.shame.map(c=>
-  `<div class="champ"><div class="yr" style="color:var(--red)">${c.year}</div><div><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div></div></div>`).join('');
+$('champlist').innerHTML = DATA.champs.map((c,i)=>
+  `<div class="champ" data-ci="${i}" style="cursor:pointer"><div class="yr">${c.year}</div><div style="flex:1"><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div><div class="croster" style="display:none;margin-top:6px">${(c.roster||[]).map(r=>`<div style="display:flex;gap:8px;font-size:12.5px;padding:1px 0"><span style="color:var(--ink3);min-width:36px">${esc(r[0])}</span><span>${esc(r[1])}</span></div>`).join('')||'<span class="note">No roster recorded.</span>'}</div></div></div>`).join('');
+$('champlist').addEventListener('click', e=>{
+  const row = e.target.closest('.champ');
+  if(!row) return;
+  const d = row.querySelector('.croster');
+  if(d) d.style.display = d.style.display==='none' ? 'block' : 'none';
+});
+$('ringlist').innerHTML = (DATA.rings||[]).map(r=>
+  `<li><span class="v">${'🏆'.repeat(Math.min(r.rings,4))}</span><span><b>${esc(r.player)}</b> <span class="d">${esc(r.pos)} · ${r.rings} rings</span></span></li>`).join('');
+$('shamelist').innerHTML = DATA.shame.map((c,i)=>
+  `<div class="champ shrow" style="cursor:pointer"><div class="yr" style="color:var(--red)">${c.year}</div><div style="flex:1"><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div><div class="croster" style="display:none;margin-top:6px">${(c.roster||[]).map(r=>`<div style="display:flex;gap:8px;font-size:12.5px;padding:1px 0"><span style="color:var(--ink3);min-width:36px">${esc(r[0])}</span><span>${esc(r[1])}</span></div>`).join('')||'<span class="note">No roster recorded.</span>'}</div></div></div>`).join('');
+$('shamelist').addEventListener('click', e=>{
+  const row = e.target.closest('.shrow');
+  if(!row) return;
+  const d = row.querySelector('.croster');
+  if(d) d.style.display = d.style.display==='none' ? 'block' : 'none';
+});
 
 show();
 </script>
