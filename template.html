@@ -181,6 +181,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <section id="moves">
     <div class="card"><h2>Trade history</h2><div id="v_trades"></div>
       <div class="note">The complete recorded history. ESPN did not retain transaction logs, so trades before 2018 are lost to time. Points = scored by the acquired players after the trade, that season (Sleeper era only).</div></div>
+    <div class="card"><h2>Best waiver pickups, Sleeper era (2020&ndash;present)</h2><ol class="rec" id="v_waivers"></ol>
+      <div class="note">Points scored while on the claiming team's roster, from pickup week on. FAAB bid shown for waiver claims. Updates daily.</div></div>
     <div class="card"><h2>Best undrafted pickups, ESPN era</h2><ol class="rec" id="v_epick"></ol>
       <div class="note">Reconstructed from drafts vs weekly lineups (ESPN deleted the actual logs): players nobody drafted who were picked up and started. Points = while starting for that team; week = first start.</div></div>
     <div class="card"><h2>Changed hands mid-season, ESPN era</h2><ol class="rec" id="v_eswap"></ol>
@@ -481,6 +483,8 @@ $('l_bench').innerHTML = '<tr><th>Owner</th><th class="num">Left on bench</th><t
   `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.left.toFixed(0)}</td><td class="num">${r.pg.toFixed(1)}</td><td class="num">${r.eff.toFixed(1)}%</td></tr>`).join('');
 
 /* ---------------- MOVES ---------------- */
+$('v_waivers').innerHTML = (DATA.moves.waivers||[]).map(s=>
+  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · ${esc(s.owner)} · ${s.year} wk${s.week}${s.bid?' · $'+s.bid+' FAAB':''}</span></span></li>`).join('');
 $('v_epick').innerHTML = (DATA.moves.espn_pickups||[]).map(s=>
   `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · ${esc(s.owner)} · ${s.year}, first start wk${s.week} · ${s.games} starts</span></span></li>`).join('');
 $('v_eswap').innerHTML = (DATA.moves.espn_swaps||[]).map(s=>
