@@ -1,0 +1,221 @@
+{
+ "asof": "entering week 9, 2026",
+ "standings": [
+  {
+   "seed": 1,
+   "owner": "Austin",
+   "team": "Dern it, Pollard!",
+   "rec": "6-2",
+   "pf": 906.7,
+   "div": "Gooch",
+   "leader": true
+  },
+  {
+   "seed": 2,
+   "owner": "Cliff",
+   "team": "The Bull Nutz",
+   "rec": "6-2",
+   "pf": 857.8,
+   "div": "Sphincter",
+   "leader": true
+  },
+  {
+   "seed": 3,
+   "owner": "Lerch",
+   "team": "Burrow McCockiner",
+   "rec": "6-2",
+   "pf": 895.9,
+   "div": "Sphincter"
+  },
+  {
+   "seed": 4,
+   "owner": "Bob",
+   "team": "Cliff is smarter than Sam",
+   "rec": "6-2",
+   "pf": 963.8,
+   "div": "Gooch"
+  },
+  {
+   "seed": 5,
+   "owner": "Steve",
+   "team": "Sam loves Trains",
+   "rec": "5-3",
+   "pf": 940.7,
+   "div": "Sphincter"
+  },
+  {
+   "seed": 6,
+   "owner": "Martin",
+   "team": "The Turn Dern service",
+   "rec": "5-3",
+   "pf": 861.9,
+   "div": "Gooch"
+  },
+  {
+   "seed": 7,
+   "owner": "Mark",
+   "team": "The Tables are Derning",
+   "rec": "4-4",
+   "pf": 897.7,
+   "div": "Sphincter"
+  },
+  {
+   "seed": 8,
+   "owner": "Clancy",
+   "team": "My Team Stinks",
+   "rec": "4-4",
+   "pf": 873.5,
+   "div": "Gooch"
+  },
+  {
+   "seed": 9,
+   "owner": "Luke",
+   "team": "The ExpenDERNbles",
+   "rec": "3-5",
+   "pf": 781.2,
+   "div": "Sphincter"
+  },
+  {
+   "seed": 10,
+   "owner": "Sam",
+   "team": "Dernty Martini, One Olave",
+   "rec": "1-7",
+   "pf": 807.5,
+   "div": "Gooch"
+  },
+  {
+   "seed": 11,
+   "owner": "Will",
+   "team": "Surrounded By Assholes",
+   "rec": "1-7",
+   "pf": 778.3,
+   "div": "Sphincter"
+  },
+  {
+   "seed": 12,
+   "owner": "Timmy",
+   "team": "Dern and OUT",
+   "rec": "1-7",
+   "pf": 644.5,
+   "div": "Gooch"
+  }
+ ],
+ "odds": [
+  {
+   "owner": "Bob",
+   "pct": 96.6
+  },
+  {
+   "owner": "Austin",
+   "pct": 94.2
+  },
+  {
+   "owner": "Lerch",
+   "pct": 90.8
+  },
+  {
+   "owner": "Cliff",
+   "pct": 86.5
+  },
+  {
+   "owner": "Martin",
+   "pct": 76.2
+  },
+  {
+   "owner": "Steve",
+   "pct": 73.1
+  },
+  {
+   "owner": "Mark",
+   "pct": 53.0
+  },
+  {
+   "owner": "Clancy",
+   "pct": 25.2
+  },
+  {
+   "owner": "Luke",
+   "pct": 4.1
+  },
+  {
+   "owner": "Will",
+   "pct": 0.1
+  },
+  {
+   "owner": "Sam",
+   "pct": 0.1
+  },
+  {
+   "owner": "Timmy",
+   "pct": 0.0
+  }
+ ],
+ "oddsnote": "20,000-season simulation. Weekly player projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free agent average). League tiebreakers applied.",
+ "week": 9,
+ "matchups": [
+  {
+   "a": "Sam",
+   "pa": 90.1,
+   "b": "Steve",
+   "pb": 93.7
+  },
+  {
+   "a": "Mark",
+   "pa": 107.4,
+   "b": "Timmy",
+   "pb": 84.1
+  },
+  {
+   "a": "Will",
+   "pa": 96.2,
+   "b": "Bob",
+   "pb": 100.8
+  },
+  {
+   "a": "Lerch",
+   "pa": 95.3,
+   "b": "Austin",
+   "pb": 92.3
+  },
+  {
+   "a": "Clancy",
+   "pa": 91.2,
+   "b": "Luke",
+   "pb": 93.5
+  },
+  {
+   "a": "Martin",
+   "pa": 97.9,
+   "b": "Cliff",
+   "pb": 93.2
+  }
+ ],
+ "elim": [
+  {
+   "owner": "Will",
+   "needs": [
+    "Loses to Bob",
+    "Plus one of: Steve beats Sam AND Lerch beats Austin  |  Steve beats Sam AND Clancy beats Luke  |  Mark beats Timmy AND Lerch beats Austin  |  Lerch beats Austin AND Clancy beats Luke"
+   ]
+  },
+  {
+   "owner": "Sam",
+   "needs": [
+    "Loses to Steve",
+    "Mark beats Timmy",
+    "Bob beats Will",
+    "Austin beats Lerch",
+    "Martin beats Cliff"
+   ]
+  },
+  {
+   "owner": "Timmy",
+   "needs": [
+    "Loses to Mark",
+    "Lerch beats Austin",
+    "Plus one of: Clancy beats Luke  |  Martin beats Cliff"
+   ]
+  }
+ ],
+ "elimnote": "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive."
+}

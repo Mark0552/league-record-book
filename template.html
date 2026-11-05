@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2 Many Chiefs — League Record Book</title>
+<style>
+:root{
+  --bg:#0f1115; --surface:#171a21; --surface2:#1f2430; --line:#2a303d;
+  --ink:#e8eaf0; --ink2:#9aa3b2; --ink3:#6b7383;
+  --accent:#2dd4bf; --gold:#fbbf24; --red:#f87171;
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#f5f6f8; --surface:#ffffff; --surface2:#eef0f4; --line:#dcdfe6;
+    --ink:#1a1d24; --ink2:#525a68; --ink3:#8a92a1; --accent:#0d9488; }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;padding-bottom:40px}
+header{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+.hwrap{padding:14px 16px 8px}
+h1{font-size:17px;font-weight:800;letter-spacing:.2px}
+h1 small{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-top:2px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:0 12px 10px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav a{flex:0 0 auto;padding:7px 14px;border-radius:999px;font-size:13.5px;font-weight:600;
+  color:var(--ink2);background:var(--surface);border:1px solid var(--line);text-decoration:none;white-space:nowrap}
+nav a.on{color:#07211d;background:var(--accent);border-color:var(--accent)}
+main{max-width:680px;margin:0 auto;padding:14px 12px}
+section{display:none}section.on{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px}
+.note{font-size:12px;color:var(--ink3);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);text-align:left;padding:4px 6px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none}
+th[data-dir="a"]::after{content:" \25B4";color:var(--accent)}
+th[data-dir="d"]::after{content:" \25BE";color:var(--accent)}
+input.flt{width:100%;padding:9px 10px;border-radius:10px;background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);font-size:14.5px;margin-bottom:10px}
+td{padding:7px 6px;border-top:1px solid var(--line);white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;padding:2px 6px;border-radius:5px;
+  background:var(--surface2);color:var(--ink2);vertical-align:1px}
+.badge.div{background:rgba(45,212,191,.16);color:var(--accent)}
+.badge.gold{background:rgba(251,191,36,.15);color:var(--gold)}
+tr.line td{border-top:2px dashed var(--ink3)}
+.bar{display:flex;align-items:center;gap:10px;margin:7px 0}
+.bar .nm{width:58px;font-size:13.5px;font-weight:600;flex:0 0 auto}
+.bar .tr{flex:1;height:13px;background:var(--surface2);border-radius:7px;overflow:hidden}
+.bar .fl{height:100%;background:var(--accent);border-radius:7px;min-width:2px}
+.bar .fl.g{background:var(--gold)}
+.bar .pc{width:54px;text-align:right;font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.mu{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;border-top:1px solid var(--line)}
+.mu:first-of-type{border-top:none}
+.mu .side{width:42%}
+.mu .side.r{text-align:right}
+.mu .own{font-weight:700;font-size:15px}
+.mu .pj{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.mu .fav .own{color:var(--accent)}
+.mu .vs{font-size:11px;color:var(--ink3)}
+.elim{border-left:3px solid var(--red);padding:10px 12px;background:var(--surface2);border-radius:10px;margin:8px 0}
+.elim b{font-size:15px}
+.elim ul{margin:6px 0 0 18px;font-size:13.5px;color:var(--ink2)}
+.selrow{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+select{flex:1;min-width:110px;padding:9px 10px;border-radius:10px;background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);font-size:14.5px;font-weight:600;-webkit-appearance:none;appearance:none}
+.h2hbox{display:flex;align-items:center;justify-content:center;gap:14px;padding:6px 0 12px}
+.h2hbox .big{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
+.h2hbox .mid{font-size:13px;color:var(--ink3);text-align:center}
+.h2hbox .who{font-size:13.5px;font-weight:700;text-align:center;color:var(--ink2)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--surface2);border-radius:10px;padding:10px 12px}
+.tile .v{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.tile .k{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.meet{display:flex;justify-content:space-between;font-size:13.5px;padding:6px 2px;border-top:1px solid var(--line);
+  font-variant-numeric:tabular-nums}
+.meet .w{font-weight:700}
+ol.rec{list-style:none}
+ol.rec li{display:flex;align-items:baseline;gap:8px;padding:7px 2px;border-top:1px solid var(--line);font-size:14px}
+ol.rec li:first-child{border-top:none}
+ol.rec .v{font-weight:800;font-variant-numeric:tabular-nums;min-width:62px;color:var(--accent)}
+ol.rec .d{color:var(--ink2);font-size:12.5px;white-space:normal}
+.champ{display:flex;align-items:center;gap:12px;padding:10px 2px;border-top:1px solid var(--line)}
+.champ:first-of-type{border-top:none}
+.champ .yr{font-size:17px;font-weight:800;min-width:52px;color:var(--gold)}
+.champ .tm{font-size:12.5px;color:var(--ink2);white-space:normal}
+.btn{display:block;width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid var(--line);
+  background:var(--surface2);color:var(--ink2);font-size:14px;font-weight:600;cursor:pointer}
+.wk-w{color:var(--ink);font-weight:700}
+.wk-l{color:var(--ink3)}
+.wk-top{color:var(--gold);font-weight:800}
+footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap"><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
+  <nav id="nav">
+    <a href="#now">Now</a><a href="#seasons">Seasons</a><a href="#h2h">H2H</a><a href="#games">Games</a>
+    <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Moves</a>
+    <a href="#draft">Draft</a><a href="#alltime">All-Time</a><a href="#champs">Champs</a>
+  </nav>
+</header>
+<main>
+  <section id="now">
+    <div class="card"><h2>Standings</h2><div class="tscroll"><table id="standings"></table></div>
+      <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut.</div></div>
+    <div class="card"><h2>Playoff &amp; championship odds</h2><div id="odds"></div>
+      <div class="note" id="oddsnote"></div></div>
+    <div class="card"><h2 id="wkhdr">This week</h2><div id="matchups"></div>
+      <div class="note">Projected points, optimized lineups, no K/DEF. Favorite in teal.</div></div>
+    <div class="card"><h2>Elimination watch</h2><div id="elims"></div><div class="note" id="elimnote"></div></div>
+  </section>
+
+  <section id="seasons">
+    <div class="selrow"><select id="seasonSel"></select></div>
+    <div class="card"><h2 id="ss_hdr">Season</h2><div class="tscroll"><table id="ss_stand"></table></div>
+      <div class="note" id="ss_note"></div></div>
+    <div class="card"><h2>Week-by-week scores</h2><div class="tscroll"><table id="ss_matrix"></table></div>
+      <div class="note">Bold = won that week. Gold = league's top score of the week.</div></div>
+    <div class="card"><h2>Playoff results</h2><div id="ss_playoffs"></div></div>
+    <div class="card"><h2>Draft</h2><div class="tscroll"><table id="ss_draft"></table></div>
+      <div class="note" id="ss_draft_note"></div></div>
+    <div class="card"><h2>Trades</h2><div id="ss_trades"></div></div>
+  </section>
+
+  <section id="h2h">
+    <div class="card"><h2>Career head-to-head</h2>
+      <div class="selrow"><select id="selA"></select><select id="selB"></select></div>
+      <div id="h2hout"></div>
+      <div class="note">Regular season + playoffs since 2015. Consolation games excluded.</div></div>
+  </section>
+
+  <section id="games">
+    <div class="card"><h2>Every game since 2015</h2>
+      <div class="selrow">
+        <select id="gOwner"></select><select id="gOpp"></select>
+        <select id="gYear"></select><select id="gType">
+          <option value="">All games</option><option value="R">Regular</option>
+          <option value="P">Playoffs</option><option value="C">Consolation</option></select>
+      </div>
+      <div class="tscroll"><table id="gTable"></table></div>
+      <button class="btn" id="gMore" style="display:none">Show all matching games</button>
+      <div class="note" id="gCount"></div></div>
+  </section>
+
+  <section id="records">
+    <div class="card"><h2>Highest team scores</h2><ol class="rec" id="r_top"></ol></div>
+    <div class="card"><h2>Best player games (starters, since 2015)</h2><ol class="rec" id="r_players"></ol>
+      <div class="note">Scored under that season's league settings (ESPN era 2015-2019, Sleeper era 2020+).</div></div>
+    <div class="card"><h2>Biggest blowouts</h2><ol class="rec" id="r_blow"></ol></div>
+    <div class="card"><h2>Closest finishes</h2><ol class="rec" id="r_close"></ol></div>
+    <div class="card"><h2>Highest-scoring matchups</h2><ol class="rec" id="r_shoot"></ol></div>
+    <div class="card"><h2>Lowest team scores</h2><ol class="rec" id="r_low"></ol></div>
+    <div class="card"><h2>Longest streaks</h2><div class="tiles" id="r_streaks"></div></div>
+  </section>
+
+  <section id="money">
+    <div class="card"><h2 id="m_hdr">Weekly high scores</h2><div id="m_weekly"></div>
+      <div class="note">$40 to the top score each week.</div></div>
+    <div class="card"><h2>2026 weekly-win money</h2><ol class="rec" id="m_tally"></ol></div>
+    <div class="card"><h2>Career weekly highs</h2><ol class="rec" id="m_counts"></ol></div>
+    <div class="card"><h2>Career money</h2><div class="tscroll"><table id="m_pay"></table></div>
+      <div class="note">From the league payout records, 2014&ndash;2025.</div></div>
+  </section>
+
+  <section id="luck">
+    <div class="card"><h2>2026 luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
+      <div class="note">All-play = your record if you played everyone every week. Luck = actual wins minus expected wins from your scores.</div></div>
+    <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
+      <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
+    <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
+      <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy.</div></div>
+  </section>
+
+  <section id="moves">
+    <div class="card"><h2>Best waiver pickups (since 2020)</h2><ol class="rec" id="v_waivers"></ol>
+      <div class="note">Points scored from pickup week to season's end. FAAB bid shown when it was a waiver claim.</div></div>
+    <div class="card"><h2>Trade history (2018&ndash;present)</h2><div id="v_trades"></div>
+      <div class="note">Points = scored by the acquired players after the trade, that season (Sleeper era trades only).</div></div>
+  </section>
+
+  <section id="draft">
+    <div class="card"><h2>Draft report card (2020&ndash;2026)</h2><div class="tscroll"><table id="d_grades"></table></div>
+      <div class="note">Value = player's season points minus the average return for that draft slot. Totals across the Sleeper era.</div></div>
+    <div class="card"><h2>Best picks</h2><ol class="rec" id="d_steals"></ol></div>
+    <div class="card"><h2>Biggest busts (top-60 picks)</h2><ol class="rec" id="d_busts"></ol></div>
+    <div class="card"><h2>Every pick, every draft</h2>
+      <div class="selrow"><select id="dYear"></select><select id="dOwnerSel"></select></div>
+      <input class="flt" id="dSearch" type="search" placeholder="Search player name...">
+      <div class="tscroll"><table id="d_all"></table></div>
+      <div class="note">ESPN-era (2015-2019) points = points scored while in a starting lineup. Sleeper-era value = points vs the average for that slot.</div></div>
+  </section>
+
+  <section id="alltime">
+    <div class="card"><h2>All-time table</h2><div class="tscroll"><table id="master"></table></div>
+      <div class="note">Regular-season records and points since 2015. Playoffs = winner's-bracket games; Apps = seasons reaching the bracket. AP = all-play record. Net $ from league payouts.</div>
+      <div class="note">Franchise history: one seat has changed hands three times &mdash; Austin, Alex, and Neville have each held it, with Austin reclaiming it in 2024. Careers tracked per person.</div></div>
+  </section>
+
+  <section id="champs">
+    <div class="card"><h2>Hall of Fame</h2><div id="champlist"></div></div>
+    <div class="card"><h2>Hall of Shame (last place)</h2><div id="shamelist"></div></div>
+  </section>
+</main>
+<footer id="foot"></footer>
+<script>
+/*__DATA__*/
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
+const G = DATA.games; // [year, week, type(R/P/C), a, sa, b, sb]
+const YEARS = [...new Set(G.map(g=>g[0]))].sort((a,b)=>b-a);
+$('sub').textContent = 'League record book · ' + DATA.updated;
+$('foot').textContent = 'Built from the Sleeper API, ESPN league history & the league record sheet · auto-updates Wednesday mornings · ' + DATA.updated;
+
+function show(){
+  let h = (location.hash||'#now').slice(1);
+  if(!document.getElementById(h)) h = 'now';
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id===h));
+  document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+h));
+  window.scrollTo(0,0);
+}
+addEventListener('hashchange', show);
+
+/* ---------------- NOW ---------------- */
+const now = DATA.now || {};
+if(now.standings){
+  let r = '<tr><th>#</th><th>Owner</th><th>Team</th><th class="num">W-L</th><th class="num">PF</th></tr>';
+  now.standings.forEach(s=>{
+    r += `<tr${s.seed===7?' class="line"':''}><td>${s.seed}</td><td><b>${esc(s.owner)}</b>${s.leader?' <span class="badge div">'+esc(s.div)+'</span>':''}</td><td style="color:var(--ink2);font-size:12.5px">${esc(s.team)}</td><td class="num">${s.rec}</td><td class="num">${f1(s.pf)}</td></tr>`;
+  });
+  $('standings').innerHTML = r;
+  const title = {}; (now.title && now.title.odds || []).forEach(t=>title[t.owner]=t.champ);
+  $('odds').innerHTML = now.odds.map(o=>{
+    const t = title[o.owner];
+    return `<div class="bar"><div class="nm">${esc(o.owner)}</div><div style="flex:1">
+      <div class="tr"><div class="fl" style="width:${Math.max(o.pct,.6)}%"></div></div>
+      ${t!=null?`<div class="tr" style="margin-top:3px;height:7px"><div class="fl g" style="width:${Math.max(t,.4)}%"></div></div>`:''}
+      </div><div class="pc">${o.pct.toFixed(1)}%${t!=null?`<div style="font-size:10.5px;color:var(--gold)">${t.toFixed(1)}%</div>`:''}</div></div>`;
+  }).join('');
+  $('oddsnote').textContent = (now.oddsnote||'') + (now.title ? ` Gold bar = championship odds (${Number(now.title.sims).toLocaleString()} full-season simulations incl. the playoff bracket).` : '');
+  $('wkhdr').textContent = 'Week ' + now.week;
+  $('matchups').innerHTML = now.matchups.map(m=>{
+    const afav = m.pa>m.pb;
+    return `<div class="mu"><div class="side ${afav?'fav':''}"><div class="own">${esc(m.a)}</div><div class="pj">${f1(m.pa)} proj</div></div><div class="vs">vs</div><div class="side r ${!afav?'fav':''}"><div class="own">${esc(m.b)}</div><div class="pj">${f1(m.pb)} proj</div></div></div>`;
+  }).join('');
+  $('elims').innerHTML = (now.elim||[]).map(e=>
+    `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('') || '<div class="note">No one can be eliminated this week.</div>';
+  $('elimnote').textContent = now.elimnote || '';
+}
+
+/* ---------------- SEASONS ---------------- */
+$('seasonSel').innerHTML = YEARS.map(y=>`<option>${y}</option>`).join('');
+function regStandings(year){
+  const st = {};
+  for(const g of G){
+    if(g[0]!==year || g[2]!=='R') continue;
+    for(const [me,you,sm,sy] of [[g[3],g[5],g[4],g[6]],[g[5],g[3],g[6],g[4]]]){
+      st[me] = st[me] || {w:0,l:0,pf:0,pa:0};
+      st[me].pf += sm; st[me].pa += sy;
+      if(sm>sy) st[me].w++; else if(sy>sm) st[me].l++;
+    }
+  }
+  return Object.entries(st).map(([o,v])=>({o,...v})).sort((x,y)=> y.w-x.w || y.pf-x.pf);
+}
+function renderSeason(){
+  const year = +$('seasonSel').value;
+  $('ss_hdr').textContent = year + ' final standings' + (year===YEARS[0]?' (so far)':'');
+  const champ = DATA.champs.find(c=>c.year===year);
+  const shame = DATA.shame.find(c=>c.year===year);
+  const rows = regStandings(year);
+  $('ss_stand').innerHTML = '<tr><th>#</th><th>Owner</th><th class="num">W-L</th><th class="num">PF</th><th class="num">PA</th></tr>' +
+    rows.map((r,i)=>`<tr><td>${i+1}</td><td><b>${esc(r.o)}</b>${champ&&champ.owner===r.o?' <span class="badge gold">CHAMP</span>':''}${shame&&shame.owner===r.o?' <span class="badge" style="color:var(--red)">LAST</span>':''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td><td class="num">${f1(r.pa)}</td></tr>`).join('');
+  $('ss_note').textContent = champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''})` : '';
+  // weekly matrix (regular season)
+  const weeks = [...new Set(G.filter(g=>g[0]===year&&g[2]==='R').map(g=>g[1]))].sort((a,b)=>a-b);
+  const owners = rows.map(r=>r.o);
+  const cell = {}; const tops = {};
+  for(const g of G){
+    if(g[0]!==year||g[2]!=='R') continue;
+    cell[g[3]+'|'+g[1]] = {pts:g[4], win:g[4]>g[6]};
+    cell[g[5]+'|'+g[1]] = {pts:g[6], win:g[6]>g[4]};
+    const t = tops[g[1]]||0;
+    tops[g[1]] = Math.max(t, g[4], g[6]);
+  }
+  let m = '<tr><th>Owner</th>' + weeks.map(w=>`<th class="num">${w}</th>`).join('') + '</tr>';
+  for(const o of owners){
+    m += `<tr><td><b>${esc(o)}</b></td>` + weeks.map(w=>{
+      const c = cell[o+'|'+w];
+      if(!c) return '<td class="num" style="color:var(--ink3)">—</td>';
+      const cls = c.pts===tops[w] ? 'wk-top' : (c.win?'wk-w':'wk-l');
+      return `<td class="num ${cls}">${c.pts.toFixed(1)}</td>`;
+    }).join('') + '</tr>';
+  }
+  $('ss_matrix').innerHTML = m;
+  // playoffs
+  const po = G.filter(g=>g[0]===year&&g[2]==='P');
+  $('ss_playoffs').innerHTML = po.length ? po.map(g=>
+    `<div class="meet"><span>wk${g[1]}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`).join('')
+    : '<div class="note">No playoff games recorded for this season yet.</div>';
+  // draft
+  const picks = (DATA.draft.all||[]).filter(d=>d.season===year);
+  if(picks.length){
+    $('ss_draft').innerHTML = '<tr><th>Pick</th><th>Player</th><th></th><th>Owner</th><th class="num">Pts</th></tr>' +
+      picks.map(d=>`<tr><td>${d.pick}</td><td><b>${esc(d.player)}</b></td><td style="color:var(--ink3);font-size:12px">${esc(d.pos)}</td><td>${esc(d.owner)}</td><td class="num">${d.pts!=null?d.pts.toFixed(0):''}</td></tr>`).join('');
+    $('ss_draft_note').textContent = year<2020 ? 'Points = scored while started (ESPN era).' : 'Season fantasy points while rostered.';
+  } else { $('ss_draft').innerHTML=''; $('ss_draft_note').textContent='No draft data for this season.'; }
+  // trades
+  const tr = (DATA.moves.trades||[]).filter(t=>t.year===year);
+  $('ss_trades').innerHTML = tr.length ? tr.map(t=>
+    `<div class="elim" style="border-left-color:var(--accent)">` +
+    t.sides.map(s=>`<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${s.got.map(esc).join(', ')||'—'}${s.pts!=null?` <span style="color:var(--ink3);font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:''}</div>`).join('') +
+    `<div style="font-size:11.5px;color:var(--ink3)">week ${t.week}</div></div>`).join('')
+    : '<div class="note">No trades recorded this season.</div>';
+}
+$('seasonSel').addEventListener('change', renderSeason);
+renderSeason();
+
+/* ---------------- H2H ---------------- */
+const owners = DATA.owners.slice().sort((a,b)=>{
+  const act = o=>DATA.active.includes(o)?0:1;
+  return act(a)-act(b) || a.localeCompare(b);
+});
+['selA','selB'].forEach(id=>{
+  $(id).innerHTML = owners.map(o=>`<option>${esc(o)}</option>`).join('');
+  $(id).addEventListener('change', renderH2H);
+});
+$('selA').value = 'Mark'; $('selB').value = 'Timmy';
+function renderH2H(){
+  const A=$('selA').value, B=$('selB').value;
+  if(A===B){ $('h2hout').innerHTML = '<div class="note">Pick two different owners.</div>'; return; }
+  let w=0,l=0,t=0,pw=0,pl=0,pfA=0,pfB=0,bestA=null;
+  const meets=[];
+  for(const g of G){
+    let sa,sb;
+    if(g[3]===A&&g[5]===B){sa=g[4];sb=g[6];}
+    else if(g[3]===B&&g[5]===A){sa=g[6];sb=g[4];}
+    else continue;
+    if(g[2]==='C') continue;
+    meets.push({y:g[0],w:g[1],ty:g[2],sa,sb});
+    pfA+=sa; pfB+=sb;
+    if(bestA===null||sa-sb>bestA.m) bestA={m:sa-sb};
+    if(g[2]==='P'){ sa>sb?pw++:pl++; continue; }
+    if(sa>sb)w++; else if(sb>sa)l++; else t++;
+  }
+  const n=meets.length;
+  if(!n){ $('h2hout').innerHTML = '<div class="note">These two have never played.</div>'; return; }
+  const last = meets.slice(-5).reverse();
+  $('h2hout').innerHTML = `
+    <div class="h2hbox">
+      <div><div class="who">${esc(A)}</div><div class="big">${w+pw}</div></div>
+      <div class="mid">all-time wins<br>${n} meetings</div>
+      <div><div class="who">${esc(B)}</div><div class="big">${l+pl}</div></div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="v">${w}-${l}${t?'-'+t:''}</div><div class="k">regular season</div></div>
+      <div class="tile"><div class="v">${pw}-${pl}</div><div class="k">playoffs</div></div>
+      <div class="tile"><div class="v">${f1(pfA/n)} – ${f1(pfB/n)}</div><div class="k">avg score</div></div>
+      <div class="tile"><div class="v">${bestA&&bestA.m>0?('+'+f1(bestA.m)):'—'}</div><div class="k">${esc(A)}'s biggest win</div></div>
+    </div>
+    <h2 style="margin:14px 0 4px">Last ${last.length} meetings</h2>
+    ${last.map(m=>`<div class="meet"><span>${m.y} wk${m.w}${m.ty==='P'?' · playoffs':''}</span><span><span class="${m.sa>m.sb?'w':''}">${esc(A)} ${f2(m.sa)}</span> — <span class="${m.sb>m.sa?'w':''}">${f2(m.sb)} ${esc(B)}</span></span></div>`).join('')}`;
+}
+renderH2H();
+
+/* ---------------- GAMES (full log) ---------------- */
+const anyOpt = label => `<option value="">${label}</option>`;
+$('gOwner').innerHTML = anyOpt('Any owner') + owners.map(o=>`<option>${esc(o)}</option>`).join('');
+$('gOpp').innerHTML = anyOpt('vs anyone') + owners.map(o=>`<option>${esc(o)}</option>`).join('');
+$('gYear').innerHTML = anyOpt('All years') + YEARS.map(y=>`<option>${y}</option>`).join('');
+let gShowAll = false;
+function renderGames(){
+  const o=$('gOwner').value, p=$('gOpp').value, y=$('gYear').value, ty=$('gType').value;
+  const rows = [];
+  for(let i=G.length-1;i>=0;i--){
+    const g=G[i];
+    if(y && g[0]!==+y) continue;
+    if(ty && g[2]!==ty) continue;
+    if(o && g[3]!==o && g[5]!==o) continue;
+    if(p && g[3]!==p && g[5]!==p) continue;
+    if(o && p && !((g[3]===o&&g[5]===p)||(g[3]===p&&g[5]===o))) continue;
+    rows.push(g);
+  }
+  const lim = gShowAll ? rows.length : 120;
+  const typ = {R:'',P:' <span class="badge gold">PO</span>',C:' <span class="badge">cons</span>'};
+  $('gTable').innerHTML = '<tr><th>When</th><th>Result</th></tr>' + rows.slice(0,lim).map(g=>
+    `<tr><td style="color:var(--ink3)">${g[0]} wk${g[1]}${typ[g[2]]}</td><td class="num" style="text-align:left"><span class="${g[4]>g[6]?'wk-w':'wk-l'}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'wk-w':'wk-l'}">${f2(g[6])} ${esc(g[5])}</span></td></tr>`).join('');
+  $('gCount').textContent = `${rows.length} games match` + (rows.length>lim?` (showing ${lim})`:'');
+  $('gMore').style.display = rows.length>lim ? 'block':'none';
+}
+['gOwner','gOpp','gYear','gType'].forEach(id=>$(id).addEventListener('change', ()=>{gShowAll=false; renderGames();}));
+$('gMore').addEventListener('click', ()=>{gShowAll=true; renderGames();});
+renderGames();
+
+/* ---------------- RECORDS ---------------- */
+const R = DATA.records;
+$('r_top').innerHTML = R.top.map(e=>`<li><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">vs ${esc(e.opp)} · ${e.year} wk${e.week}</span></span></li>`).join('');
+$('r_low').innerHTML = R.low.map(e=>`<li><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">vs ${esc(e.opp)} · ${e.year} wk${e.week}${e.note?' · '+esc(e.note):''}</span></span></li>`).join('');
+$('r_blow').innerHTML = R.blowouts.map(g=>`<li><span class="v">+${f2(g.margin)}</span><span><b>${esc(g.sa>g.sb?g.a:g.b)}</b> <span class="d">over ${esc(g.sa>g.sb?g.b:g.a)} (${f1(Math.max(g.sa,g.sb))}–${f1(Math.min(g.sa,g.sb))}) · ${g.year} wk${g.week}</span></span></li>`).join('');
+$('r_close').innerHTML = R.closest.map(g=>`<li><span class="v">${f2(g.margin)}</span><span><b>${esc(g.sa>g.sb?g.a:g.b)}</b> <span class="d">edged ${esc(g.sa>g.sb?g.b:g.a)} (${f2(Math.max(g.sa,g.sb))}–${f2(Math.min(g.sa,g.sb))}) · ${g.year} wk${g.week}</span></span></li>`).join('');
+$('r_shoot').innerHTML = R.shootouts.map(g=>`<li><span class="v">${f1(g.total)}</span><span><b>${esc(g.a)} ${f1(g.sa)}</b> <span class="d">vs</span> <b>${f1(g.sb)} ${esc(g.b)}</b> <span class="d">· ${g.year} wk${g.week}</span></span></li>`).join('');
+$('r_players').innerHTML = R.players.map(p=>`<li><span class="v">${f1(p.pts)}</span><span><b>${esc(p.name)}</b> <span class="d">${esc(p.pos)} · ${esc(p.owner)} · ${p.year} wk${p.week}</span></span></li>`).join('');
+$('r_streaks').innerHTML =
+  R.winstreaks.map(s=>`<div class="tile"><div class="v">W${s.n}</div><div class="k">${esc(s.owner)}</div></div>`).join('') +
+  R.lossstreaks.slice(0,1).map(s=>`<div class="tile"><div class="v" style="color:var(--red)">L${s.n}</div><div class="k">${esc(s.owner)} (ouch)</div></div>`).join('');
+
+/* ---------------- MONEY ---------------- */
+const M = DATA.money;
+$('m_hdr').textContent = M.year + ' weekly high scores';
+$('m_weekly').innerHTML = M.weekly.map(e=>
+  `<div class="meet"><span>week ${e.week}</span><span><span class="w">${esc(e.owner)}</span> · ${e.pts.toFixed(2)}</span></div>`).join('');
+const tally = {};
+M.weekly.forEach(e=>tally[e.owner]=(tally[e.owner]||0)+1);
+$('m_tally').innerHTML = Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([o,n])=>
+  `<li><span class="v">$${n*M.perweek}</span><span><b>${esc(o)}</b> <span class="d">${n} weekly win${n>1?'s':''}</span></span></li>`).join('');
+$('m_counts').innerHTML = M.counts.slice(0,14).map(c=>
+  `<li><span class="v">${c.n}</span><span><b>${esc(c.owner)}</b> <span class="d">weekly highs since 2015</span></span></li>`).join('');
+$('m_pay').innerHTML = '<tr><th>Owner</th><th class="num">Paid in</th><th class="num">Earned</th><th class="num">Net</th></tr>' +
+  M.payouts.slice().sort((a,b)=>parseFloat(String(b.net).replace(/[$,]/g,''))-parseFloat(String(a.net).replace(/[$,]/g,''))).map(p=>
+  `<tr><td><b>${esc(p.owner)}</b></td><td class="num">${esc(p.paid)}</td><td class="num">${esc(p.earned)}</td><td class="num">${esc(p.net)}</td></tr>`).join('');
+
+/* ---------------- LUCK ---------------- */
+const L = DATA.luck;
+$('l_season').innerHTML = '<tr><th>Owner</th><th class="num">Record</th><th class="num">All-play</th><th class="num">Luck</th></tr>' +
+  L.season.slice().sort((a,b)=>b.luck-a.luck).map(r=>
+  `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.w}-${r.l}</td><td class="num">${r.apw}-${r.apl}</td><td class="num" style="color:${r.luck>0.5?'var(--accent)':r.luck<-0.5?'var(--red)':'var(--ink2)'}">${r.luck>0?'+':''}${r.luck.toFixed(1)}</td></tr>`).join('');
+$('l_career').innerHTML = '<tr><th>Owner</th><th class="num">All-play</th><th class="num">Luck</th><th class="num">Lucky W</th><th class="num">Unlucky L</th></tr>' +
+  L.career.slice().sort((a,b)=>b.luck-a.luck).map(r=>
+  `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.apw}-${r.apl}</td><td class="num">${r.luck>0?'+':''}${r.luck.toFixed(1)}</td><td class="num">${r.lucky}</td><td class="num">${r.unlucky}</td></tr>`).join('');
+const BN = DATA.bench;
+$('l_bench').innerHTML = '<tr><th>Owner</th><th class="num">Left on bench</th><th class="num">Per week</th><th class="num">Efficiency</th></tr>' +
+  BN.career.slice().sort((a,b)=>b.eff-a.eff).map(r=>
+  `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.left.toFixed(0)}</td><td class="num">${r.pg.toFixed(1)}</td><td class="num">${r.eff.toFixed(1)}%</td></tr>`).join('');
+
+/* ---------------- MOVES ---------------- */
+$('v_waivers').innerHTML = DATA.moves.waivers.map(s=>
+  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · ${esc(s.owner)} · ${s.year} wk${s.week}${s.bid?' · $'+s.bid+' FAAB':''}</span></span></li>`).join('');
+let tHTML = '', lastYr = null;
+DATA.moves.trades.forEach(t=>{
+  if(t.year!==lastYr){ tHTML += `<h2 style="margin:14px 0 4px">${t.year}</h2>`; lastYr = t.year; }
+  const best = Math.max(...t.sides.map(s=>s.pts==null?-1:s.pts));
+  tHTML += `<div class="elim" style="border-left-color:var(--accent)">` +
+    t.sides.map(s=>`<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${s.got.map(esc).join(', ')||'—'}` +
+      (s.pts!=null?` <span style="color:${s.pts===best?'var(--accent)':'var(--ink3)'};font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:'') + `</div>`).join('') +
+    `<div style="font-size:11.5px;color:var(--ink3)">week ${t.week}</div></div>`;
+});
+$('v_trades').innerHTML = tHTML;
+
+/* ---------------- DRAFT ---------------- */
+const DY = [2020,2021,2022,2023,2024,2025,2026];
+$('d_grades').innerHTML = `<tr><th>Owner</th>${DY.map(y=>'<th class="num">'+String(y).slice(2)+'</th>').join('')}<th class="num">Total</th></tr>` +
+  DATA.draft.grades.map(g=>
+  `<tr><td><b>${esc(g.owner)}</b></td>${DY.map(y=>{const v=g.years[y];return '<td class="num" style="color:'+(v>0?'var(--accent)':v<0?'var(--red)':'var(--ink3)')+'">'+(v==null?'':(v>0?'+':'')+v)+'</td>';}).join('')}<td class="num"><b>${g.total>0?'+':''}${g.total}</b></td></tr>`).join('');
+$('d_steals').innerHTML = DATA.draft.steals.map(d=>
+  `<li><span class="v">+${d.value.toFixed(0)}</span><span><b>${esc(d.player)}</b> <span class="d">${esc(d.pos)} · pick ${d.pick} · ${esc(d.owner)} · ${d.season} · ${d.pts.toFixed(0)} pts</span></span></li>`).join('');
+$('d_busts').innerHTML = DATA.draft.busts.map(d=>
+  `<li><span class="v" style="color:var(--red)">${d.value.toFixed(0)}</span><span><b>${esc(d.player)}</b> <span class="d">${esc(d.pos)} · pick ${d.pick} · ${esc(d.owner)} · ${d.season} · ${d.pts.toFixed(0)} pts</span></span></li>`).join('');
+const dYears = [...new Set((DATA.draft.all||[]).map(d=>d.season))].sort((a,b)=>b-a);
+$('dYear').innerHTML = dYears.map(y=>`<option>${y}</option>`).join('');
+$('dOwnerSel').innerHTML = anyOpt('All owners') + owners.map(o=>`<option>${esc(o)}</option>`).join('');
+function renderDraftAll(){
+  const y=+$('dYear').value, o=$('dOwnerSel').value, q=($('dSearch').value||'').toLowerCase();
+  let picks = (DATA.draft.all||[]).filter(d=>(!o || d.owner===o) && (!q || d.player.toLowerCase().includes(q)));
+  if(!q) picks = picks.filter(d=>d.season===y);   // name search looks across ALL drafts
+  $('d_all').innerHTML = `<tr><th>Pick</th><th>Player</th><th></th><th>Owner</th>${q?'<th class="num">Yr</th>':''}<th class="num">Pts</th><th class="num">Value</th></tr>` +
+    picks.map(d=>`<tr><td>${d.pick}</td><td><b>${esc(d.player)}</b></td><td style="color:var(--ink3);font-size:12px">${esc(d.pos)}</td><td>${esc(d.owner)}</td>${q?'<td class="num">'+d.season+'</td>':''}<td class="num">${d.pts!=null?d.pts.toFixed(0):''}</td><td class="num" style="color:${(d.value||0)>0?'var(--accent)':(d.value||0)<0?'var(--red)':'var(--ink3)'}">${d.value!=null?(d.value>0?'+':'')+d.value.toFixed(0):''}</td></tr>`).join('');
+}
+['dYear','dOwnerSel'].forEach(id=>$(id).addEventListener('change', renderDraftAll));
+$('dSearch').addEventListener('input', renderDraftAll);
+renderDraftAll();
+
+/* ---------------- universal column sorting (tap any header) ---------------- */
+document.addEventListener('click', e=>{
+  const th = e.target.closest('th');
+  if(!th) return;
+  const table = th.closest('table');
+  if(!table) return;
+  const rows = [...table.querySelectorAll('tr')].filter(r=>r.querySelector('td'));
+  if(rows.length < 2) return;
+  const idx = [...th.parentNode.children].indexOf(th);
+  const dir = th.dataset.dir === 'd' ? 1 : -1;   // first tap = descending (big numbers first)
+  table.querySelectorAll('th').forEach(h=>h.removeAttribute('data-dir'));
+  th.dataset.dir = dir === 1 ? 'a' : 'd';
+  const val = r=>{
+    const c = r.children[idx];
+    if(!c) return '';
+    const t = c.textContent.trim();
+    const n = parseFloat(t.replace(/[$,%+]/g,''));
+    return isNaN(n) ? t.toLowerCase() : n;
+  };
+  rows.sort((a,b)=>{
+    const x = val(a), y = val(b);
+    if(typeof x !== typeof y) return (String(x) < String(y) ? -1 : 1) * dir;
+    return (x < y ? -1 : x > y ? 1 : 0) * dir;
+  });
+  rows.forEach(r=>r.parentNode.appendChild(r));
+});
+
+/* ---------------- ALL-TIME ---------------- */
+const at = DATA.alltime;
+const luckBy = {}; DATA.luck.career.forEach(r=>luckBy[r.owner]=r);
+const highBy = {}; DATA.money.counts.forEach(c=>highBy[c.owner]=c.n);
+const shameBy = {}; DATA.shame.forEach(s=>shameBy[s.owner]=(shameBy[s.owner]||0)+1);
+const appsBy = {};
+for(const g of G){ if(g[2]==='P'){ (appsBy[g[3]]=appsBy[g[3]]||new Set()).add(g[0]); (appsBy[g[5]]=appsBy[g[5]]||new Set()).add(g[0]); } }
+const rows = Object.keys(at).map(o=>({o, ...at[o]}))
+  .sort((x,y)=> (y.w/(y.w+y.l||1)) - (x.w/(x.w+x.l||1)) );
+$('master').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="num">W-L</th><th class="num">Win%</th><th class="num">PF/G</th><th class="num">AP W-L</th><th class="num">Luck</th><th class="num">Playoffs</th><th class="num">Apps</th><th class="num">Titles</th><th class="num">Lasts</th><th class="num">Wk highs</th><th class="num">Net $</th></tr>' +
+  rows.map(r=>{
+    const pct = r.w+r.l ? (100*r.w/(r.w+r.l)).toFixed(1) : '—';
+    const lk = luckBy[r.o]||{};
+    const inactive = !DATA.active.includes(r.o);
+    return `<tr${inactive?' style="color:var(--ink3)"':''}><td><b>${esc(r.o)}</b></td><td class="num">${r.seasons}</td><td class="num">${r.w}-${r.l}${r.t?'-'+r.t:''}</td><td class="num">${pct}</td><td class="num">${(r.pf/(r.g||1)).toFixed(1)}</td><td class="num">${lk.apw!=null?lk.apw+'-'+lk.apl:''}</td><td class="num">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):''}</td><td class="num">${r.pw}-${r.pl}</td><td class="num">${appsBy[r.o]?appsBy[r.o].size:0}</td><td class="num">${r.titles||''}</td><td class="num">${shameBy[r.o]||''}</td><td class="num">${highBy[r.o]||''}</td><td class="num">${esc(r.net||'')}</td></tr>`;
+  }).join('');
+
+/* ---------------- CHAMPS ---------------- */
+$('champlist').innerHTML = DATA.champs.map(c=>
+  `<div class="champ"><div class="yr">${c.year}</div><div><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div></div></div>`).join('');
+$('shamelist').innerHTML = DATA.shame.map(c=>
+  `<div class="champ"><div class="yr" style="color:var(--red)">${c.year}</div><div><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div></div></div>`).join('');
+
+show();
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+espn.txt
+data/raw/players.json
+data/raw/proj_cache_*.json
+data/simout_*.json
+site/
+__pycache__/
