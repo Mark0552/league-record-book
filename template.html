@@ -98,8 +98,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <div class="hwrap"><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
   <nav id="nav">
     <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
-    <a href="#records">Records</a><a href="#money">Money</a><a href="#moves">Transactions</a>
-    <a href="#draft">Draft</a><a href="#alltime">Legacy</a>
+    <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Transactions</a>
+    <a href="#draft">Draft</a><a href="#alltime">All-Time</a><a href="#champs">Champs</a>
   </nav>
 </header>
 <main>
@@ -108,8 +108,6 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut. &#10003; IN = clinched a spot; OUT = mathematically eliminated (house tiebreak rules).</div></div>
     <div class="card"><h2>Playoff &amp; championship odds</h2><div id="odds"></div>
       <div class="note" id="oddsnote"></div></div>
-    <div class="card"><h2>This season's luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
-      <div class="note">All-play = your record if you played everyone every week. Luck = actual wins minus expected wins from your scores. Positive = the schedule has been kind.</div></div>
     <div class="card" id="elimcard"><h2>Elimination watch</h2><div id="elims"></div><div class="note" id="elimnote"></div></div>
     <div class="card" id="bwbcard" style="display:none"><h2 id="bwbhdr">🏆 Buck Wong Bowl bracket</h2><div id="bwb"></div>
       <div class="note" id="bwbnote">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
@@ -195,6 +193,15 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">ESPN-era (2015-2019) points = points scored while in a starting lineup. Sleeper-era value = points vs the average for that slot.</div></div>
   </section>
 
+  <section id="luck">
+    <div class="card"><h2>This season's luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
+      <div class="note">All-play = your record if you played everyone every week. Luck = actual wins minus expected wins from your scores. Positive = the schedule has been kind.</div></div>
+    <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
+      <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
+    <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
+      <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
+  </section>
+
   <section id="alltime">
     <div class="card"><h2>Owner profile</h2>
       <div class="selrow"><select id="profSel"></select></div>
@@ -202,10 +209,9 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>All-time table</h2><div class="tscroll"><table id="master"></table></div>
       <div class="note">Regular-season records and points since 2015. Playoffs = winner's-bracket games; Apps = seasons reaching the bracket. AP = all-play record. Net $ from league payouts.</div>
       <div class="note">Franchise history (per the league's own payout ledger): two seats have changed hands &mdash; Austin (2015) &rarr; Alex (2016) &rarr; Luke (2017&ndash;present), and Neville (2015&ndash;2023) &rarr; Austin (2024&ndash;present). Careers tracked per person.</div></div>
-    <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
-      <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
-    <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
-      <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
+  </section>
+
+  <section id="champs">
     <div class="card"><h2>🏆 Buck Wong Bowl game history</h2><div id="bwbhist"></div>
       <div class="note">Every championship game on record. Tap one for both starting lineups.</div></div>
     <div class="card"><h2>🥄 Lerch Cup game history</h2><div id="lchist"></div>
@@ -231,7 +237,6 @@ $('foot').textContent = 'Built from the Sleeper API, ESPN league history & the l
 function show(){
   let h = (location.hash||'#now').slice(1);
   if(h === 'h2h') h = 'games';
-  if(h === 'luck' || h === 'champs') h = 'alltime';
   if(!document.getElementById(h)) h = 'now';
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id===h));
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+h));
