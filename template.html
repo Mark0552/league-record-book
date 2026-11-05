@@ -240,7 +240,7 @@ if(now.standings){
       ${t!=null?`<div class="tr" style="margin-top:3px;height:7px"><div class="fl g" style="width:${Math.max(t,.4)}%"></div></div>`:''}
       </div><div class="pc">${o.pct.toFixed(1)}%${t!=null?`<div style="font-size:10.5px;color:var(--gold)">${t.toFixed(1)}%</div>`:''}</div></div>`;
   }).join('');
-  $('oddsnote').textContent = (now.oddsnote||'') + (now.title ? ` Gold bar = championship odds (${Number(now.title.sims).toLocaleString()} full-season simulations incl. the playoff bracket).` : '');
+  $('oddsnote').textContent = (now.oddsnote||'') + (now.title ? ' Teal bar = make the playoffs, gold bar = win the championship.' : '');
   $('wkhdr').textContent = 'Week ' + now.week;
   $('matchups').innerHTML = now.matchups.map(m=>{
     const afav = m.pa>m.pb;

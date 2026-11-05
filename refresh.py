@@ -150,28 +150,8 @@ def wproj(rid, w):
     return out
 WP = {t: {w: wproj(t, w) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS}
 
-# ---------------- 3. odds sim ----------------
-print("simulating ...")
-N = 20000
-random.seed(42)
+# ---------------- 3. one simulation to rule them all: 100k full seasons incl. bracket ----------------
 sdv = {t: max(12.0, statistics.stdev(sc[t])) if len(sc[t]) > 1 else 20.0 for t in TEAMS}
-made = {t: 0 for t in TEAMS}
-for s in range(N):
-    wins = dict(wins0); pf = dict(pf0)
-    h2h = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
-    for w in weeks_left:
-        for a, b in future[w]:
-            pa = max(30, random.gauss(WP[a][w], sdv[a])); pb = max(30, random.gauss(WP[b][w], sdv[b]))
-            if pa == pb: pa += .01
-            wi, lo = (a, b) if pa > pb else (b, a)
-            wins[wi] += 1; pf[a] += pa; pf[b] += pb
-            h2h[a][b][1] += 1; h2h[b][a][1] += 1; h2h[wi][lo][0] += 1
-    winners = {contextual_rank(D[dn], wins, pf, h2h)[0] for dn in (1, 2)}
-    nw = contextual_rank([t for t in TEAMS if t not in winners], wins, pf, h2h)
-    for t in winners | set(nw[:4]):
-        made[t] += 1
-
-# ---------------- 3b. championship simulation (full bracket), 100k ----------------
 N_TITLE = 100000
 title_counts = {k: {t: 0 for t in TEAMS} for k in ("made", "bye", "finals", "champs")}
 if weeks_left:
@@ -211,6 +191,13 @@ if weeks_left:
     json.dump(dict(asof=f"entering week {cur_week}, {season}", sims=N_TITLE, odds=title_odds),
               open("data/title_odds.json", "w", encoding="utf-8"), indent=1)
     print("wrote data/title_odds.json")
+    made, N = title_counts["made"], N_TITLE
+else:
+    # season over: playoff field is settled by the actual standings
+    w1 = contextual_rank(D[1], wins0, pf0, h2h0)[0]; w2 = contextual_rank(D[2], wins0, pf0, h2h0)[0]
+    nw0 = contextual_rank([t for t in TEAMS if t not in (w1, w2)], wins0, pf0, h2h0)
+    made = {t: (1 if t in {w1, w2, *nw0[:4]} else 0) for t in TEAMS}
+    N = 1
 
 # ---------------- 4. elimination solver (house rule, witness-verified) ----------------
 def maxflow_feasible(glist, budget):
@@ -370,9 +357,9 @@ now = dict(
     standings=standings,
     odds=sorted([dict(owner=OWNER[t], pct=round(100 * made[t] / N, 1)) for t in TEAMS],
                 key=lambda o: -o["pct"]),
-    oddsnote="20,000-season simulation. Weekly player projections, optimized lineups (no K/DEF), "
-             "bye and injury holes filled with a waiver add (top-5 free agent average). "
-             "League tiebreakers applied.",
+    oddsnote="100,000 full-season simulations (regular season + playoff bracket). Weekly player "
+             "projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver "
+             "add (top-5 free agent average). League tiebreakers applied.",
     week=cur_week,
     matchups=matchup_cards,
     elim=elim_cards,

@@ -103,35 +103,35 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 96.6
+   "pct": 96.9
   },
   {
    "owner": "Austin",
-   "pct": 94.2
+   "pct": 94.0
   },
   {
    "owner": "Lerch",
-   "pct": 90.8
+   "pct": 90.5
   },
   {
    "owner": "Cliff",
-   "pct": 86.5
+   "pct": 86.4
   },
   {
    "owner": "Martin",
-   "pct": 76.2
+   "pct": 76.0
   },
   {
    "owner": "Steve",
-   "pct": 73.1
+   "pct": 73.2
   },
   {
    "owner": "Mark",
-   "pct": 53.0
+   "pct": 53.1
   },
   {
    "owner": "Clancy",
-   "pct": 25.2
+   "pct": 25.4
   },
   {
    "owner": "Luke",
@@ -150,7 +150,7 @@
    "pct": 0.0
   }
  ],
- "oddsnote": "20,000-season simulation. Weekly player projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free agent average). League tiebreakers applied.",
+ "oddsnote": "100,000 full-season simulations (regular season + playoff bracket). Weekly player projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free agent average). League tiebreakers applied.",
  "week": 9,
  "matchups": [
   {
