@@ -152,6 +152,7 @@ WP = {t: {w: wproj(t, w) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS}
 
 # ---------------- 3. one simulation to rule them all: 100k full seasons incl. bracket ----------------
 sdv = {t: max(12.0, statistics.stdev(sc[t])) if len(sc[t]) > 1 else 20.0 for t in TEAMS}
+status = {}   # owner clinch/elimination status, filled by the solver or by the settled field
 N_TITLE = 100000
 title_counts = {k: {t: 0 for t in TEAMS} for k in ("made", "bye", "finals", "champs")}
 if weeks_left:
@@ -193,11 +194,61 @@ if weeks_left:
     print("wrote data/title_odds.json")
     made, N = title_counts["made"], N_TITLE
 else:
-    # season over: playoff field is settled by the actual standings
+    # regular season over: field is settled; simulate what's LEFT of the live bracket
     w1 = contextual_rank(D[1], wins0, pf0, h2h0)[0]; w2 = contextual_rank(D[2], wins0, pf0, h2h0)[0]
     nw0 = contextual_rank([t for t in TEAMS if t not in (w1, w2)], wins0, pf0, h2h0)
-    made = {t: (1 if t in {w1, w2, *nw0[:4]} else 0) for t in TEAMS}
+    field = {w1, w2, *nw0[:4]}
+    made = {t: (1 if t in field else 0) for t in TEAMS}
     N = 1
+    for t in TEAMS:
+        status[t] = "clinched" if t in field else "out"
+    try:
+        wb_raw = json.load(open(yr_dir / "winners_bracket.json"))
+        if any(isinstance(mt.get("t1"), int) for mt in wb_raw):
+            random.seed(7)
+            gauss = random.gauss
+            finals_c = {t: 0 for t in TEAMS}; champs_c = {t: 0 for t in TEAMS}
+            byes_c = {t: 0 for t in TEAMS}
+            NB = 100000
+            for s in range(NB):
+                res = {}  # match id -> (winner_roster, loser_roster)
+                for mt in sorted(wb_raw, key=lambda m: (m.get("r", 1), m.get("m", 0))):
+                    def resolve(side):
+                        v = mt.get(side)
+                        if isinstance(v, int):
+                            return v
+                        fr = mt.get(side + "_from") or {}
+                        if "w" in fr and fr["w"] in res:
+                            return res[fr["w"]][0]
+                        if "l" in fr and fr["l"] in res:
+                            return res[fr["l"]][1]
+                        return None
+                    a, b = resolve("t1"), resolve("t2")
+                    if a is None or b is None:
+                        continue
+                    if isinstance(mt.get("w"), int):           # already played
+                        res[mt["m"]] = (mt["w"], mt["l"])
+                    else:
+                        wk = min(PSTART + mt.get("r", 1) - 1, 17)
+                        pa = gauss(WP[a].get(wk, 100), sdv[a]); pb = gauss(WP[b].get(wk, 100), sdv[b])
+                        res[mt["m"]] = (a, b) if pa >= pb else (b, a)
+                    if mt.get("p") == 1:
+                        fa, fb = (res[mt["m"]][0], res[mt["m"]][1])
+                        finals_c[fa] += 1; finals_c[fb] += 1
+                        champs_c[fa] += 1
+            r1_teams = {mt.get("t1") for mt in wb_raw if mt.get("r") == 1} | \
+                       {mt.get("t2") for mt in wb_raw if mt.get("r") == 1}
+            title_odds = sorted([dict(owner=OWNER[t],
+                                      playoffs=100.0 if t in field else 0.0,
+                                      bye=100.0 if (t in field and t not in {x for x in r1_teams if x}) else 0.0,
+                                      final=round(100 * finals_c[t] / NB, 2),
+                                      champ=round(100 * champs_c[t] / NB, 3)) for t in TEAMS],
+                                key=lambda o: -o["champ"])
+            json.dump(dict(asof=f"playoffs, {season} (through week {last_scored})", sims=NB, odds=title_odds),
+                      open("data/title_odds.json", "w", encoding="utf-8"), indent=1)
+            print("wrote data/title_odds.json (live bracket simulation)")
+    except Exception as ex:
+        print("playoff title sim skipped:", ex)
 
 # ---------------- 4. elimination solver (house rule, witness-verified) ----------------
 def maxflow_feasible(glist, budget):
@@ -340,6 +391,76 @@ if not FAST and future.get(cur_week):
             elim_cards.append(dict(owner=OWNER[x], needs=needs))
     elimnote = "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive."
 
+# ---------------- 4a. clinched / eliminated right now ----------------
+def can_miss(x):
+    """Does ANY remaining outcome leave x out of the playoffs? (x loses out = worst case)"""
+    allg = [g for w in sorted(future) for g in future[w]]
+    M = wins0[x]
+    others = [t for t in TEAMS if t != x]
+    owndiv = [t for t in others if division[t] == division[x]]
+    # threshold to finish above x (adversary-optimistic on ties)
+    thresh = {}
+    for y in others:
+        xw, g = h2h0[x][y]
+        fm = sum(1 for a, b in allg if {a, b} == {x, y})   # x loses these
+        x_strictly_ahead = xw * 2 > (g + fm)
+        thresh[y] = M + 1 if x_strictly_ahead else M
+    def above_feasible(T):
+        Tset = set(T)
+        kk, glist = {}, []
+        for a, b in allg:
+            if a in Tset and b in Tset:
+                glist.append((a, b))
+        for y in T:
+            free_wins = sum(1 for a, b in allg if (a == y) != (b == y)
+                            and not (a in Tset and b in Tset))
+            k = thresh[y] - (wins0[y] + free_wins)
+            if k > len([1 for a, b in glist if y in (a, b)]):
+                return False
+            kk[y] = max(0, k)
+        need = sum(kk.values())
+        if need == 0:
+            return True
+        # flow: each internal game gives 1 win; each y must collect >= kk[y]
+        tidx = {y: i for i, y in enumerate(T)}
+        n = 2 + len(glist) + len(T); s, t = 0, n - 1
+        cap = [[0] * n for _ in range(n)]
+        for i, (a, b) in enumerate(glist):
+            cap[s][1 + i] = 1
+            cap[1 + i][1 + len(glist) + tidx[a]] = 1
+            cap[1 + i][1 + len(glist) + tidx[b]] = 1
+        for y, i in tidx.items():
+            cap[1 + len(glist) + i][t] = kk[y]
+        flow = 0
+        while True:
+            par = [-1] * n; par[s] = s; q = deque([s])
+            while q and par[t] == -1:
+                u = q.popleft()
+                for v in range(n):
+                    if par[v] == -1 and cap[u][v] > 0:
+                        par[v] = u; q.append(v)
+            if par[t] == -1:
+                return flow >= need
+            v = t
+            while v != s:
+                u = par[v]; cap[u][v] -= 1; cap[v][u] += 1; v = u
+            flow += 1
+    # minimal "x misses" families: all 5 division rivals above, or any 6 others (>=1 rival) above
+    if above_feasible(owndiv):
+        return True
+    for T in itertools.combinations(others, 6):
+        if any(division[y] == division[x] for y in T) and above_feasible(T):
+            return True
+    return False
+
+if weeks_left:
+    print("computing clinch/elimination status ...")
+    for x in TEAMS:
+        if not alive(x, wins0, h2h0, future):
+            status[x] = "out"
+        elif not can_miss(x):
+            status[x] = "clinched"
+
 # ---------------- 4b. playoff brackets (appear automatically once seeded) ----------------
 def bracket_view(bracket, final_label):
     if not bracket:
@@ -390,7 +511,8 @@ try:
     seeded = any(isinstance(mt.get("t1"), int) or isinstance(mt.get("t2"), int)
                  for mt in (wb_raw or []) + (lb_raw or []))
     if seeded:
-        brackets = dict(bwb=bracket_view(wb_raw, "bwb"), lerch=bracket_view(lb_raw, "lerch"))
+        brackets = dict(bwb=bracket_view(wb_raw, "bwb"), lerch=bracket_view(lb_raw, "lerch"),
+                        projected=bool(weeks_left))
 except Exception as ex:
     print("bracket build skipped:", ex)
 
@@ -402,12 +524,15 @@ seed_order = sorted(leaders, key=lambda t: order.index(t)) + nonw
 standings = []
 for i, t in enumerate(seed_order, 1):
     standings.append(dict(seed=i, owner=OWNER[t], team=teamname[t],
-                          rec=f"{wins0[t]}-{(cur_week - 1) - wins0[t]}", pf=round(pf0[t], 1),
-                          div=DIVNAME[division[t]], **({"leader": True} if t in leaders else {})))
+                          rec=f"{wins0[t]}-{last_scored - wins0[t]}", pf=round(pf0[t], 1),
+                          div=DIVNAME[division[t]],
+                          **({"leader": True} if t in leaders else {}),
+                          **({"status": status[t]} if t in status else {})))
 matchup_cards = [dict(a=OWNER[a], pa=round(WP[a][cur_week], 1), b=OWNER[b], pb=round(WP[b][cur_week], 1))
                  for a, b in future.get(cur_week, [])]
 now = dict(
-    asof=f"entering week {cur_week}, {season}",
+    asof=(f"entering week {cur_week}, {season}" if weeks_left
+          else f"playoffs, {season} — regular season complete"),
     standings=standings,
     odds=sorted([dict(owner=OWNER[t], pct=round(100 * made[t] / N, 1)) for t in TEAMS],
                 key=lambda o: -o["pct"]),

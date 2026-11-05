@@ -163,7 +163,7 @@
    "a": "Mark",
    "pa": 107.2,
    "b": "Timmy",
-   "pb": 84.3
+   "pb": 84.2
   },
   {
    "a": "Will",
@@ -175,7 +175,7 @@
    "a": "Lerch",
    "pa": 95.2,
    "b": "Austin",
-   "pb": 92.3
+   "pb": 92.1
   },
   {
    "a": "Clancy",
@@ -187,7 +187,7 @@
    "a": "Martin",
    "pa": 97.7,
    "b": "Cliff",
-   "pb": 92.9
+   "pb": 93.0
   }
  ],
  "elim": [
@@ -376,6 +376,7 @@
     "s2": null,
     "w": null
    }
-  ]
+  ],
+  "projected": true
  }
 }

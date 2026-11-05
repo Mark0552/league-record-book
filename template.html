@@ -97,7 +97,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 <header>
   <div class="hwrap"><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
   <nav id="nav">
-    <a href="#now">Now</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
+    <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
     <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Moves</a>
     <a href="#draft">Draft</a><a href="#alltime">All-Time</a><a href="#champs">Champs</a>
   </nav>
@@ -105,14 +105,14 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 <main>
   <section id="now">
     <div class="card"><h2>Standings</h2><div class="tscroll"><table id="standings"></table></div>
-      <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut.</div></div>
+      <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut. &#10003; IN = clinched a spot; OUT = mathematically eliminated (house tiebreak rules).</div></div>
     <div class="card"><h2>Playoff &amp; championship odds</h2><div id="odds"></div>
       <div class="note" id="oddsnote"></div></div>
     <div class="card" id="elimcard"><h2>Elimination watch</h2><div id="elims"></div><div class="note" id="elimnote"></div></div>
-    <div class="card" id="bwbcard" style="display:none"><h2>🏆 Buck Wong Bowl bracket</h2><div id="bwb"></div>
-      <div class="note">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
-    <div class="card" id="lccard" style="display:none"><h2>🥄 Lerch Cup bracket</h2><div id="lc"></div>
-      <div class="note">Lose your way to the bottom: the Lerch Cup game's loser takes last place.</div></div>
+    <div class="card" id="bwbcard" style="display:none"><h2 id="bwbhdr">🏆 Buck Wong Bowl bracket</h2><div id="bwb"></div>
+      <div class="note" id="bwbnote">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
+    <div class="card" id="lccard" style="display:none"><h2 id="lchdr">🥄 Lerch Cup bracket</h2><div id="lc"></div>
+      <div class="note" id="lcnote">The toilet bowl: losers advance, and the Lerch Cup game's loser-of-losers takes last place.</div></div>
   </section>
 
   <section id="seasons">
@@ -241,7 +241,9 @@ const now = DATA.now || {};
 if(now.standings){
   let r = '<tr><th>#</th><th>Owner</th><th>Team</th><th class="num">W-L</th><th class="num">PF</th></tr>';
   now.standings.forEach(s=>{
-    r += `<tr${s.seed===7?' class="line"':''}><td>${s.seed}</td><td><b>${esc(s.owner)}</b>${s.leader?' <span class="badge div">'+esc(s.div)+'</span>':''}</td><td style="color:var(--ink2);font-size:12.5px">${esc(s.team)}</td><td class="num">${s.rec}</td><td class="num">${f1(s.pf)}</td></tr>`;
+    const st = s.status==='clinched' ? ' <span class="badge" style="background:rgba(45,212,191,.16);color:var(--accent)">✓ IN</span>'
+             : s.status==='out' ? ' <span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">OUT</span>' : '';
+    r += `<tr${s.seed===7?' class="line"':''}><td>${s.seed}</td><td><b>${esc(s.owner)}</b>${s.leader?' <span class="badge div">'+esc(s.div)+'</span>':''}${st}</td><td style="color:var(--ink2);font-size:12.5px">${esc(s.team)}</td><td class="num">${s.rec}</td><td class="num">${f1(s.pf)}</td></tr>`;
   });
   $('standings').innerHTML = r;
   const title = {}; (now.title && now.title.odds || []).forEach(t=>title[t.owner]=t.champ);
@@ -276,6 +278,12 @@ if(now.standings){
     };
     renderBracket(now.brackets.bwb, $('bwb'));
     renderBracket(now.brackets.lerch, $('lc'));
+    if(now.brackets.projected){
+      $('bwbhdr').textContent = '🏆 Buck Wong Bowl bracket (projected)';
+      $('lchdr').textContent = '🥄 Lerch Cup bracket (projected)';
+      $('bwbnote').textContent = 'Projected from today’s standings — seeds lock in after week 14. Seeds 1-2 (division winners) get byes.';
+      $('lcnote').textContent = 'Projected from today’s standings. The toilet bowl: losers advance, and the Lerch Cup game decides last place.';
+    }
     $('bwbcard').style.display = '';
     $('lccard').style.display = '';
   }
