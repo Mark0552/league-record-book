@@ -145,6 +145,10 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   </section>
 
   <section id="records">
+    <div class="card"><h2>Player league careers</h2>
+      <input class="flt" id="pSearch" type="search" placeholder="Search any player ever started (e.g. Derrick Henry)...">
+      <div id="pResults"></div><div id="pCareer"></div>
+      <div class="note">Every player started in this league since 2015: who owned them, when, and what they produced. Defenses may appear under each era's naming.</div></div>
     <div class="card"><h2>Highest team scores</h2><ol class="rec" id="r_top"></ol></div>
     <div class="card"><h2>Best player games (starters, since 2015)</h2><ol class="rec" id="r_players"></ol>
       <div class="note">Scored under that season's league settings (ESPN era 2015-2019, Sleeper era 2020+).</div></div>
@@ -467,6 +471,76 @@ document.addEventListener('click', e=>{
 ['gOwner','gOpp','gYear','gType'].forEach(id=>$(id).addEventListener('change', ()=>{gShowAll=false; renderGames();}));
 $('gMore').addEventListener('click', ()=>{gShowAll=true; renderGames();});
 renderGames();
+
+/* ---------------- PLAYER LEAGUE CAREERS ---------------- */
+let PIDX = null;
+function buildPlayerIndex(){
+  PIDX = {};
+  for(const [k, lu] of Object.entries(DATA.lineups||{})){
+    const [y, w, o] = k.split('|');
+    for(const p of lu){
+      const e = PIDX[p[0]] = PIDX[p[0]] || {pos:p[1], starts:0, pts:0, own:{}, yrs:{}};
+      e.starts++; e.pts += p[2];
+      const po = e.own[o] = e.own[o] || {starts:0, pts:0, years:new Set()};
+      po.starts++; po.pts += p[2]; po.years.add(+y);
+      const py = e.yrs[y] = e.yrs[y] || {starts:0, pts:0, owners:new Set(), best:0};
+      py.starts++; py.pts += p[2]; py.owners.add(o);
+      if(p[2] > py.best) py.best = p[2];
+    }
+  }
+}
+const normP = s => s.toLowerCase().replace(/[^a-z]/g,'');
+function ringCount(name){
+  const n = normP(name);
+  let r = 0;
+  for(const c of DATA.champs)
+    if((c.roster||[]).some(x => x[0] !== 'BN' && (normP(x[1]) === n || normP(x[1]).includes(n) || n.includes(normP(x[1])))))
+      r++;
+  return r;
+}
+function yearsLabel(set){
+  const ys = [...set].sort();
+  return ys.length > 2 ? `${ys[0]}–${ys[ys.length-1]}` : ys.join(', ');
+}
+function showPlayer(name){
+  const e = PIDX[name];
+  if(!e) return;
+  const rings = ringCount(name);
+  const ownRows = Object.entries(e.own).sort((a,b)=>b[1].starts-a[1].starts)
+    .map(([o,v])=>`<tr><td><b>${esc(o)}</b></td><td class="num">${yearsLabel(v.years)}</td><td class="num">${v.starts}</td><td class="num">${v.pts.toFixed(0)}</td></tr>`).join('');
+  const yrRows = Object.entries(e.yrs).sort((a,b)=>b[0]-a[0])
+    .map(([y,v])=>`<tr><td>${y}</td><td>${[...v.owners].map(esc).join(', ')}</td><td class="num">${v.starts}</td><td class="num">${v.pts.toFixed(0)}</td><td class="num">${v.best.toFixed(1)}</td></tr>`).join('');
+  $('pCareer').innerHTML = `
+    <div class="h2hbox" style="gap:20px">
+      <div style="text-align:center"><div class="who">${esc(e.pos)}</div><div class="big" style="font-size:22px">${esc(name)}</div></div>
+    </div>
+    <div class="tiles" style="margin-bottom:12px">
+      <div class="tile"><div class="v">${e.starts}</div><div class="k">starts in this league</div></div>
+      <div class="tile"><div class="v">${e.pts.toFixed(0)}</div><div class="k">points (${(e.pts/e.starts).toFixed(1)}/start)</div></div>
+      <div class="tile"><div class="v">${Object.keys(e.own).length}</div><div class="k">owner${Object.keys(e.own).length>1?'s':''}</div></div>
+      <div class="tile"><div class="v">${rings ? '🏆'.repeat(Math.min(rings,4)) : '—'}</div><div class="k">${rings} ring${rings===1?'':'s'}</div></div>
+    </div>
+    <h2 style="margin:10px 0 2px">By owner</h2>
+    <div class="tscroll"><table><tr><th>Owner</th><th class="num">Years</th><th class="num">Starts</th><th class="num">Pts</th></tr>${ownRows}</table></div>
+    <h2 style="margin:12px 0 2px">By season</h2>
+    <div class="tscroll"><table><tr><th>Year</th><th>Owner</th><th class="num">Starts</th><th class="num">Pts</th><th class="num">Best wk</th></tr>${yrRows}</table></div>`;
+}
+$('pSearch').addEventListener('input', ()=>{
+  if(!PIDX) buildPlayerIndex();
+  const q = normP($('pSearch').value);
+  if(q.length < 2){ $('pResults').innerHTML=''; $('pCareer').innerHTML=''; return; }
+  const hits = Object.keys(PIDX).filter(n => normP(n).includes(q))
+    .sort((a,b)=>PIDX[b].pts-PIDX[a].pts).slice(0,8);
+  if(hits.length === 1){ $('pResults').innerHTML=''; showPlayer(hits[0]); return; }
+  $('pCareer').innerHTML='';
+  $('pResults').innerHTML = hits.map(n=>
+    `<div class="meet" style="cursor:pointer" data-pn="${esc(n)}"><span><b>${esc(n)}</b> <span style="color:var(--ink3);font-size:12px">${esc(PIDX[n].pos)}</span></span><span>${PIDX[n].pts.toFixed(0)} pts · ${PIDX[n].starts} starts</span></div>`).join('')
+    || '<div class="note">No player by that name has ever been started here.</div>';
+});
+$('pResults').addEventListener('click', e=>{
+  const row = e.target.closest('[data-pn]');
+  if(row){ $('pResults').innerHTML=''; showPlayer(row.dataset.pn); }
+});
 
 /* ---------------- RECORDS ---------------- */
 const R = DATA.records;
