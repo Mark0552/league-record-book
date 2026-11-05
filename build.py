@@ -240,6 +240,22 @@ low_games = sorted(expand, key=lambda x: x[0])[:10]
 blowouts = sorted(games, key=lambda g: -abs(g["sa"] - g["sb"]))[:10]
 closest = sorted([g for g in games if g["sa"] != g["sb"]], key=lambda g: abs(g["sa"] - g["sb"]))[:10]
 shootouts = sorted(games, key=lambda g: -(g["sa"] + g["sb"]))[:10]
+# season PF totals (regular season only, completed seasons only)
+season_pf = defaultdict(lambda: dict(pf=0.0, g=0))
+reg_weeks_by_year = defaultdict(set)
+for g in games:
+    if g["type"] == "Regular":
+        reg_weeks_by_year[g["year"]].add(g["week"])
+        for o, pts in ((g["a"], g["sa"]), (g["b"], g["sb"])):
+            e = season_pf[(o, g["year"])]
+            e["pf"] += pts; e["g"] += 1
+complete_years = {y for y, wks in reg_weeks_by_year.items()
+                  if y < CUR_SEASON or len(wks) >= playoff_start_26 - 1}
+season_rows = [dict(owner=o, year=y, pf=round(v["pf"], 2), g=v["g"], ppg=round(v["pf"] / v["g"], 1))
+               for (o, y), v in season_pf.items() if y in complete_years]
+season_high = sorted(season_rows, key=lambda r: -r["pf"])[:10]
+season_low = sorted(season_rows, key=lambda r: r["pf"])[:10]
+
 win_streaks = sorted(((longest_run(streak_seq[o], "W"), o) for o in OWNERS), reverse=True)[:5]
 loss_streaks = sorted(((longest_run(streak_seq[o], "L"), o) for o in OWNERS), reverse=True)[:5]
 loss_high = sorted([e for e in expand if e[0] < e[2]], key=lambda x: -x[0])[:10]   # heartbreakers
@@ -817,6 +833,8 @@ payload = dict(
         shootouts=[dict(total=round(g["sa"] + g["sb"], 2), **g) for g in shootouts],
         winstreaks=[dict(n=n, owner=o) for n, o in win_streaks],
         lossstreaks=[dict(n=n, owner=o) for n, o in loss_streaks],
+        season_high=season_high,
+        season_low=season_low,
         loss_high=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in loss_high],
         win_low=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in win_low],
         players=top_players,

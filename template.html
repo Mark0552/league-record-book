@@ -153,6 +153,9 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Closest finishes</h2><ol class="rec" id="r_close"></ol></div>
     <div class="card"><h2>Highest-scoring matchups</h2><ol class="rec" id="r_shoot"></ol></div>
     <div class="card"><h2>Lowest team scores</h2><ol class="rec" id="r_low"></ol></div>
+    <div class="card"><h2>Highest-scoring seasons</h2><ol class="rec" id="r_seasonhi"></ol>
+      <div class="note">Regular season only, completed seasons. Seasons were 13 games through 2020 and 14 games since 2021 &mdash; the per-game average is the fair comparison.</div></div>
+    <div class="card"><h2>Lowest-scoring seasons</h2><ol class="rec" id="r_seasonlo"></ol></div>
     <div class="card"><h2>Heartbreakers (most points in a loss)</h2><ol class="rec" id="r_losshi"></ol></div>
     <div class="card"><h2>Daylight robberies (fewest points in a win)</h2><ol class="rec" id="r_winlo"></ol></div>
     <div class="card"><h2>Longest streaks</h2><div class="tiles" id="r_streaks"></div></div>
@@ -436,6 +439,8 @@ $('r_low').innerHTML = R.low.map(e=>`<li><span class="v">${f2(e.pts)}</span><spa
 $('r_blow').innerHTML = R.blowouts.map(g=>`<li><span class="v">+${f2(g.margin)}</span><span><b>${esc(g.sa>g.sb?g.a:g.b)}</b> <span class="d">over ${esc(g.sa>g.sb?g.b:g.a)} (${f1(Math.max(g.sa,g.sb))}–${f1(Math.min(g.sa,g.sb))}) · ${g.year} wk${g.week}</span></span></li>`).join('');
 $('r_close').innerHTML = R.closest.map(g=>`<li><span class="v">${f2(g.margin)}</span><span><b>${esc(g.sa>g.sb?g.a:g.b)}</b> <span class="d">edged ${esc(g.sa>g.sb?g.b:g.a)} (${f2(Math.max(g.sa,g.sb))}–${f2(Math.min(g.sa,g.sb))}) · ${g.year} wk${g.week}</span></span></li>`).join('');
 $('r_shoot').innerHTML = R.shootouts.map(g=>`<li><span class="v">${f1(g.total)}</span><span><b>${esc(g.a)} ${f1(g.sa)}</b> <span class="d">vs</span> <b>${f1(g.sb)} ${esc(g.b)}</b> <span class="d">· ${g.year} wk${g.week}</span></span></li>`).join('');
+$('r_seasonhi').innerHTML = R.season_high.map(e=>`<li><span class="v">${e.pf.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · ${e.ppg.toFixed(1)}/game over ${e.g} games</span></span></li>`).join('');
+$('r_seasonlo').innerHTML = R.season_low.map(e=>`<li><span class="v">${e.pf.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · ${e.ppg.toFixed(1)}/game over ${e.g} games</span></span></li>`).join('');
 $('r_losshi').innerHTML = R.loss_high.map(e=>`<li><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">lost to ${esc(e.opp)}'s ${f2(e.opp_pts)} · ${e.year} wk${e.week}</span></span></li>`).join('');
 $('r_winlo').innerHTML = R.win_low.map(e=>`<li><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">beat ${esc(e.opp)}'s ${f2(e.opp_pts)} · ${e.year} wk${e.week}</span></span></li>`).join('');
 $('r_players').innerHTML = R.players.map(p=>`<li><span class="v">${f1(p.pts)}</span><span><b>${esc(p.name)}</b> <span class="d">${esc(p.pos)} · ${esc(p.owner)} · ${p.year} wk${p.week}</span></span></li>`).join('');
