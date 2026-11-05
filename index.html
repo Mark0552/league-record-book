@@ -98,8 +98,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <div class="hwrap"><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
   <nav id="nav">
     <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
-    <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Moves</a>
-    <a href="#draft">Draft</a><a href="#alltime">All-Time</a><a href="#champs">Champs</a>
+    <a href="#records">Records</a><a href="#money">Money</a><a href="#moves">Transactions</a>
+    <a href="#draft">Draft</a><a href="#alltime">Legacy</a>
   </nav>
 </header>
 <main>
@@ -108,6 +108,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut. &#10003; IN = clinched a spot; OUT = mathematically eliminated (house tiebreak rules).</div></div>
     <div class="card"><h2>Playoff &amp; championship odds</h2><div id="odds"></div>
       <div class="note" id="oddsnote"></div></div>
+    <div class="card"><h2>This season's luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
+      <div class="note">All-play = your record if you played everyone every week. Luck = actual wins minus expected wins from your scores. Positive = the schedule has been kind.</div></div>
     <div class="card" id="elimcard"><h2>Elimination watch</h2><div id="elims"></div><div class="note" id="elimnote"></div></div>
     <div class="card" id="bwbcard" style="display:none"><h2 id="bwbhdr">🏆 Buck Wong Bowl bracket</h2><div id="bwb"></div>
       <div class="note" id="bwbnote">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
@@ -169,14 +171,6 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">From the league payout records, 2014&ndash;2025.</div></div>
   </section>
 
-  <section id="luck">
-    <div class="card"><h2>2026 luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
-      <div class="note">All-play = your record if you played everyone every week. Luck = actual wins minus expected wins from your scores.</div></div>
-    <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
-      <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
-    <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
-      <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
-  </section>
 
   <section id="moves">
     <div class="card"><h2>Trade history</h2><div id="v_trades"></div>
@@ -202,14 +196,22 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   </section>
 
   <section id="alltime">
+    <div class="card"><h2>Owner profile</h2>
+      <div class="selrow"><select id="profSel"></select></div>
+      <div id="profile"></div></div>
     <div class="card"><h2>All-time table</h2><div class="tscroll"><table id="master"></table></div>
       <div class="note">Regular-season records and points since 2015. Playoffs = winner's-bracket games; Apps = seasons reaching the bracket. AP = all-play record. Net $ from league payouts.</div>
       <div class="note">Franchise history (per the league's own payout ledger): two seats have changed hands &mdash; Austin (2015) &rarr; Alex (2016) &rarr; Luke (2017&ndash;present), and Neville (2015&ndash;2023) &rarr; Austin (2024&ndash;present). Careers tracked per person.</div></div>
-  </section>
-
-  <section id="champs">
+    <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
+      <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
+    <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
+      <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
+    <div class="card"><h2>🏆 Buck Wong Bowl game history</h2><div id="bwbhist"></div>
+      <div class="note">Every championship game on record. Tap one for both starting lineups.</div></div>
+    <div class="card"><h2>🥄 Lerch Cup game history</h2><div id="lchist"></div>
+      <div class="note">Every last-place game on record. Tap one for the lineups that earned it.</div></div>
     <div class="card"><h2>The Buck Wong Bowl &mdash; Hall of Fame</h2><div id="champlist"></div>
-      <div class="note">Buck Wong Bowl champions, 2014&ndash;present. Tap a champion for the full title-winning lineup.</div></div>
+      <div class="note">Buck Wong Bowl champions, 2014&ndash;present. Tap a champion for the full title-winning roster.</div></div>
     <div class="card"><h2>Players with multiple rings</h2><ol class="rec" id="ringlist"></ol></div>
     <div class="card"><h2>The Lerch Cup &mdash; Hall of Shame</h2><div id="shamelist"></div>
       <div class="note">Lerch Cup "winners" (last place), 2014&ndash;present.</div></div>
@@ -229,6 +231,7 @@ $('foot').textContent = 'Built from the Sleeper API, ESPN league history & the l
 function show(){
   let h = (location.hash||'#now').slice(1);
   if(h === 'h2h') h = 'games';
+  if(h === 'luck' || h === 'champs') h = 'alltime';
   if(!document.getElementById(h)) h = 'now';
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id===h));
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+h));
@@ -425,22 +428,36 @@ function renderGames(){
   $('gCount').textContent = `${rows.length} games match` + (rows.length>lim?` (showing ${lim})`:'') + ' · tap a game for starting lineups';
   $('gMore').style.display = rows.length>lim ? 'block':'none';
 }
+function lineupSide(y, w, o){
+  const lu = (DATA.lineups||{})[`${y}|${w}|${o}`];
+  if(!lu) return `<div class="note">No lineup data for ${esc(o)}.</div>`;
+  return `<div style="flex:1;min-width:150px"><b style="font-size:13px">${esc(o)}</b>` +
+    lu.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span><span style="color:var(--ink3)">${esc(p[1])}</span> ${esc(p[0])}</span><span style="font-variant-numeric:tabular-nums">${p[2].toFixed(1)}</span></div>`).join('') + '</div>';
+}
+const lineupPanel = (y,w,a,b) => `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${lineupSide(y,w,a)}${lineupSide(y,w,b)}</div>`;
 $('gTable').addEventListener('click', e=>{
   const tr = e.target.closest('tr.grow');
   if(!tr) return;
   const next = tr.nextElementSibling;
   if(next && next.classList.contains('detailrow')){ next.remove(); return; }
   const {y,w,a,b} = tr.dataset;
-  const side = o=>{
-    const lu = (DATA.lineups||{})[`${y}|${w}|${o}`];
-    if(!lu) return `<div class="note">No lineup data for ${esc(o)}.</div>`;
-    return `<div style="flex:1;min-width:150px"><b style="font-size:13px">${esc(o)}</b>` +
-      lu.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span><span style="color:var(--ink3)">${esc(p[1])}</span> ${esc(p[0])}</span><span style="font-variant-numeric:tabular-nums">${p[2].toFixed(1)}</span></div>`).join('') + '</div>';
-  };
   const d = document.createElement('tr');
   d.className = 'detailrow';
-  d.innerHTML = `<td colspan="2" style="background:var(--surface2)"><div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${side(a)}${side(b)}</div></td>`;
+  d.innerHTML = `<td colspan="2" style="background:var(--surface2)">${lineupPanel(y,w,a,b)}</td>`;
   tr.after(d);
+});
+// generic div-based lineup rows (finals histories)
+document.addEventListener('click', e=>{
+  const row = e.target.closest('.lurow');
+  if(!row) return;
+  const next = row.nextElementSibling;
+  if(next && next.classList.contains('ludetail')){ next.remove(); return; }
+  const {y,w,a,b} = row.dataset;
+  const d = document.createElement('div');
+  d.className = 'ludetail';
+  d.style.cssText = 'background:var(--surface2);border-radius:8px;padding:8px;margin:4px 0';
+  d.innerHTML = lineupPanel(y,w,a,b);
+  row.after(d);
 });
 ['gOwner','gOpp','gYear','gType'].forEach(id=>$(id).addEventListener('change', ()=>{gShowAll=false; renderGames();}));
 $('gMore').addEventListener('click', ()=>{gShowAll=true; renderGames();});
@@ -577,6 +594,85 @@ $('master').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="nu
     const inactive = !DATA.active.includes(r.o);
     return `<tr${inactive?' style="color:var(--ink3)"':''}><td><b>${esc(r.o)}</b></td><td class="num">${r.seasons}</td><td class="num">${r.w}-${r.l}${r.t?'-'+r.t:''}</td><td class="num">${pct}</td><td class="num">${(r.pf/(r.g||1)).toFixed(1)}</td><td class="num">${lk.apw!=null?lk.apw+'-'+lk.apl:''}</td><td class="num">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):''}</td><td class="num">${r.pw}-${r.pl}</td><td class="num">${appsBy[r.o]?appsBy[r.o].size:0}</td><td class="num">${r.titles||''}</td><td class="num">${shameBy[r.o]||''}</td><td class="num">${highBy[r.o]||''}</td><td class="num">${esc(r.net||'')}</td></tr>`;
   }).join('');
+
+/* ---------------- OWNER PROFILES ---------------- */
+$('profSel').innerHTML = owners.map(o=>`<option>${esc(o)}</option>`).join('');
+$('profSel').value = 'Mark';
+function renderProfile(){
+  const o = $('profSel').value;
+  const a = at[o] || {};
+  const lk = luckBy[o] || {};
+  const titles = DATA.champs.filter(c=>c.owner===o).map(c=>c.year);
+  const lasts = DATA.shame.filter(s=>s.owner===o).map(s=>s.year);
+  // year-by-year finishes
+  const yrRows = [];
+  for(const y of YEARS){
+    const st = regStandings(y);
+    const i = st.findIndex(r=>r.o===o);
+    if(i < 0) continue;
+    const r = st[i];
+    const flag = titles.includes(y) ? ' 🏆' : lasts.includes(y) ? ' 🥄' : '';
+    yrRows.push(`<tr><td>${y}${flag}</td><td class="num">${i+1}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td></tr>`);
+  }
+  // head-to-head vs everyone (regular + playoffs)
+  const vs = {};
+  for(const g of G){
+    if(g[2]==='C') continue;
+    let me, you, sm, sy;
+    if(g[3]===o){ me=o; you=g[5]; sm=g[4]; sy=g[6]; }
+    else if(g[5]===o){ me=o; you=g[3]; sm=g[6]; sy=g[4]; }
+    else continue;
+    vs[you] = vs[you] || {w:0,l:0};
+    sm>sy ? vs[you].w++ : vs[you].l++;
+  }
+  const vsRows = Object.entries(vs).sort((x,y)=> (y[1].w-y[1].l)-(x[1].w-x[1].l))
+    .map(([u,r])=>`<tr><td>vs <b>${esc(u)}</b></td><td class="num" style="color:${r.w>r.l?'var(--accent)':r.w<r.l?'var(--red)':'var(--ink2)'}">${r.w}-${r.l}</td></tr>`);
+  // signature players (most starts for this owner, all-time)
+  const sig = {};
+  for(const [k, lu] of Object.entries(DATA.lineups||{})){
+    if(!k.endsWith('|'+o)) continue;
+    for(const p of lu){
+      const s = sig[p[0]] = sig[p[0]] || {n:0, pts:0, pos:p[1]};
+      s.n++; s.pts += p[2];
+    }
+  }
+  const sigRows = Object.entries(sig).sort((x,y)=>y[1].n-x[1].n).slice(0,8)
+    .map(([nm,s])=>`<li><span class="v">${s.n}×</span><span><b>${esc(nm)}</b> <span class="d">${esc(s.pos)} · ${s.pts.toFixed(0)} pts started</span></span></li>`);
+  const pct = a.w+a.l ? (100*a.w/(a.w+a.l)).toFixed(1)+'%' : '—';
+  $('profile').innerHTML = `
+    <div class="tiles">
+      <div class="tile"><div class="v">${a.w||0}-${a.l||0}</div><div class="k">career record (${pct})</div></div>
+      <div class="tile"><div class="v">${a.pw||0}-${a.pl||0}</div><div class="k">playoffs · ${titles.length} title${titles.length===1?'':'s'}</div></div>
+      <div class="tile"><div class="v">${(a.pf/(a.g||1)).toFixed(1)}</div><div class="k">points per game</div></div>
+      <div class="tile"><div class="v">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):'—'}</div><div class="k">career luck (wins)</div></div>
+    </div>
+    ${titles.length?`<div class="note" style="color:var(--gold)">🏆 Buck Wong Bowls: ${titles.join(', ')}</div>`:''}
+    ${lasts.length?`<div class="note" style="color:var(--red)">🥄 Lerch Cups: ${lasts.join(', ')}</div>`:''}
+    <h2 style="margin:14px 0 4px">Season by season</h2>
+    <div class="tscroll"><table><tr><th>Year</th><th class="num">Finish</th><th class="num">W-L</th><th class="num">PF</th></tr>${yrRows.join('')}</table></div>
+    <h2 style="margin:14px 0 4px">Signature players (most starts)</h2>
+    <ol class="rec">${sigRows.join('')}</ol>
+    <h2 style="margin:14px 0 4px">Against everyone</h2>
+    <div class="tscroll"><table>${vsRows.join('')}</table></div>`;
+}
+$('profSel').addEventListener('change', renderProfile);
+renderProfile();
+
+/* ---------------- FINALS HISTORIES ---------------- */
+function finalsHistory(kind, el){
+  const src = kind==='P' ? DATA.champs : DATA.shame;
+  el.innerHTML = src.slice().sort((x,y)=>y.year-x.year).map(c=>{
+    const pool = G.filter(g=>g[0]===c.year && g[2]===kind);
+    if(!pool.length) return `<div class="meet"><span>${c.year}</span><span class="note">no game data (pre-2015)</span></div>`;
+    const lastWk = Math.max(...pool.map(g=>g[1]));
+    const g = pool.find(g=> g[1]===lastWk &&
+      (kind==='P' ? ((g[4]>g[6]?g[3]:g[5])===c.owner) : ((g[4]<g[6]?g[3]:g[5])===c.owner)));
+    if(!g) return `<div class="meet"><span>${c.year}</span><span class="note">game not identified</span></div>`;
+    return `<div class="meet lurow" style="cursor:pointer" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><span><b>${c.year}</b> wk${g[1]}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
+  }).join('');
+}
+finalsHistory('P', $('bwbhist'));
+finalsHistory('C', $('lchist'));
 
 /* ---------------- CHAMPS ---------------- */
 $('champlist').innerHTML = DATA.champs.map((c,i)=>
