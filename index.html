@@ -97,7 +97,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 <header>
   <div class="hwrap"><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
   <nav id="nav">
-    <a href="#now">Now</a><a href="#seasons">Seasons</a><a href="#h2h">H2H</a><a href="#games">Games</a>
+    <a href="#now">Now</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
     <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Moves</a>
     <a href="#draft">Draft</a><a href="#alltime">All-Time</a><a href="#champs">Champs</a>
   </nav>
@@ -109,6 +109,10 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Playoff &amp; championship odds</h2><div id="odds"></div>
       <div class="note" id="oddsnote"></div></div>
     <div class="card" id="elimcard"><h2>Elimination watch</h2><div id="elims"></div><div class="note" id="elimnote"></div></div>
+    <div class="card" id="bwbcard" style="display:none"><h2>🏆 Buck Wong Bowl bracket</h2><div id="bwb"></div>
+      <div class="note">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
+    <div class="card" id="lccard" style="display:none"><h2>🥄 Lerch Cup bracket</h2><div id="lc"></div>
+      <div class="note">Lose your way to the bottom: the Lerch Cup game's loser takes last place.</div></div>
   </section>
 
   <section id="seasons">
@@ -125,24 +129,19 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Trades</h2><div id="ss_trades"></div></div>
   </section>
 
-  <section id="h2h">
-    <div class="card"><h2>Career head-to-head</h2>
-      <div class="selrow"><select id="selA"></select><select id="selB"></select></div>
-      <div id="h2hout"></div>
-      <div class="note">Regular season + playoffs since 2015. Consolation games excluded.</div></div>
-  </section>
-
   <section id="games">
-    <div class="card"><h2>Every game since 2015</h2>
+    <div class="card"><h2>Head-to-head &amp; every game since 2015</h2>
       <div class="selrow">
         <select id="gOwner"></select><select id="gOpp"></select>
         <select id="gYear"></select><select id="gType">
           <option value="">All games</option><option value="R">Regular</option>
           <option value="P">Playoffs</option><option value="C">Consolation</option></select>
       </div>
+      <div id="h2hsummary"></div>
       <div class="tscroll"><table id="gTable"></table></div>
       <button class="btn" id="gMore" style="display:none">Show all matching games</button>
-      <div class="note" id="gCount"></div></div>
+      <div class="note" id="gCount"></div>
+      <div class="note">Pick two owners for their career head-to-head. Tap any game for starting lineups.</div></div>
   </section>
 
   <section id="records">
@@ -227,6 +226,7 @@ $('foot').textContent = 'Built from the Sleeper API, ESPN league history & the l
 
 function show(){
   let h = (location.hash||'#now').slice(1);
+  if(h === 'h2h') h = 'games';
   if(!document.getElementById(h)) h = 'now';
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id===h));
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+h));
@@ -257,6 +257,25 @@ if(now.standings){
     $('elimnote').textContent = now.elimnote || '';
   } else {
     $('elimcard').style.display = 'none';
+  }
+  if(now.brackets){
+    const renderBracket = (list, el) => {
+      let html = '', lastR = null;
+      (list||[]).forEach(mt=>{
+        if(mt.r !== lastR){ html += `<h2 style="margin:12px 0 2px">Week ${mt.week}</h2>`; lastR = mt.r; }
+        const fin = mt.label === 'Buck Wong Bowl' || mt.label === 'Lerch Cup game';
+        const cell = (t, s) => {
+          const won = mt.w && mt.w === t;
+          return `<span class="${won?'wk-w':''}" style="${t.startsWith('Winner of')||t.startsWith('Loser of')||t==='TBD'?'color:var(--ink3)':''}">${esc(t)}${s!=null?' '+s.toFixed(2):''}</span>`;
+        };
+        html += `<div class="meet"><span style="${fin?'color:var(--gold);font-weight:700':''}">${esc(mt.label)}</span><span>${cell(mt.t1, mt.s1)} — ${cell(mt.t2, mt.s2)}</span></div>`;
+      });
+      el.innerHTML = html;
+    };
+    renderBracket(now.brackets.bwb, $('bwb'));
+    renderBracket(now.brackets.lerch, $('lc'));
+    $('bwbcard').style.display = '';
+    $('lccard').style.display = '';
   }
 }
 
@@ -339,54 +358,12 @@ function renderSeason(){
 $('seasonSel').addEventListener('change', renderSeason);
 renderSeason();
 
-/* ---------------- H2H ---------------- */
 const owners = DATA.owners.slice().sort((a,b)=>{
   const act = o=>DATA.active.includes(o)?0:1;
   return act(a)-act(b) || a.localeCompare(b);
 });
-['selA','selB'].forEach(id=>{
-  $(id).innerHTML = owners.map(o=>`<option>${esc(o)}</option>`).join('');
-  $(id).addEventListener('change', renderH2H);
-});
-$('selA').value = 'Mark'; $('selB').value = 'Timmy';
-function renderH2H(){
-  const A=$('selA').value, B=$('selB').value;
-  if(A===B){ $('h2hout').innerHTML = '<div class="note">Pick two different owners.</div>'; return; }
-  let w=0,l=0,t=0,pw=0,pl=0,pfA=0,pfB=0,bestA=null;
-  const meets=[];
-  for(const g of G){
-    let sa,sb;
-    if(g[3]===A&&g[5]===B){sa=g[4];sb=g[6];}
-    else if(g[3]===B&&g[5]===A){sa=g[6];sb=g[4];}
-    else continue;
-    if(g[2]==='C') continue;
-    meets.push({y:g[0],w:g[1],ty:g[2],sa,sb});
-    pfA+=sa; pfB+=sb;
-    if(bestA===null||sa-sb>bestA.m) bestA={m:sa-sb};
-    if(g[2]==='P'){ sa>sb?pw++:pl++; continue; }
-    if(sa>sb)w++; else if(sb>sa)l++; else t++;
-  }
-  const n=meets.length;
-  if(!n){ $('h2hout').innerHTML = '<div class="note">These two have never played.</div>'; return; }
-  const last = meets.slice().reverse();
-  $('h2hout').innerHTML = `
-    <div class="h2hbox">
-      <div><div class="who">${esc(A)}</div><div class="big">${w+pw}</div></div>
-      <div class="mid">all-time wins<br>${n} meetings</div>
-      <div><div class="who">${esc(B)}</div><div class="big">${l+pl}</div></div>
-    </div>
-    <div class="tiles">
-      <div class="tile"><div class="v">${w}-${l}${t?'-'+t:''}</div><div class="k">regular season</div></div>
-      <div class="tile"><div class="v">${pw}-${pl}</div><div class="k">playoffs</div></div>
-      <div class="tile"><div class="v">${f1(pfA/n)} – ${f1(pfB/n)}</div><div class="k">avg score</div></div>
-      <div class="tile"><div class="v">${bestA&&bestA.m>0?('+'+f1(bestA.m)):'—'}</div><div class="k">${esc(A)}'s biggest win</div></div>
-    </div>
-    <h2 style="margin:14px 0 4px">All ${last.length} meetings</h2>
-    ${last.map(m=>`<div class="meet"><span>${m.y} wk${m.w}${m.ty==='P'?' · playoffs':''}</span><span><span class="${m.sa>m.sb?'w':''}">${esc(A)} ${f2(m.sa)}</span> — <span class="${m.sb>m.sa?'w':''}">${f2(m.sb)} ${esc(B)}</span></span></div>`).join('')}`;
-}
-renderH2H();
 
-/* ---------------- GAMES (full log) ---------------- */
+/* ---------------- H2H + GAMES (full log) ---------------- */
 const anyOpt = label => `<option value="">${label}</option>`;
 $('gOwner').innerHTML = anyOpt('Any owner') + owners.map(o=>`<option>${esc(o)}</option>`).join('');
 $('gOpp').innerHTML = anyOpt('vs anyone') + owners.map(o=>`<option>${esc(o)}</option>`).join('');
@@ -403,6 +380,33 @@ function renderGames(){
     if(p && g[3]!==p && g[5]!==p) continue;
     if(o && p && !((g[3]===o&&g[5]===p)||(g[3]===p&&g[5]===o))) continue;
     rows.push(g);
+  }
+  // head-to-head summary when exactly two owners are chosen (reflects the active filters)
+  if(o && p && o!==p){
+    let wA=0,wB=0,pwA=0,pwB=0,pfA=0,pfB=0,best=0;
+    for(const g of rows){
+      const sa = g[3]===o ? g[4] : g[6];
+      const sb = g[3]===o ? g[6] : g[4];
+      pfA+=sa; pfB+=sb;
+      if(sa-sb>best) best=sa-sb;
+      if(g[2]==='P'){ sa>sb?pwA++:pwB++; }
+      else if(g[2]==='R'){ sa>sb?wA++:wB++; }
+    }
+    const n = rows.length;
+    $('h2hsummary').innerHTML = n ? `
+      <div class="h2hbox">
+        <div><div class="who">${esc(o)}</div><div class="big">${wA+pwA}</div></div>
+        <div class="mid">wins<br>${n} meetings</div>
+        <div><div class="who">${esc(p)}</div><div class="big">${wB+pwB}</div></div>
+      </div>
+      <div class="tiles" style="margin-bottom:12px">
+        <div class="tile"><div class="v">${wA}-${wB}</div><div class="k">regular season</div></div>
+        <div class="tile"><div class="v">${pwA}-${pwB}</div><div class="k">playoffs</div></div>
+        <div class="tile"><div class="v">${f1(pfA/n)} – ${f1(pfB/n)}</div><div class="k">avg score</div></div>
+        <div class="tile"><div class="v">${best>0?'+'+f1(best):'—'}</div><div class="k">${esc(o)}'s biggest win</div></div>
+      </div>` : '<div class="note">These two have never played.</div>';
+  } else {
+    $('h2hsummary').innerHTML = '';
   }
   const lim = gShowAll ? rows.length : 120;
   const typ = {R:'',P:' <span class="badge gold">PO</span>',C:' <span class="badge">cons</span>'};

@@ -340,6 +340,60 @@ if not FAST and future.get(cur_week):
             elim_cards.append(dict(owner=OWNER[x], needs=needs))
     elimnote = "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive."
 
+# ---------------- 4b. playoff brackets (appear automatically once seeded) ----------------
+def bracket_view(bracket, final_label):
+    if not bracket:
+        return None
+    maxp = max((mt.get("p") or 0) for mt in bracket)
+    out = []
+    for mt in sorted(bracket, key=lambda m: (m.get("r", 1), m.get("m", 0))):
+        r = mt.get("r", 1)
+        wk = PSTART + r - 1
+        def ref(side):
+            v = mt.get(side)
+            if isinstance(v, int):
+                return OWNER.get(v, "?")
+            fr = mt.get(side + "_from") or {}
+            if "w" in fr:
+                return f"Winner of M{fr['w']}"
+            if "l" in fr:
+                return f"Loser of M{fr['l']}"
+            return "TBD"
+        s1 = s2 = None
+        if isinstance(mt.get("t1"), int) and isinstance(mt.get("t2"), int):
+            for a, b, p_, q_ in games.get(wk, []):
+                if {a, b} == {mt["t1"], mt["t2"]} and (p_ or q_):
+                    s1, s2 = (p_, q_) if a == mt["t1"] else (q_, p_)
+        p = mt.get("p")
+        if p == 1:
+            # losers bracket is a toilet bowl: the p=1 match decides LAST place
+            label = "Buck Wong Bowl" if final_label == "bwb" else "Lerch Cup game"
+        elif p:
+            label = "Place game"
+        else:
+            label = "Semifinal" if r == 2 and final_label == "bwb" else f"Round {r}"
+        if final_label == "bwb" and r == 1:
+            label = "Quarterfinal"
+        # display winner = who scored more (the bracket's own w field means
+        # "advancer", which in the toilet bowl is the game's LOSER)
+        disp_w = None
+        if s1 is not None and s2 is not None:
+            disp_w = ref("t1") if s1 > s2 else ref("t2")
+        out.append(dict(m=mt.get("m"), r=r, week=wk, label=label,
+                        t1=ref("t1"), t2=ref("t2"), s1=s1, s2=s2, w=disp_w))
+    return out
+
+brackets = None
+try:
+    wb_raw = json.load(open(yr_dir / "winners_bracket.json"))
+    lb_raw = json.load(open(yr_dir / "losers_bracket.json"))
+    seeded = any(isinstance(mt.get("t1"), int) or isinstance(mt.get("t2"), int)
+                 for mt in (wb_raw or []) + (lb_raw or []))
+    if seeded:
+        brackets = dict(bwb=bracket_view(wb_raw, "bwb"), lerch=bracket_view(lb_raw, "lerch"))
+except Exception as ex:
+    print("bracket build skipped:", ex)
+
 # ---------------- 5. write now.json ----------------
 order = contextual_rank(TEAMS, wins0, pf0, h2h0)
 leaders = {contextual_rank(D[dn], wins0, pf0, h2h0)[0] for dn in (1, 2)}
@@ -364,6 +418,7 @@ now = dict(
     matchups=matchup_cards,
     elim=elim_cards,
     elimnote=elimnote,
+    brackets=brackets,
 )
 json.dump(now, open("data/now.json", "w", encoding="utf-8"), indent=1)
 print("wrote data/now.json")

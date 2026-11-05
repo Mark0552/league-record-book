@@ -753,14 +753,15 @@ for y in sorted(shame_raw, reverse=True):
         shame.append(dict(year=y, owner=canon(c["Owner"]),
                           team=c.get("Team Name", ""), record=c.get("Record", ""),
                           roster=shame_roster.get(y, [])))
-# current-season Lerch Cup from the losers bracket, once its last-place game is scored
+# current-season Lerch Cup from the losers bracket, once its last-place game is scored.
+# The consolation is a toilet bowl: losers advance, so the "winner" (advancer) of the
+# p=1 match IS last place (verified against the 2025 bracket -> Timmy, matching the sheet).
 if CUR_SEASON not in {s["year"] for s in shame}:
     lb26 = load(2026, "losers_bracket") or []
-    placed = [mt for mt in lb26 if isinstance(mt.get("l"), int) and mt.get("p")]
-    if placed:
-        bottom = max(placed, key=lambda mt: mt["p"])
-        shame.insert(0, dict(year=CUR_SEASON, owner=ROSTER_OWNER_2026[bottom["l"]],
-                             team=team.get(bottom["l"], ""), record="", roster=[]))
+    final_l = next((mt for mt in lb26 if mt.get("p") == 1 and isinstance(mt.get("w"), int)), None)
+    if final_l:
+        shame.insert(0, dict(year=CUR_SEASON, owner=ROSTER_OWNER_2026[final_l["w"]],
+                             team=team.get(final_l["w"], ""), record="", roster=[]))
 
 # worst-game notes from the sheet
 worst_notes = {}
