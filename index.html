@@ -150,6 +150,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Scenario odds</h2>
       <div class="tscroll"><table id="pmOdds"></table></div>
       <div class="note" id="pmOddsNote"></div></div>
+    <div class="card"><h2>Points-for tiebreak watch</h2><div id="pmTies"></div>
+      <div class="note" id="pmTiesNote"></div></div>
     <div class="card"><h2>Seed distribution</h2>
       <div class="tscroll"><table id="pmSeeds"></table></div>
       <div class="note">How often each team lands at each final seed in this scenario. Seeds 1&ndash;2 = division winners with byes; 1&ndash;6 make the Buck Wong Bowl bracket; 7&ndash;12 go to the toilet bowl.</div></div>
@@ -453,12 +455,25 @@ if(now.standings){
     }
     return out;
   }
-  function seedsFor(wins, pf, h2h){
-    const w1 = ctxRank(div1, wins, pf, h2h)[0];
-    const w2 = ctxRank(div2, wins, pf, h2h)[0];
+  function seedsFull(wins, pf, h2h){
+    const r1 = ctxRank(div1, wins, pf, h2h);
+    const r2 = ctxRank(div2, wins, pf, h2h);
+    const w1 = r1[0], w2 = r2[0];
     const byes = ctxRank([w1,w2], wins, pf, h2h);
     const rest = []; for(let t=0;t<n;t++) if(t!==w1 && t!==w2) rest.push(t);
-    return [...byes, ...ctxRank(rest, wins, pf, h2h)];
+    return {S: [...byes, ...ctxRank(rest, wins, pf, h2h)], r1, r2, rest};
+  }
+  function seedsFor(wins, pf, h2h){ return seedsFull(wins, pf, h2h).S; }
+  // did the order between a and b (same record, same ranking pool) fall through to PF?
+  function pfDecided(pool, a, b, wins, h2h){
+    const g = pool.filter(t=>wins[t]===wins[a]);
+    let balanced = true; const c0 = scntA[g[0]*n+g[1]];
+    outer: for(let i=0;i<g.length;i++) for(let j=i+1;j<g.length;j++)
+      if(scntA[g[i]*n+g[j]]!==c0){ balanced=false; break outer; }
+    if(!balanced) return true;                     // unbalanced group -> straight to PF
+    let ga=0, gb=0;
+    for(const u of g){ if(u!==a) ga+=h2h[a*n+u]; if(u!==b) gb+=h2h[b*n+u]; }
+    return ga===gb;                                // H2H dead heat -> PF decides
   }
 
   function runSims(N){
@@ -466,6 +481,13 @@ if(now.standings){
     const pickCode = sched.map(g => picks[g.key]===g.an ? 1 : picks[g.key]===g.bn ? 2 : 0);
     const seedCount = Array.from({length:n}, ()=>new Int32Array(n));
     const champC = new Int32Array(n), lastC = new Int32Array(n);
+    const ties = {};   // "lo|hi|kind" -> {n, loAbove}
+    const tally = (a, b, kind, aboveIsA) => {
+      const lo = Math.min(a,b), hi = Math.max(a,b), k = lo+'|'+hi+'|'+kind;
+      const e = ties[k] || (ties[k] = {n:0, loAbove:0});
+      e.n++;
+      if((aboveIsA ? a : b) === lo) e.loAbove++;
+    };
     const bg = (x,y,r)=> gauss(pwMean[r][x], sdA[x]) >= gauss(pwMean[r][y], sdA[y]) ? x : y;   // score winner
     const bl = (x,y,r)=> gauss(pwMean[r][x], sdA[x]) >= gauss(pwMean[r][y], sdA[y]) ? y : x;   // score loser
     for(let s=0;s<N;s++){
@@ -478,8 +500,15 @@ if(now.standings){
         if(pa>pb){ wins[g.a]++; h2h[g.a*n+g.b]++; } else { wins[g.b]++; h2h[g.b*n+g.a]++; }
         pf[g.a]+=Math.max(30,pa); pf[g.b]+=Math.max(30,pb);
       }
-      const S = seedsFor(wins, pf, h2h);
+      const {S, r1, r2, rest} = seedsFull(wins, pf, h2h);
       for(let i=0;i<n;i++) seedCount[S[i]][i]++;
+      // PF-tiebreak bookkeeping at the boundaries that matter
+      if(wins[S[5]]===wins[S[6]] && pfDecided(rest, S[5], S[6], wins, h2h))
+        tally(S[5], S[6], 'spot', true);
+      if(wins[r1[0]]===wins[r1[1]] && pfDecided(div1, r1[0], r1[1], wins, h2h))
+        tally(r1[0], r1[1], 'bye', true);
+      if(wins[r2[0]]===wins[r2[1]] && pfDecided(div2, r2[0], r2[1], wins, h2h))
+        tally(r2[0], r2[1], 'bye', true);
       // Buck Wong Bowl: QFs s4v s5, s3v s6; SFs s1 v W(4v5), s2 v W(3v6); final
       const q1 = bg(S[3],S[4],0), q2 = bg(S[2],S[5],0);
       champC[bg(bg(S[0],q1,1), bg(S[1],q2,1), 2)]++;
@@ -487,7 +516,7 @@ if(now.standings){
       const a1 = bl(S[8],S[6],0), a2 = bl(S[7],S[9],0);
       lastC[bl(bl(S[11],a1,1), bl(S[10],a2,1), 2)]++;
     }
-    return {seedCount, champC, lastC, N};
+    return {seedCount, champC, lastC, ties, N};
   }
 
   function renderPicks(){
@@ -521,6 +550,24 @@ if(now.standings){
     const np = Object.keys(picks).length;
     $('pmOddsNote').textContent = `${res.N.toLocaleString()} simulations of the remaining schedule and both brackets, conditioned on your picks (forced winners keep realistic scores). House tiebreaks and division byes applied. ` +
       (np ? `${np} pick${np>1?'s':''} locked in.` : 'No picks yet — this is the pure projection.');
+    renderTies(res);
+  }
+  function renderTies(res){
+    const rows = Object.entries(res.ties).map(([k,e])=>{
+      const parts = k.split('|');
+      const a = +parts[0], b = +parts[1], kind = parts[2];
+      const pfa = M.pf[T[a]], pfb = M.pf[T[b]];
+      const leader = pfa >= pfb ? a : b, trail = leader===a ? b : a;
+      const leaderHolds = (leader===a ? e.loAbove : e.n - e.loAbove) / e.n * 100;
+      return {a, b, kind, pct: e.n/res.N*100, leader, trail, gap: Math.abs(pfa-pfb), leaderHolds};
+    }).filter(r=>r.pct>=0.3).sort((x,y)=>y.pct-x.pct).slice(0,8);
+    $('pmTies').innerHTML = rows.length ? rows.map(r=>
+      `<div class="elim" style="border-left-color:var(--gold)"><b>${esc(T[r.a])} vs ${esc(T[r.b])}</b> — ${r.kind==='spot'?'the last playoff spot':'a division title + bye'} comes down to points-for in <b>${r.pct.toFixed(1)}%</b> of sims.
+      <div style="margin-top:3px;color:var(--ink2)">Today: <b>${esc(T[r.leader])}</b> leads the PF race by <b>${r.gap.toFixed(1)}</b> (${M.pf[T[r.leader]].toFixed(1)} to ${M.pf[T[r.trail]].toFixed(1)}) and holds the tiebreak in ${r.leaderHolds.toFixed(0)}% of those sims.</div></div>`
+    ).join('') : '<div class="note">No points-for tiebreaks at the playoff cut or the division titles in this scenario — those boundaries settle on record or head-to-head.</div>';
+    $('pmTiesNote').textContent = rows.length
+      ? 'Picks force winners, not scores — every remaining game still adds points to both teams. The gap shown is today’s PF separation; the % shows how often the current leader is still ahead when the tiebreak hits.'
+      : '';
   }
   let res = runSims(10000);
   renderPicks(); renderOdds(res);
