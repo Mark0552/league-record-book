@@ -99,7 +99,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <nav id="nav">
     <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
     <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Transactions</a>
-    <a href="#draft">Draft</a><a href="#owners">Owners</a><a href="#alltime">All-Time</a>
+    <a href="#draft">Draft</a><a href="#players">Players</a><a href="#owners">Owners</a><a href="#alltime">All-Time</a>
   </nav>
 </header>
 <main>
@@ -212,6 +212,20 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
     <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
       <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
+  </section>
+
+  <section id="players">
+    <div class="selrow"><select id="plPos">
+      <option value="">All positions</option><option>QB</option><option>RB</option>
+      <option>WR</option><option>TE</option><option value="FLEX">FLEX (RB/WR/TE)</option>
+      <option>K</option><option>DEF</option>
+    </select></div>
+    <div class="card"><h2>Most games started</h2><ol class="rec" id="pl_starts"></ol>
+      <div class="note">Every start since 2015, with the owners who started them. Tap a player for their full league career.</div></div>
+    <div class="card"><h2>Most points scored</h2><ol class="rec" id="pl_pts"></ol>
+      <div class="note">Points while in a starting lineup, under each season's scoring.</div></div>
+    <div class="card"><h2>Best points per start</h2><ol class="rec" id="pl_ppg"></ol>
+      <div class="note">Minimum 10 starts.</div></div>
   </section>
 
   <section id="owners">
@@ -733,6 +747,35 @@ $('master').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="nu
     const inactive = !DATA.active.includes(r.o);
     return `<tr${inactive?' style="color:var(--ink3)"':''}><td><b>${esc(r.o)}</b></td><td class="num">${r.seasons}</td><td class="num">${r.w}-${r.l}${r.t?'-'+r.t:''}</td><td class="num">${pct}</td><td class="num">${(r.pf/(r.g||1)).toFixed(1)}</td><td class="num">${lk.apw!=null?lk.apw+'-'+lk.apl:''}</td><td class="num">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):''}</td><td class="num">${r.pw}-${r.pl}</td><td class="num">${appsBy[r.o]?appsBy[r.o].size:0}</td><td class="num">${r.titles||0}</td><td class="num">${shameBy[r.o]||0}</td><td class="num">${highBy[r.o]||0}</td><td class="num">${r.net?esc(r.net):'<span style="color:var(--ink3)">—</span>'}</td></tr>`;
   }).join('');
+
+/* ---------------- PLAYERS TAB ---------------- */
+function renderPlayersTab(){
+  if(!PIDX) buildPlayerIndex();
+  const pos = $('plPos').value;
+  const match = p => !pos || (pos==='FLEX' ? ['RB','WR','TE'].includes(p) : p===pos);
+  const entries = Object.entries(PIDX).filter(([n,e])=>match(e.pos));
+  const ownStr = e => Object.entries(e.own).sort((a,b)=>b[1].starts-a[1].starts)
+    .slice(0,3).map(([o,v])=>`${esc(o)} ${v.starts}`).join(', ')
+    + (Object.keys(e.own).length>3 ? ` +${Object.keys(e.own).length-3} more` : '');
+  const row = (n,e,val) => `<li class="plrow" style="cursor:pointer" data-pn="${esc(n)}"><span class="v">${val}</span><span><b>${esc(n)}</b> <span class="d">${esc(e.pos)} · ${ownStr(e)}</span></span></li>`;
+  $('pl_starts').innerHTML = entries.slice().sort((a,b)=>b[1].starts-a[1].starts).slice(0,15)
+    .map(([n,e])=>row(n,e,e.starts+'×')).join('');
+  $('pl_pts').innerHTML = entries.slice().sort((a,b)=>b[1].pts-a[1].pts).slice(0,15)
+    .map(([n,e])=>row(n,e,e.pts.toFixed(0))).join('');
+  $('pl_ppg').innerHTML = entries.filter(([n,e])=>e.starts>=10)
+    .sort((a,b)=>(b[1].pts/b[1].starts)-(a[1].pts/a[1].starts)).slice(0,15)
+    .map(([n,e])=>row(n,e,(e.pts/e.starts).toFixed(1))).join('');
+}
+$('plPos').addEventListener('change', renderPlayersTab);
+document.getElementById('players').addEventListener('click', e=>{
+  const r = e.target.closest('.plrow');
+  if(!r) return;
+  location.hash = '#records';
+  $('pSearch').value = r.dataset.pn;
+  $('pResults').innerHTML = '';
+  showPlayer(r.dataset.pn);
+});
+renderPlayersTab();
 
 /* ---------------- OWNER PROFILES ---------------- */
 $('profSel').innerHTML = owners.map(o=>`<option>${esc(o)}</option>`).join('');
