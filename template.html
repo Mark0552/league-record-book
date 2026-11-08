@@ -260,6 +260,22 @@ const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const G = DATA.games; // [year, week, type(R/P/C), a, sa, b, sb]
 const YEARS = [...new Set(G.map(g=>g[0]))].sort((a,b)=>b-a);
 $('sub').textContent = 'League record book · ' + DATA.updated;
+// crayon-box lettering for the league name
+(function(){
+  const h = document.querySelector('h1');
+  const tn = h.childNodes[0];
+  const colors = ['#ef4444','#f59e0b','#22c55e','#38bdf8','#a78bfa','#ec4899','#14b8a6'];
+  const frag = document.createDocumentFragment();
+  let i = 0;
+  for(const ch of tn.textContent){
+    if(ch === ' '){ frag.appendChild(document.createTextNode(' ')); continue; }
+    const s = document.createElement('span');
+    s.style.color = colors[i++ % colors.length];
+    s.textContent = ch;
+    frag.appendChild(s);
+  }
+  h.replaceChild(frag, tn);
+})();
 $('foot').textContent = 'Built from the Sleeper API, ESPN league history & the league record sheet · auto-updates Wednesday mornings · ' + DATA.updated;
 
 function show(){
