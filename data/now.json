@@ -127,15 +127,15 @@
   },
   {
    "owner": "Mark",
-   "pct": 53.4
+   "pct": 53.5
   },
   {
    "owner": "Clancy",
-   "pct": 18.6
+   "pct": 18.5
   },
   {
    "owner": "Luke",
-   "pct": 7.4
+   "pct": 7.5
   },
   {
    "owner": "Will",
@@ -175,17 +175,17 @@
    "a": "Lerch",
    "pa": 93.6,
    "b": "Austin",
-   "pb": 95.9
+   "pb": 95.7
   },
   {
    "a": "Clancy",
    "pa": 87.8,
    "b": "Luke",
-   "pb": 96.0
+   "pb": 96.2
   },
   {
    "a": "Martin",
-   "pa": 93.9,
+   "pa": 94.0,
    "b": "Cliff",
    "pb": 92.2
   }
