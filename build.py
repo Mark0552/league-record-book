@@ -904,8 +904,13 @@ if canon_name:
     _remap(draft_payload["busts"])
 
 # ================= INFLATION-ADJUSTED RECORDS =================
-# 2015-2018 were standard scoring; adjusted mode re-scores that era at 0.5 PPR
-# using per-week receptions (nflverse), and ranks seasons per-game.
+# Scoring rules changed over the years (verified from ESPN mSettings + Sleeper
+# scoring_settings): 0.5 PPR arrived in 2019; rush 100-199 (+2) / 200+ (+4)
+# game bonuses arrived in 2024 (rec equivalents existed every year; pass
+# bonuses never did). Adjusted mode re-scores 2015-2018 at 0.5 PPR and
+# retro-applies the rush bonuses to 2015-2023 using nflverse weekly stats,
+# and ranks seasons per-game. XP-miss -1 (added 2025) is NOT retro-applied
+# (no per-week kicking source; worth ~1-2 pts/season league-wide).
 def norm_infl(s):
     s = _re.sub(r"[^a-z ]", "", s.lower())
     s = _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", s)
@@ -917,6 +922,14 @@ for yr in range(2015, 2019):
         recmaps[yr] = json.load(open(fp, encoding="utf-8"))
 def rec_of(yr, w, name):
     return (recmaps.get(yr) or {}).get(f"{w}|{norm_infl(name)}", 0.0)
+rushmaps = {}
+for yr in range(2015, 2024):
+    fp = espn_dir / f"rush_{yr}.json"
+    if fp.exists():
+        rushmaps[yr] = json.load(open(fp, encoding="utf-8"))
+def rush_bonus_of(yr, w, name):
+    ry = (rushmaps.get(yr) or {}).get(f"{w}|{norm_infl(name)}", 0.0)
+    return 4.0 if ry >= 200 else (2.0 if ry >= 100 else 0.0)
 
 adj_player_entries = []
 team_delta = defaultdict(float)   # (yr, w, owner) -> +points at 0.5 PPR
@@ -925,6 +938,8 @@ for key, lu in lineups.items():
     yr, w = int(yr_s), int(w_s)
     for nm, pos, pts in lu:
         bump = 0.5 * rec_of(yr, w, nm) if yr <= 2018 else 0.0
+        if yr <= 2023:
+            bump += rush_bonus_of(yr, w, nm)
         team_delta[(yr, w, o)] += bump
         if pts + bump > 30:
             adj_player_entries.append((pts + bump, nm, pos, o, yr, w))
