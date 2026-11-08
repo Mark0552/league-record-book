@@ -178,8 +178,6 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Bold = won that week. Gold = league's top score of the week. (n) and the cell color = where the score ranked league-wide that week: green = best, red = worst.</div></div>
     <div class="card"><h2>Scoring distribution</h2><div id="ss_dist"></div>
       <div class="note">Each team's weekly scores: whisker = min to max, box = middle half (Q1&ndash;Q3), bright tick = median. Sorted by median.</div></div>
-    <div class="card"><h2>All-play &amp; median standings</h2><div class="tscroll"><table id="ss_lenses"></table></div>
-      <div class="note">All-play = record if you played all 11 teams every week. vs Median = record against each week's league median score. Big gaps from the real record = schedule luck.</div></div>
     <div class="card"><h2>Playoff results</h2><div id="ss_playoffs"></div></div>
     <div class="card"><h2>Consolation bracket</h2><div id="ss_consol"></div>
       <div class="note">The road to the Lerch Cup.</div></div>
@@ -257,10 +255,10 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   </section>
 
   <section id="luck">
-    <div class="card"><h2>This season's luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
-      <div class="note">All-play = your record if you played everyone every week. Luck = actual wins minus expected wins from your scores. Positive = the schedule has been kind.</div></div>
+    <div class="selrow"><select id="luckYear"></select></div>
+    <div class="card"><h2 id="l_hdr">Season luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
+      <div class="note">All-play = your record if you played everyone every week. vs Median = your record against each week's league median score. Luck = actual wins minus expected wins from your scores — positive means the schedule has been kind.</div></div>
     <div class="card"><h2>Schedule simulator</h2>
-      <div class="selrow"><select id="schedYear"></select></div>
       <div id="schedAwards"></div>
       <div class="tscroll"><table id="schedMatrix"></table></div>
       <div class="note">Each row: that team's record if it had played the column team's schedule (their own scores, the other guy's opponents). Diagonal = actual record. Green = better than reality, red = worse.</div></div>
@@ -712,25 +710,6 @@ function renderSeason(){
         <div class="bmed" style="left:${X(d.med)}"></div></div>
       <div class="blab">${d.med.toFixed(0)} · ${d.min.toFixed(0)}–${d.max.toFixed(0)}</div></div>`).join('');
   } else $('ss_dist').innerHTML = '<div class="note">No games yet.</div>';
-  // all-play & median standings
-  const lens = owners.map(o=>{
-    let apw=0, apl=0, apt=0, mw=0, ml=0;
-    for(const w of weeks){
-      const c = cell[o+'|'+w]; if(!c) continue;
-      const others = owners.filter(x=>x!==o).map(x=>cell[x+'|'+w]).filter(Boolean).map(x=>x.pts);
-      if(!others.length) continue;
-      apw += others.filter(p=>c.pts>p).length;
-      apl += others.filter(p=>c.pts<p).length;
-      apt += others.filter(p=>c.pts===p).length;
-      const all = [c.pts, ...others].sort((a,b)=>a-b);
-      const med = (all[Math.floor((all.length-1)/2)] + all[Math.ceil((all.length-1)/2)])/2;
-      c.pts>med ? mw++ : ml++;
-    }
-    const r = rows.find(x=>x.o===o);
-    return {o, r, apw, apl, apt, mw, ml};
-  });
-  $('ss_lenses').innerHTML = '<tr><th>Owner</th><th class="num">Record</th><th class="num">All-play</th><th class="num">vs Median</th></tr>' +
-    lens.map(x=>`<tr><td><b>${esc(x.o)}</b></td><td class="num">${x.r?x.r.w+'-'+x.r.l:'—'}</td><td class="num">${x.apw}-${x.apl}${x.apt?'-'+x.apt:''}</td><td class="num">${x.mw}-${x.ml}</td></tr>`).join('');
   // playoffs
   const po = G.filter(g=>g[0]===year&&g[2]==='P');
   const lastPOwk = Math.max(0, ...po.map(g=>g[1]));
@@ -785,9 +764,9 @@ $('ss_stand').addEventListener('click', e=>{
 $('seasonSel').addEventListener('change', renderSeason);
 
 /* ---------------- SCHEDULE SIMULATOR (Luck tab) ---------------- */
-$('schedYear').innerHTML = YEARS.map(y=>`<option>${y}</option>`).join('');
+$('luckYear').innerHTML = YEARS.map(y=>`<option>${y}</option>`).join('');
 function renderSched(){
-  const year = +$('schedYear').value;
+  const year = +$('luckYear').value;
   const sc = {}, opp = {}, wkSet = new Set(), ownSet = new Set();
   for(const g of G){
     if(g[0]!==year || g[2]!=='R') continue;
@@ -847,7 +826,7 @@ function renderSched(){
     ['📉 Biggest downgrade', `${esc(down.x)} would go <b>${fmtRec(R[down.x+'|'+down.y])}</b> with ${esc(down.y)}'s schedule (actual ${fmtRec(R[down.x+'|'+down.x])}, ${down.v.toFixed(1)} W)`],
   ].map(([t,d])=>`<div class="meet"><span style="flex:none;font-weight:700">${t}</span><span style="text-align:right;color:var(--ink2)">${d}</span></div>`).join('');
 }
-$('schedYear').addEventListener('change', renderSched);
+$('luckYear').addEventListener('change', ()=>{ renderLuckSeason(); renderSched(); });
 renderSched();
 renderSeason();
 
@@ -1079,9 +1058,38 @@ $('m_pay').innerHTML = '<tr><th>Owner</th><th class="num">Paid in</th><th class=
 
 /* ---------------- LUCK ---------------- */
 const L = DATA.luck;
-$('l_season').innerHTML = '<tr><th>Owner</th><th class="num">Record</th><th class="num">All-play</th><th class="num">Luck</th></tr>' +
-  L.season.slice().sort((a,b)=>b.luck-a.luck).map(r=>
-  `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.w}-${r.l}</td><td class="num">${r.apw}-${r.apl}</td><td class="num" style="color:${r.luck>0.5?'var(--accent)':r.luck<-0.5?'var(--red)':'var(--ink2)'}">${r.luck>0?'+':''}${r.luck.toFixed(1)}</td></tr>`).join('');
+function renderLuckSeason(){
+  const year = +$('luckYear').value;
+  $('l_hdr').textContent = year + ' luck meter';
+  const wk = {}, rec = {};
+  for(const g of G){
+    if(g[0]!==year || g[2]!=='R') continue;
+    (wk[g[1]] = wk[g[1]]||[]).push([g[4], g[3]], [g[6], g[5]]);
+    for(const [me,sm,sy] of [[g[3],g[4],g[6]],[g[5],g[6],g[4]]]){
+      rec[me] = rec[me] || {w:0,l:0};
+      if(sm>sy) rec[me].w++; else if(sy>sm) rec[me].l++;
+    }
+  }
+  const st = {};
+  for(const lst of Object.values(wk)){
+    const n = lst.length;
+    const sorted = lst.map(x=>x[0]).sort((a,b)=>a-b);
+    const med = (sorted[Math.floor((n-1)/2)] + sorted[Math.ceil((n-1)/2)])/2;
+    for(const [pts,o] of lst){
+      const s = st[o] = st[o] || {apw:0,apl:0,exp:0,mw:0,ml:0};
+      const beat = lst.reduce((c,x)=> x[0]<pts ? c+1 : c, 0);
+      s.apw += beat; s.apl += n-1-beat; s.exp += beat/(n-1);
+      pts>med ? s.mw++ : s.ml++;
+    }
+  }
+  const rows = Object.keys(st).map(o=>{
+    const r = rec[o]||{w:0,l:0};
+    return {o, ...st[o], w:r.w, l:r.l, luck: r.w - st[o].exp};
+  }).sort((a,b)=>b.luck-a.luck);
+  $('l_season').innerHTML = '<tr><th>Owner</th><th class="num">W-L</th><th class="num">All-play</th><th class="num">vs Median</th><th class="num">Luck</th></tr>' +
+    rows.map(r=>`<tr><td><b>${esc(r.o)}</b></td><td class="num">${r.w}-${r.l}</td><td class="num">${r.apw}-${r.apl}</td><td class="num">${r.mw}-${r.ml}</td><td class="num" style="color:${r.luck>0.5?'var(--accent)':r.luck<-0.5?'var(--red)':'var(--ink2)'}">${r.luck>0?'+':''}${r.luck.toFixed(1)}</td></tr>`).join('');
+}
+renderLuckSeason();
 $('l_career').innerHTML = '<tr><th>Owner</th><th class="num">All-play</th><th class="num">Luck</th><th class="num">Lucky W</th><th class="num">Unlucky L</th></tr>' +
   L.career.slice().sort((a,b)=>b.luck-a.luck).map(r=>
   `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.apw}-${r.apl}</td><td class="num">${r.luck>0?'+':''}${r.luck.toFixed(1)}</td><td class="num">${r.lucky}</td><td class="num">${r.unlucky}</td></tr>`).join('');
