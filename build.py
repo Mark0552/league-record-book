@@ -826,6 +826,65 @@ for season in SLEEPER_SEASONS:
                            info.get("position", "?"), round(pp.get(pid, 0) or 0, 1)])
             lineups[f"{season}|{w}|{o}"] = lu
 
+# ================= INFLATION-ADJUSTED RECORDS =================
+# 2015-2018 were standard scoring; adjusted mode re-scores that era at 0.5 PPR
+# using per-week receptions (nflverse), and ranks seasons per-game.
+def norm_infl(s):
+    s = _re.sub(r"[^a-z ]", "", s.lower())
+    s = _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", s)
+    return s.replace(" ", "")
+recmaps = {}
+for yr in range(2015, 2019):
+    fp = espn_dir / f"rec_{yr}.json"
+    if fp.exists():
+        recmaps[yr] = json.load(open(fp, encoding="utf-8"))
+def rec_of(yr, w, name):
+    return (recmaps.get(yr) or {}).get(f"{w}|{norm_infl(name)}", 0.0)
+
+adj_player_entries = []
+team_delta = defaultdict(float)   # (yr, w, owner) -> +points at 0.5 PPR
+for key, lu in lineups.items():
+    yr_s, w_s, o = key.split("|")
+    yr, w = int(yr_s), int(w_s)
+    for nm, pos, pts in lu:
+        bump = 0.5 * rec_of(yr, w, nm) if yr <= 2018 else 0.0
+        team_delta[(yr, w, o)] += bump
+        if pts + bump > 30:
+            adj_player_entries.append((pts + bump, nm, pos, o, yr, w))
+adj_player_entries.sort(key=lambda e: -e[0])
+adj_players = [dict(pts=round(e[0], 1), name=e[1], pos=e[2], owner=e[3], year=e[4], week=e[5])
+               for e in adj_player_entries[:15]]
+
+adj_expand = []
+for g in games:
+    da = team_delta.get((g["year"], g["week"], g["a"]), 0.0)
+    db = team_delta.get((g["year"], g["week"], g["b"]), 0.0)
+    adj_expand.append((g["sa"] + da, g["a"], g["sb"] + db, g["b"], g))
+    adj_expand.append((g["sb"] + db, g["b"], g["sa"] + da, g["a"], g))
+adj_top = sorted(adj_expand, key=lambda x: -x[0])[:10]
+adj_low = sorted(adj_expand, key=lambda x: x[0])[:10]
+
+adj_season = defaultdict(lambda: dict(pf=0.0, g=0))
+for g in games:
+    if g["type"] != "Regular":
+        continue
+    for o, pts in ((g["a"], g["sa"] + team_delta.get((g["year"], g["week"], g["a"]), 0.0)),
+                   (g["b"], g["sb"] + team_delta.get((g["year"], g["week"], g["b"]), 0.0))):
+        e = adj_season[(o, g["year"])]
+        e["pf"] += pts; e["g"] += 1
+adj_season_rows = [dict(owner=o, year=y, pf=round(v["pf"], 1), g=v["g"], ppg=round(v["pf"] / v["g"], 2))
+                   for (o, y), v in adj_season.items() if y in complete_years]
+adj = dict(
+    top=[dict(pts=round(e[0], 2), owner=e[1], opp=e[3], opp_pts=round(e[2], 2),
+              year=e[4]["year"], week=e[4]["week"]) for e in adj_top],
+    low=[dict(pts=round(e[0], 2), owner=e[1], opp=e[3], opp_pts=round(e[2], 2),
+              year=e[4]["year"], week=e[4]["week"],
+              note=worst_notes.get((e[4]["year"], e[4]["week"], e[1]), "")) for e in adj_low],
+    players=adj_players,
+    season_high=sorted(adj_season_rows, key=lambda r: -r["ppg"])[:10],
+    season_low=sorted(adj_season_rows, key=lambda r: r["ppg"])[:10],
+)
+
 # ---------------- 2026 "now" data ----------------
 now = json.load(open("data/now.json", encoding="utf-8")) if Path("data/now.json").exists() else {}
 if Path("data/title_odds.json").exists():
@@ -858,6 +917,7 @@ payload = dict(
         loss_high=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in loss_high],
         win_low=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in win_low],
         players=top_players,
+        adj=adj,
     ),
     rings=rings,
     money=money,
