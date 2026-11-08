@@ -127,7 +127,6 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Playoff results</h2><div id="ss_playoffs"></div></div>
     <div class="card"><h2>Consolation bracket</h2><div id="ss_consol"></div>
       <div class="note">The road to the Lerch Cup.</div></div>
-    <div class="card"><h2>Trades</h2><div id="ss_trades"></div></div>
   </section>
 
   <section id="games">
@@ -404,9 +403,9 @@ function renderSeason(){
     ordered = rows; cut = 6;
   }
   $('ss_stand').innerHTML = '<tr><th>#</th><th>Owner</th><th class="num">W-L</th><th class="num">PF</th><th class="num">PA</th></tr>' +
-    ordered.map((r,i)=>`<tr${i===cut?' class="line"':''}><td>${i+1}</td><td><b>${esc(r.o)}</b>${champ&&champ.owner===r.o?' <span class="badge gold">🏆 Buck Wong Bowl</span>':''}${shame&&shame.owner===r.o?' <span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">🥄 Lerch Cup</span>':''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td><td class="num">${f1(r.pa)}</td></tr>`).join('');
+    ordered.map((r,i)=>`<tr class="srow${i===cut?' line':''}" style="cursor:pointer" data-o="${esc(r.o)}"><td>${i+1}</td><td><b>${esc(r.o)}</b>${champ&&champ.owner===r.o?' <span class="badge gold">🏆 Buck Wong Bowl</span>':''}${shame&&shame.owner===r.o?' <span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">🥄 Lerch Cup</span>':''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td><td class="num">${f1(r.pa)}</td></tr>`).join('');
   $('ss_note').textContent = (champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''}). ` : '')
-    + 'Ordered by league tiebreakers; playoff teams above the dashed cut (division winners earn seeds regardless of record).'
+    + 'Ordered by league tiebreakers; playoff teams above the dashed cut (division winners earn seeds regardless of record). Tap an owner for who they started that season.'
     + (year===YEARS[0] && !poSet.size ? ' Current-season order mirrors the live League Status seeding.' : '');
   // weekly matrix (regular season)
   const weeks = [...new Set(G.filter(g=>g[0]===year&&g[2]==='R').map(g=>g[1]))].sort((a,b)=>a-b);
@@ -446,14 +445,35 @@ function renderSeason(){
     return `<div class="meet"><span>wk${g[1]}${isCup?' · <span style="color:var(--red);font-weight:700">Lerch Cup</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
   }).join('')
     : '<div class="note">No consolation games recorded.</div>';
-  // trades
-  const tr = (DATA.moves.trades||[]).filter(t=>t.year===year);
-  $('ss_trades').innerHTML = tr.length ? tr.map(t=>
-    `<div class="elim" style="border-left-color:var(--accent)">` +
-    t.sides.map(s=>`<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${s.got.map(esc).join(', ')||'—'}${s.pts!=null?` <span style="color:var(--ink3);font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:''}</div>`).join('') +
-    `<div style="font-size:11.5px;color:var(--ink3)">week ${t.week}</div></div>`).join('')
-    : '<div class="note">No trades recorded this season.</div>';
 }
+// tap an owner in the season standings -> their roster usage that year
+$('ss_stand').addEventListener('click', e=>{
+  const tr = e.target.closest('tr.srow');
+  if(!tr) return;
+  const next = tr.nextElementSibling;
+  if(next && next.classList.contains('detailrow')){ next.remove(); return; }
+  const year = +$('seasonSel').value, o = tr.dataset.o;
+  const agg = {};
+  for(const [k, lu] of Object.entries(DATA.lineups||{})){
+    const parts = k.split('|');
+    if(+parts[0] !== year || parts[2] !== o) continue;
+    for(const p of lu){
+      const a = agg[p[0]] = agg[p[0]] || {pos: p[1], n: 0, pts: 0};
+      a.n++; a.pts += p[2];
+    }
+  }
+  const rows = Object.entries(agg).sort((x,y)=>y[1].pts-x[1].pts);
+  const d = document.createElement('tr');
+  d.className = 'detailrow';
+  d.innerHTML = `<td colspan="5" style="background:var(--surface2)">
+    <b style="font-size:13px">${esc(o)}'s ${year} starters</b>` +
+    (rows.length ? rows.map(([nm,a])=>
+      `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0">
+        <span><span style="color:var(--ink3)">${esc(a.pos)}</span> ${esc(nm)}</span>
+        <span style="font-variant-numeric:tabular-nums">${a.n} start${a.n>1?'s':''} · ${a.pts.toFixed(1)} pts</span></div>`).join('')
+      : '<div class="note">No lineup data for this season.</div>') + '</td>';
+  tr.after(d);
+});
 $('seasonSel').addEventListener('change', renderSeason);
 renderSeason();
 
