@@ -354,10 +354,12 @@ if(now.standings){
       </div><div class="pc">${o.pct.toFixed(1)}%${t!=null?`<div style="font-size:10.5px;color:var(--gold)">${t.toFixed(1)}%</div>`:''}</div></div>`;
   }).join('');
   $('oddsnote').textContent = (now.oddsnote||'') + (now.title ? ' Teal bar = make the playoffs, gold bar = win the championship.' : '');
-  if((now.elim||[]).length){
-    $('elims').innerHTML = now.elim.map(e=>
-      `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('');
-    $('elimnote').textContent = now.elimnote || '';
+  if((now.elim||[]).length || (now.brink||[]).length){
+    $('elims').innerHTML = (now.elim||[]).map(e=>
+      `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('')
+      + (now.brink||[]).map(e=>
+      `<div class="elim" style="border-left-color:var(--gold)"><b>${esc(e.owner)}</b> is on the brink if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('');
+    $('elimnote').textContent = [(now.elim||[]).length ? now.elimnote : '', now.brinknote || ''].filter(Boolean).join(' ');
   } else {
     $('elimcard').style.display = 'none';
   }

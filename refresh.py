@@ -288,17 +288,19 @@ def qualifies(x, wins, pf, h2h):
         return True
     return x in contextual_rank([t for t in TEAMS if t not in winners], wins, pf, h2h)[:4]
 
-def alive(x, wins_now, h2h_now, future_games):
+def alive(x, wins_now, h2h_now, future_games, tie_ok=True):
     """Can x still make the playoffs if every tie breaks x's way? A tie is
     never lost in advance: a multiway unbalanced tie group falls to points-for
     under the house rule, which can rescue a team that trails every pairwise
-    head-to-head (it happened in 2024 and 2025)."""
+    head-to-head (it happened in 2024 and 2025). With tie_ok=False, asks the
+    opposite question: can x still get in OUTRIGHT, without needing any
+    tiebreaker (every tie counts as lost)?"""
     allg = [g for w in sorted(future_games) for g in future_games[w]]
     xg = [(a, b) for a, b in allg if x in (a, b)]
     pl = [(a, b) for a, b in allg if x not in (a, b)]
     M = wins_now[x] + len(xg)
     others = sorted([t for t in TEAMS if t != x], key=lambda t: -wins_now[t])
-    caps = {y: M for y in others}
+    caps = {y: (M if tie_ok else M - 1) for y in others}
     forced = [t for t in others if wins_now[t] > caps[t]]
     otherdiv = frozenset(t for t in others if division[t] != division[x])
     cands = ([otherdiv] if all(f in otherdiv for f in forced) else [])
@@ -365,6 +367,7 @@ def factor_conditions(combos, games_list):
     return needs
 
 elim_cards = []
+brink_cards = []
 clinch_cards = []
 elimnote = ""
 if not FAST and future.get(cur_week):
@@ -377,7 +380,7 @@ if not FAST and future.get(cur_week):
         if not xg:
             continue
         opp = xg[0][0] if xg[0][1] == x else xg[0][1]
-        combos = []
+        combos, brink_combos = [], []
         for combo in itertools.product(*[[a, b] for a, b in other]):
             w9 = dict(wins0); w9[opp] += 1
             hh = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
@@ -388,9 +391,14 @@ if not FAST and future.get(cur_week):
                 w9[wt] += 1; rec2(wt, b if wt == a else a)
             if not alive(x, w9, hh, FUTA):
                 combos.append(combo)
+            elif not alive(x, w9, hh, FUTA, tie_ok=False):
+                brink_combos.append(combo)
         if combos:
             needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(combos, other)
             elim_cards.append(dict(owner=OWNER[x], needs=needs))
+        if brink_combos:
+            needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(brink_combos, other)
+            brink_cards.append(dict(owner=OWNER[x], needs=needs))
     elimnote = "Shown only when no combination of results and tiebreakers could save the team — a spot still reachable via a points-for tiebreak counts as alive."
 
 # ---------------- 4a. clinched / eliminated right now ----------------
@@ -631,6 +639,8 @@ now = dict(
     matchups=matchup_cards,
     elim=elim_cards,
     elimnote=elimnote,
+    brink=brink_cards,
+    brinknote="On the brink: these results would leave no path to the playoffs without winning a points-for tiebreak." if brink_cards else "",
     clinch=clinch_cards,
     clinchnote="Lock up a playoff spot no matter what happens the rest of the season." if clinch_cards else "",
     brackets=brackets,

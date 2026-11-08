@@ -192,6 +192,27 @@
  ],
  "elim": [],
  "elimnote": "Shown only when no combination of results and tiebreakers could save the team \u2014 a spot still reachable via a points-for tiebreak counts as alive.",
+ "brink": [
+  {
+   "owner": "Will",
+   "needs": [
+    "Loses to Bob"
+   ]
+  },
+  {
+   "owner": "Sam",
+   "needs": [
+    "Loses to Steve"
+   ]
+  },
+  {
+   "owner": "Timmy",
+   "needs": [
+    "Loses to Mark"
+   ]
+  }
+ ],
+ "brinknote": "On the brink: these results would leave no path to the playoffs without winning a points-for tiebreak.",
  "clinch": [],
  "clinchnote": "",
  "brackets": {
