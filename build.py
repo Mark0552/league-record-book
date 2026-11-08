@@ -857,6 +857,47 @@ for season in SLEEPER_SEASONS:
                            info.get("position", "?"), round(pp.get(pid, 0) or 0, 1)])
             lineups[f"{season}|{w}|{o}"] = lu
 
+# ================= PLAYER NAME UNIFICATION =================
+# The same human appears under era-dependent names ("Aaron Jones" vs "Aaron Jones Sr.",
+# "Ravens D/ST" vs "Ravens"). Merge variants; the most-used spelling wins.
+def player_key(name, pos):
+    s = _re.sub(r"[^a-z ]", "", name.lower())
+    s = _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", s)
+    if pos == "DEF":
+        s = s.replace("dst", "")
+    return s.replace(" ", "")
+
+variant_counts = defaultdict(Counter)
+for lu in lineups.values():
+    for nm, pos, pts in lu:
+        variant_counts[player_key(nm, pos)][nm] += 1
+canon_name = {}
+for k, c in variant_counts.items():
+    if len(c) > 1:
+        best = max(c.items(), key=lambda kv: (kv[1], len(kv[0])))[0]
+        for nm in c:
+            if nm != best:
+                canon_name[nm] = best
+if canon_name:
+    print(f"name unification: {len(canon_name)} variant spellings merged into "
+          f"{len(set(canon_name.values()))} identities")
+    for lu in lineups.values():
+        for p in lu:
+            if p[0] in canon_name:
+                p[0] = canon_name[p[0]]
+    def _remap(items, field="player"):
+        for it in items:
+            if it.get(field) in canon_name:
+                it[field] = canon_name[it[field]]
+    _remap(top_players, "name")
+    _remap(espn_pickups)
+    _remap(espn_swaps)
+    for lst in moves["waivers"].values():
+        _remap(lst)
+    _remap(draft_payload["all"])
+    _remap(draft_payload["steals"])
+    _remap(draft_payload["busts"])
+
 # ================= INFLATION-ADJUSTED RECORDS =================
 # 2015-2018 were standard scoring; adjusted mode re-scores that era at 0.5 PPR
 # using per-week receptions (nflverse), and ranks seasons per-game.
