@@ -155,26 +155,39 @@ sdv = {t: max(12.0, statistics.stdev(sc[t])) if len(sc[t]) > 1 else 20.0 for t i
 status = {}   # owner clinch/elimination status, filled by the solver or by the settled field
 N_TITLE = 100000
 title_counts = {k: {t: 0 for t in TEAMS} for k in ("made", "bye", "finals", "champs")}
+lose_odds = {}   # playoff odds conditioned on losing this week's game
 if weeks_left:
     print("simulating championships (100k) ...")
     random.seed(7)
     gauss = random.gauss
     sched = [(w, a, b) for w in weeks_left for a, b in future[w]]
+    lose_cnt = {t: 0 for t in TEAMS}
+    lose_made = {t: 0 for t in TEAMS}
     for s in range(N_TITLE):
         wins = dict(wins0); pf = dict(pf0)
         h2h = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
+        losers = []
         for w, a, b in sched:
             pa = gauss(WP[a][w], sdv[a]); pb = gauss(WP[b][w], sdv[b])
             if pa > pb:
                 wins[a] += 1; h2h[a][b][1] += 1; h2h[b][a][1] += 1; h2h[a][b][0] += 1
+                lo = b
             else:
                 wins[b] += 1; h2h[a][b][1] += 1; h2h[b][a][1] += 1; h2h[b][a][0] += 1
+                lo = a
+            if w == cur_week:
+                losers.append(lo)
             pf[a] += max(30, pa); pf[b] += max(30, pb)
         w1 = contextual_rank(D[1], wins, pf, h2h)[0]; w2 = contextual_rank(D[2], wins, pf, h2h)[0]
         byes_ = contextual_rank([w1, w2], wins, pf, h2h)
         nw = contextual_rank([t for t in TEAMS if t not in (w1, w2)], wins, pf, h2h)
         s1, s2 = byes_; s3, s4, s5, s6 = nw[:4]
-        for t in (s1, s2, s3, s4, s5, s6):
+        fieldset = (s1, s2, s3, s4, s5, s6)
+        for t in losers:
+            lose_cnt[t] += 1
+            if t in fieldset:
+                lose_made[t] += 1
+        for t in fieldset:
             title_counts["made"][t] += 1
         title_counts["bye"][s1] += 1; title_counts["bye"][s2] += 1
         def game(x, y, w):
@@ -193,6 +206,7 @@ if weeks_left:
               open("data/title_odds.json", "w", encoding="utf-8"), indent=1)
     print("wrote data/title_odds.json")
     made, N = title_counts["made"], N_TITLE
+    lose_odds = {t: round(100 * lose_made[t] / lose_cnt[t], 1) for t in TEAMS if lose_cnt[t]}
 else:
     # regular season over: field is settled; simulate what's LEFT of the live bracket
     w1 = contextual_rank(D[1], wins0, pf0, h2h0)[0]; w2 = contextual_rank(D[2], wins0, pf0, h2h0)[0]
@@ -398,7 +412,7 @@ if not FAST and future.get(cur_week):
             elim_cards.append(dict(owner=OWNER[x], needs=needs))
         if brink_combos:
             needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(brink_combos, other)
-            brink_cards.append(dict(owner=OWNER[x], needs=needs))
+            brink_cards.append(dict(owner=OWNER[x], needs=needs, odds=lose_odds.get(x)))
     elimnote = "Shown only when no combination of results and tiebreakers could save the team — a spot still reachable via a points-for tiebreak counts as alive."
 
 # ---------------- 4a. clinched / eliminated right now ----------------
@@ -640,7 +654,7 @@ now = dict(
     elim=elim_cards,
     elimnote=elimnote,
     brink=brink_cards,
-    brinknote="On the brink: these results would leave no path to the playoffs without winning a points-for tiebreak." if brink_cards else "",
+    brinknote="On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out." if brink_cards else "",
     clinch=clinch_cards,
     clinchnote="Lock up a playoff spot no matter what happens the rest of the season." if clinch_cards else "",
     brackets=brackets,

@@ -357,8 +357,12 @@ if(now.standings){
   if((now.elim||[]).length || (now.brink||[]).length){
     $('elims').innerHTML = (now.elim||[]).map(e=>
       `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('')
-      + (now.brink||[]).map(e=>
-      `<div class="elim" style="border-left-color:var(--gold)"><b>${esc(e.owner)}</b> is on the brink if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('');
+      + (now.brink||[]).map(e=>{
+        const eff = e.odds != null && e.odds < 1;
+        const oddsTxt = e.odds != null
+          ? `<div style="margin-top:5px;font-size:12.5px;color:var(--ink2)">If it happens: ~${e.odds}% to make the playoffs${eff ? ' — alive only through a points-for tiebreak' : ''}.</div>` : '';
+        return `<div class="elim" style="border-left-color:${eff?'var(--red)':'var(--gold)'}"><b>${esc(e.owner)}</b> is ${eff?'effectively out':'on the brink'} if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul>${oddsTxt}</div>`;
+      }).join('');
     $('elimnote').textContent = [(now.elim||[]).length ? now.elimnote : '', now.brinknote || ''].filter(Boolean).join(' ');
   } else {
     $('elimcard').style.display = 'none';

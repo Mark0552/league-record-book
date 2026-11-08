@@ -197,22 +197,25 @@
    "owner": "Will",
    "needs": [
     "Loses to Bob"
-   ]
+   ],
+   "odds": 0.0
   },
   {
    "owner": "Sam",
    "needs": [
     "Loses to Steve"
-   ]
+   ],
+   "odds": 0.0
   },
   {
    "owner": "Timmy",
    "needs": [
     "Loses to Mark"
-   ]
+   ],
+   "odds": 0.0
   }
  ],
- "brinknote": "On the brink: these results would leave no path to the playoffs without winning a points-for tiebreak.",
+ "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
  "clinch": [],
  "clinchnote": "",
  "brackets": {
