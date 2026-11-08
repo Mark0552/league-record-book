@@ -222,7 +222,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="alltime">
     <div class="card"><h2>All-time table</h2><div class="tscroll"><table id="master"></table></div>
-      <div class="note">Regular-season records and points since 2015. Playoffs = winner's-bracket games; Apps = seasons reaching the bracket. AP = all-play record. Net $ from league payouts.</div>
+      <div class="note">Regular-season records and points since 2015. Playoffs = winner's-bracket games; Apps = seasons reaching the bracket. AP = all-play record. Net $ from league payouts &mdash; a dash means that owner's money is tracked on a shared franchise seat (Luke / Austin / Alex and Neville / Austin); see the Money tab for the seat totals.</div>
       <div class="note">Franchise history (per the league's own payout ledger): two seats have changed hands &mdash; Austin (2015) &rarr; Alex (2016) &rarr; Luke (2017&ndash;present), and Neville (2015&ndash;2023) &rarr; Austin (2024&ndash;present). Careers tracked per person.</div></div>
     <div class="card"><h2>🏆 Buck Wong Bowl game history</h2><div id="bwbhist"></div>
       <div class="note">Every championship game on record. Tap one for both starting lineups.</div></div>
@@ -731,7 +731,7 @@ $('master').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="nu
     const pct = r.w+r.l ? (100*r.w/(r.w+r.l)).toFixed(1) : '—';
     const lk = luckBy[r.o]||{};
     const inactive = !DATA.active.includes(r.o);
-    return `<tr${inactive?' style="color:var(--ink3)"':''}><td><b>${esc(r.o)}</b></td><td class="num">${r.seasons}</td><td class="num">${r.w}-${r.l}${r.t?'-'+r.t:''}</td><td class="num">${pct}</td><td class="num">${(r.pf/(r.g||1)).toFixed(1)}</td><td class="num">${lk.apw!=null?lk.apw+'-'+lk.apl:''}</td><td class="num">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):''}</td><td class="num">${r.pw}-${r.pl}</td><td class="num">${appsBy[r.o]?appsBy[r.o].size:0}</td><td class="num">${r.titles||''}</td><td class="num">${shameBy[r.o]||''}</td><td class="num">${highBy[r.o]||''}</td><td class="num">${esc(r.net||'')}</td></tr>`;
+    return `<tr${inactive?' style="color:var(--ink3)"':''}><td><b>${esc(r.o)}</b></td><td class="num">${r.seasons}</td><td class="num">${r.w}-${r.l}${r.t?'-'+r.t:''}</td><td class="num">${pct}</td><td class="num">${(r.pf/(r.g||1)).toFixed(1)}</td><td class="num">${lk.apw!=null?lk.apw+'-'+lk.apl:''}</td><td class="num">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):''}</td><td class="num">${r.pw}-${r.pl}</td><td class="num">${appsBy[r.o]?appsBy[r.o].size:0}</td><td class="num">${r.titles||0}</td><td class="num">${shameBy[r.o]||0}</td><td class="num">${highBy[r.o]||0}</td><td class="num">${r.net?esc(r.net):'<span style="color:var(--ink3)">—</span>'}</td></tr>`;
   }).join('');
 
 /* ---------------- OWNER PROFILES ---------------- */
