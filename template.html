@@ -220,6 +220,12 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Heartbreakers (most points in a loss)</h2><ol class="rec" id="r_losshi"></ol></div>
     <div class="card"><h2>Daylight robberies (fewest points in a win)</h2><ol class="rec" id="r_winlo"></ol></div>
     <div class="card"><h2>Longest streaks</h2><div class="tiles" id="r_streaks"></div></div>
+    <div class="card"><h2>Earliest playoff clinches</h2><ol class="rec" id="r_clinch"></ol>
+      <div class="note">First week a playoff spot was locked no matter how every remaining game <em>and</em> every tiebreaker fell. Spots that came down to a points-for tiebreak never mathematically lock, so they can't appear here.</div></div>
+    <div class="card"><h2>Earliest bye clinches</h2><ol class="rec" id="r_byec"></ol>
+      <div class="note">First week the division title (and the first-round bye that comes with it) was locked outright.</div></div>
+    <div class="card"><h2>Earliest eliminations</h2><ol class="rec" id="r_elim"></ol>
+      <div class="note">First week a team was mathematically dead &mdash; no combination of remaining results or tiebreakers could have saved them.</div></div>
   </section>
 
   <section id="money">
@@ -1011,6 +1017,13 @@ renderRecordLists();
 $('r_streaks').innerHTML =
   R.winstreaks.map(s=>`<div class="tile"><div class="v">W${s.n}</div><div class="k">${esc(s.owner)}</div></div>`).join('') +
   R.lossstreaks.slice(0,1).map(s=>`<div class="tile"><div class="v" style="color:var(--red)">L${s.n}</div><div class="k">${esc(s.owner)} (ouch)</div></div>`).join('');
+const CL = R.clinches || {spot:[],bye:[],elim:[]};
+const clRow = (e, verb) =>
+  `<li><span class="v">${e.spare>0?'+'+e.spare:'0'}</span><span><b>${esc(e.owner)}</b> <span class="d">${verb} week ${e.week} of ${e.of} · ${e.year}</span></span></li>`;
+$('r_clinch').innerHTML = CL.spot.map(e=>clRow(e,'clinched')).join('') || '<li><span class="d">Nothing yet</span></li>';
+$('r_byec').innerHTML = CL.bye.map(e=>clRow(e,'locked the division')).join('') || '<li><span class="d">Nothing yet</span></li>';
+$('r_elim').innerHTML = CL.elim.map(e=>
+  `<li><span class="v" style="color:var(--red)">${e.spare>0?'+'+e.spare:'0'}</span><span><b>${esc(e.owner)}</b> <span class="d">eliminated week ${e.week} of ${e.of} · ${e.year}</span></span></li>`).join('') || '<li><span class="d">Nothing yet</span></li>';
 
 /* ---------------- MONEY ---------------- */
 const M = DATA.money;

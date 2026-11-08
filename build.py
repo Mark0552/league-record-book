@@ -2,9 +2,9 @@
 
 Usage: python build.py data/raw
 """
-import csv, json, sys, html
+import csv, itertools, json, sys, html
 from pathlib import Path
-from collections import defaultdict
+from collections import defaultdict, deque
 
 RAW = Path(sys.argv[1] if len(sys.argv) > 1 else "data/raw")
 OUT = Path("site")
@@ -977,6 +977,244 @@ adj = dict(
     season_low=sorted(adj_season_rows, key=lambda r: r["ppg"])[:10],
 )
 
+# ---------------- clinch / elimination history ----------------
+# Replay every regular season week by week and find the first week each owner
+# locked a playoff spot, locked a first-round bye (division title), or was
+# mathematically eliminated. Strict math: a clinch counts only if it holds no
+# matter how every remaining game AND every tiebreaker falls; an elimination
+# only if no combination could save them. Spots settled by points-for
+# tiebreaks never mathematically lock (multiway unbalanced ties fall to PF),
+# so ties always count as undecided in both directions.
+
+def _ch_divmap(yr):
+    """owner -> division (1/2) for a season."""
+    if yr <= 2019:
+        f = espn_dir / f"{yr}.json"
+        if not f.exists():
+            return None
+        d = json.load(open(f, encoding="utf-8"))
+        if isinstance(d, list):
+            d = d[0]
+        members = {m["id"]: (m.get("firstName", "") + " " + m.get("lastName", "")).strip()
+                   for m in d.get("members", [])}
+        log_teams = {g["a"] for g in games if g["year"] == yr} | {g["b"] for g in games if g["year"] == yr}
+        dmap = {}
+        for t in d.get("teams", []):
+            # the rotating seat lists co-owners; pick the one in this year's game log
+            cands = [ESPN_NAME.get(members.get(o, ""), members.get(o, ""))
+                     for o in (t.get("owners") or [t.get("primaryOwner")])]
+            owner = next((c for c in cands if c in log_teams), cands[0] if cands else "?")
+            dmap[owner] = t.get("divisionId", 0) + 1
+        return dmap
+    rost = load(yr, "rosters")
+    if not rost:
+        return None
+    users = {u["user_id"]: u for u in (load(yr, "users") or [])}
+    dmap = {}
+    for r in rost:
+        owner = uid26.get(r["owner_id"])
+        if not owner:
+            votes = defaultdict(int)
+            for w in range(1, 19):
+                m = load(yr, f"matchups_{w}")
+                if not m:
+                    continue
+                for x in m:
+                    if x["roster_id"] == r["roster_id"] and x["points"]:
+                        hit = score_owner[yr].get((w, round(x["points"], 1)))
+                        if hit:
+                            votes[hit] += 1
+            owner = max(votes, key=votes.get) if votes else users.get(r["owner_id"], {}).get("display_name", "?")
+        dmap[owner] = (r.get("settings") or {}).get("division")
+    return dmap
+
+def _ch_flow(glist, budget):
+    """Can the games in glist be distributed so each team wins <= budget[team]?"""
+    Gn = len(glist)
+    if Gn == 0:
+        return True
+    if sum(budget.values()) < Gn:
+        return False
+    tidx = {y: i for i, y in enumerate(budget)}
+    n = 2 + Gn + len(budget); s, t = 0, n - 1
+    cap = [[0] * n for _ in range(n)]
+    for i, (a, b) in enumerate(glist):
+        cap[s][1 + i] = 1
+        cap[1 + i][1 + Gn + tidx[a]] = 1
+        cap[1 + i][1 + Gn + tidx[b]] = 1
+    for y, i in tidx.items():
+        cap[1 + Gn + i][t] = budget[y]
+    flow = 0
+    while True:
+        par = [-1] * n; par[s] = s; q = deque([s])
+        while q and par[t] == -1:
+            u = q.popleft()
+            for v in range(n):
+                if par[v] == -1 and cap[u][v] > 0:
+                    par[v] = u; q.append(v)
+        if par[t] == -1:
+            return flow == Gn
+        v = t
+        while v != s:
+            u = par[v]; cap[u][v] -= 1; cap[v][u] += 1; v = u
+        flow += 1
+
+def _ch_alive(x, wins, future, teams, div):
+    """Can x still make the playoffs if every tie breaks x's way?"""
+    allg = [g for w in sorted(future) for g in future[w]]
+    xg = [(a, b) for a, b in allg if x in (a, b)]
+    pl = [(a, b) for a, b in allg if x not in (a, b)]
+    M = wins[x] + len(xg)
+    others = sorted([t for t in teams if t != x], key=lambda t: -wins[t])
+    forced = [t for t in others if wins[t] > M]
+    otherdiv = frozenset(t for t in others if div[t] != div[x])
+    cands = ([otherdiv] if all(f in otherdiv for f in forced) else [])
+    for S in itertools.combinations(others, 5):
+        if {div[t] for t in S} == {1, 2} and all(f in S for f in forced):
+            cands.append(frozenset(S))
+    for S in cands:
+        budget, bad = {}, False
+        for y in others:
+            if y in S:
+                continue
+            room = M - wins[y]
+            if room < 0:
+                bad = True; break
+            budget[y] = room
+        if bad:
+            continue
+        if _ch_flow([(a, b) for a, b in pl if a in budget and b in budget], budget):
+            return True
+    return False
+
+def _ch_can_miss(x, wins, future, teams, div):
+    """Can any remaining outcome leave x out, if every tie breaks against x?"""
+    allg = [g for w in sorted(future) for g in future[w]]
+    M = wins[x]
+    others = [t for t in teams if t != x]
+    owndiv = [t for t in others if div[t] == div[x]]
+    def above_feasible(T):
+        Tset = set(T)
+        kk, glist = {}, []
+        for a, b in allg:
+            if a in Tset and b in Tset:
+                glist.append((a, b))
+        for y in T:
+            free_wins = sum(1 for a, b in allg if (a == y) != (b == y)
+                            and not (a in Tset and b in Tset))
+            k = M - (wins[y] + free_wins)
+            if k > len([1 for a, b in glist if y in (a, b)]):
+                return False
+            kk[y] = max(0, k)
+        need = sum(kk.values())
+        if need == 0:
+            return True
+        tidx = {y: i for i, y in enumerate(T)}
+        n = 2 + len(glist) + len(T); s, t = 0, n - 1
+        cap = [[0] * n for _ in range(n)]
+        for i, (a, b) in enumerate(glist):
+            cap[s][1 + i] = 1
+            cap[1 + i][1 + len(glist) + tidx[a]] = 1
+            cap[1 + i][1 + len(glist) + tidx[b]] = 1
+        for y, i in tidx.items():
+            cap[1 + len(glist) + i][t] = kk[y]
+        flow = 0
+        while True:
+            par = [-1] * n; par[s] = s; q = deque([s])
+            while q and par[t] == -1:
+                u = q.popleft()
+                for v in range(n):
+                    if par[v] == -1 and cap[u][v] > 0:
+                        par[v] = u; q.append(v)
+            if par[t] == -1:
+                return flow >= need
+            v = t
+            while v != s:
+                u = par[v]; cap[u][v] -= 1; cap[v][u] += 1; v = u
+            flow += 1
+    if above_feasible(owndiv):
+        return True
+    for T in itertools.combinations(others, 6):
+        if any(div[y] == div[x] for y in T) and above_feasible(T):
+            return True
+    return False
+
+def _ch_can_lose_division(x, wins, future, teams, div):
+    allg = [g for w in sorted(future) for g in future[w]]
+    for y in (t for t in teams if t != x and div[t] == div[x]):
+        if wins[y] + sum(1 for a, b in allg if y in (a, b)) >= wins[x]:
+            return True
+    return False
+
+clinch_rows = dict(spot=[], bye=[], elim=[])
+_ch_warn = []
+for yr in sorted({g["year"] for g in games}):
+    dmap = _ch_divmap(yr)
+    reg = [g for g in games if g["year"] == yr and g["type"] == "Regular"]
+    weeks = sorted({g["week"] for g in reg})
+    teams = sorted({g["a"] for g in reg} | {g["b"] for g in reg})
+    if not dmap or len(teams) != 12 or any(dmap.get(t) not in (1, 2) for t in teams):
+        _ch_warn.append(f"{yr}: missing division data, skipped")
+        continue
+    div = {t: dmap[t] for t in teams}
+    byweek = {w: [(g["a"], g["b"], g["sa"], g["sb"]) for g in reg if g["week"] == w] for w in weeks}
+    extra = {}
+    if yr == CUR_SEASON:   # schedule of unplayed weeks, so mid-season clinches are exact
+        for w in range(1, playoff_start_26):
+            if w in byweek:
+                continue
+            pair = defaultdict(list)
+            for x in (load(yr, f"matchups_{w}") or []):
+                if x.get("matchup_id") is not None:
+                    pair[x["matchup_id"]].append(x["roster_id"])
+            prs = [(ROSTER_OWNER_2026[p[0]], ROSTER_OWNER_2026[p[1]]) for p in pair.values() if len(p) == 2]
+            if prs:
+                extra[w] = prs
+    regweeks = max(list(weeks) + list(extra.keys()))
+    wins = {t: 0 for t in teams}
+    res = {t: {} for t in teams}
+    for w in weeks:
+        for a, b, sa, sb in byweek[w]:
+            if sa > sb:
+                wins[a] += 1
+            elif sb > sa:
+                wins[b] += 1
+        future = {fw: [(a, b) for a, b, _, _ in byweek[fw]] for fw in weeks if fw > w}
+        for fw, prs in extra.items():
+            if fw > w:
+                future[fw] = prs
+        for x in teams:
+            r = res[x]
+            if "elim" in r:
+                continue
+            if "spot" not in r and not _ch_alive(x, wins, future, teams, div):
+                r["elim"] = w
+                continue
+            if "bye" not in r and not _ch_can_lose_division(x, wins, future, teams, div):
+                r["bye"] = w
+                r.setdefault("spot", w)
+            if "spot" not in r and not _ch_can_miss(x, wins, future, teams, div):
+                r["spot"] = w
+    for t, v in res.items():
+        for kind, wk in v.items():
+            clinch_rows[kind].append(dict(owner=t, year=yr, week=wk, of=regweeks, spare=regweeks - wk))
+    # regression tripwire: strict clinches/eliminations must agree with reality
+    po = [g for g in games if g["year"] == yr and g["type"] == "Playoff"]
+    if po:
+        field = {g["a"] for g in po} | {g["b"] for g in po}
+        w1 = min(g["week"] for g in po)
+        rd1 = {g["a"] for g in po if g["week"] == w1} | {g["b"] for g in po if g["week"] == w1}
+        if {t for t, v in res.items() if "spot" in v} - field:
+            _ch_warn.append(f"{yr}: clinched team missed the field")
+        if {t for t, v in res.items() if "bye" in v} - (field - rd1):
+            _ch_warn.append(f"{yr}: bye-clinched team did not get the bye")
+        if {t for t, v in res.items() if "elim" in v} & field:
+            _ch_warn.append(f"{yr}: eliminated team made the field")
+for k in clinch_rows:
+    clinch_rows[k].sort(key=lambda r: (-r["spare"], r["year"], r["owner"]))
+print("clinch history: " + ("; ".join(_ch_warn) if _ch_warn else
+      f"{len({r['year'] for r in clinch_rows['spot']})} seasons replayed, all consistent with actual fields"))
+
 # ---------------- 2026 "now" data ----------------
 now = json.load(open("data/now.json", encoding="utf-8")) if Path("data/now.json").exists() else {}
 if Path("data/title_odds.json").exists():
@@ -1010,6 +1248,8 @@ payload = dict(
         win_low=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in win_low],
         players=top_players,
         adj=adj,
+        clinches=dict(spot=clinch_rows["spot"][:10], bye=clinch_rows["bye"][:10],
+                      elim=clinch_rows["elim"][:10]),
     ),
     rings=rings,
     money=money,

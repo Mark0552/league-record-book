@@ -289,19 +289,16 @@ def qualifies(x, wins, pf, h2h):
     return x in contextual_rank([t for t in TEAMS if t not in winners], wins, pf, h2h)[:4]
 
 def alive(x, wins_now, h2h_now, future_games):
-    """'Practical' survival: a tied rival who holds the head-to-head edge ranks ahead
-    (no points-for-miracle escape). Division title or top-4 non-winner qualifies."""
+    """Can x still make the playoffs if every tie breaks x's way? A tie is
+    never lost in advance: a multiway unbalanced tie group falls to points-for
+    under the house rule, which can rescue a team that trails every pairwise
+    head-to-head (it happened in 2024 and 2025)."""
     allg = [g for w in sorted(future_games) for g in future_games[w]]
     xg = [(a, b) for a, b in allg if x in (a, b)]
     pl = [(a, b) for a, b in allg if x not in (a, b)]
     M = wins_now[x] + len(xg)
     others = sorted([t for t in TEAMS if t != x], key=lambda t: -wins_now[t])
-    caps = {}
-    for y in others:
-        xw, g = h2h_now[x][y]
-        fm = sum(1 for a, b in allg if {a, b} == {x, y})
-        xw += fm; g += fm                       # x wins any future meetings
-        caps[y] = M - 1 if (g and xw * 2 < g) else M
+    caps = {y: M for y in others}
     forced = [t for t in others if wins_now[t] > caps[t]]
     otherdiv = frozenset(t for t in others if division[t] != division[x])
     cands = ([otherdiv] if all(f in otherdiv for f in forced) else [])
@@ -394,7 +391,7 @@ if not FAST and future.get(cur_week):
         if combos:
             needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(combos, other)
             elim_cards.append(dict(owner=OWNER[x], needs=needs))
-    elimnote = "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive."
+    elimnote = "Shown only when no combination of results and tiebreakers could save the team — a spot still reachable via a points-for tiebreak counts as alive."
 
 # ---------------- 4a. clinched / eliminated right now ----------------
 def can_miss(x, wins_now=None, h2h_now=None, future_games=None):
@@ -406,13 +403,9 @@ def can_miss(x, wins_now=None, h2h_now=None, future_games=None):
     M = wins_now[x]
     others = [t for t in TEAMS if t != x]
     owndiv = [t for t in others if division[t] == division[x]]
-    # threshold to finish above x (adversary-optimistic on ties)
-    thresh = {}
-    for y in others:
-        xw, g = h2h_now[x][y]
-        fm = sum(1 for a, b in allg if {a, b} == {x, y})   # x loses these
-        x_strictly_ahead = xw * 2 > (g + fm)
-        thresh[y] = M + 1 if x_strictly_ahead else M
+    # a tie can always break against x (a multiway unbalanced tie group falls
+    # to points-for), so reaching x's win total is enough to finish above x
+    thresh = {y: M for y in others}
     def above_feasible(T):
         Tset = set(T)
         kk, glist = {}, []
@@ -462,15 +455,13 @@ def can_miss(x, wins_now=None, h2h_now=None, future_games=None):
     return False
 
 def can_lose_division(x, wins_now, h2h_now, future_games):
-    """Can any division rival still finish above x? (x loses out; rival optimism on ties)"""
+    """Can any division rival still catch x? A rival who can merely tie x
+    can take the title (ties are never safe in advance under the house rule)."""
     allg = [g for w in sorted(future_games) for g in future_games[w]]
     M = wins_now[x]
     for y in (t for t in TEAMS if t != x and division[t] == division[x]):
-        xw, g = h2h_now[x][y]
-        fm = sum(1 for a, b in allg if {a, b} == {x, y})
-        thresh = M + 1 if xw * 2 > (g + fm) else M
         max_y = wins_now[y] + sum(1 for a, b in allg if y in (a, b))
-        if max_y >= thresh:
+        if max_y >= M:
             return True
     return False
 

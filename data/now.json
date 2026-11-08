@@ -103,7 +103,7 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 96.6
+   "pct": 96.5
   },
   {
    "owner": "Austin",
@@ -115,15 +115,15 @@
   },
   {
    "owner": "Cliff",
-   "pct": 84.5
+   "pct": 84.0
   },
   {
    "owner": "Steve",
-   "pct": 80.0
+   "pct": 79.9
   },
   {
    "owner": "Martin",
-   "pct": 70.9
+   "pct": 71.5
   },
   {
    "owner": "Mark",
@@ -131,11 +131,11 @@
   },
   {
    "owner": "Clancy",
-   "pct": 18.7
+   "pct": 19.0
   },
   {
    "owner": "Luke",
-   "pct": 6.8
+   "pct": 6.7
   },
   {
    "owner": "Will",
@@ -161,7 +161,7 @@
   },
   {
    "a": "Mark",
-   "pa": 109.1,
+   "pa": 110.2,
    "b": "Timmy",
    "pb": 84.2
   },
@@ -169,55 +169,29 @@
    "a": "Will",
    "pa": 99.9,
    "b": "Bob",
-   "pb": 101.3
+   "pb": 101.2
   },
   {
    "a": "Lerch",
-   "pa": 93.8,
+   "pa": 94.0,
    "b": "Austin",
-   "pb": 95.7
+   "pb": 95.5
   },
   {
    "a": "Clancy",
-   "pa": 87.7,
+   "pa": 88.0,
    "b": "Luke",
    "pb": 96.2
   },
   {
    "a": "Martin",
-   "pa": 88.8,
+   "pa": 90.9,
    "b": "Cliff",
-   "pb": 92.1
+   "pb": 92.2
   }
  ],
- "elim": [
-  {
-   "owner": "Will",
-   "needs": [
-    "Loses to Bob",
-    "Plus one of: Steve beats Sam AND Lerch beats Austin  |  Steve beats Sam AND Clancy beats Luke  |  Mark beats Timmy AND Lerch beats Austin  |  Lerch beats Austin AND Clancy beats Luke"
-   ]
-  },
-  {
-   "owner": "Sam",
-   "needs": [
-    "Loses to Steve",
-    "Mark beats Timmy",
-    "Bob beats Will",
-    "Austin beats Lerch",
-    "Martin beats Cliff"
-   ]
-  },
-  {
-   "owner": "Timmy",
-   "needs": [
-    "Loses to Mark",
-    "Lerch beats Austin",
-    "Plus one of: Clancy beats Luke  |  Martin beats Cliff"
-   ]
-  }
- ],
- "elimnote": "Under league tiebreak rules; a points-for miracle technically keeps a team mathematically alive.",
+ "elim": [],
+ "elimnote": "Shown only when no combination of results and tiebreakers could save the team \u2014 a spot still reachable via a points-for tiebreak counts as alive.",
  "clinch": [],
  "clinchnote": "",
  "brackets": {
@@ -547,8 +521,8 @@
   ],
   "proj": {
    "Mark": {
-    "9": 109.1,
-    "10": 104.2,
+    "9": 110.2,
+    "10": 104.1,
     "11": 84.2,
     "12": 107.3,
     "13": 101.5,
@@ -558,8 +532,8 @@
     "17": 107.2
    },
    "Clancy": {
-    "9": 87.7,
-    "10": 95.5,
+    "9": 88.0,
+    "10": 96.0,
     "11": 90.6,
     "12": 98.9,
     "13": 85.4,
@@ -570,7 +544,7 @@
    },
    "Will": {
     "9": 99.9,
-    "10": 93.1,
+    "10": 93.2,
     "11": 75.2,
     "12": 93.3,
     "13": 97.7,
@@ -581,7 +555,7 @@
    },
    "Sam": {
     "9": 88.2,
-    "10": 88.9,
+    "10": 89.3,
     "11": 89.6,
     "12": 90.8,
     "13": 85.3,
@@ -592,7 +566,7 @@
    },
    "Steve": {
     "9": 92.9,
-    "10": 99.9,
+    "10": 100.0,
     "11": 107.8,
     "12": 101.5,
     "13": 87.9,
@@ -613,19 +587,19 @@
     "17": 87.7
    },
    "Bob": {
-    "9": 101.3,
-    "10": 102.3,
+    "9": 101.2,
+    "10": 102.4,
     "11": 84.5,
-    "12": 107.3,
-    "13": 99.3,
-    "14": 95.8,
-    "15": 107.7,
-    "16": 100.7,
-    "17": 103.0
+    "12": 107.1,
+    "13": 99.2,
+    "14": 95.7,
+    "15": 107.6,
+    "16": 100.6,
+    "17": 102.8
    },
    "Lerch": {
-    "9": 93.8,
-    "10": 97.6,
+    "9": 94.0,
+    "10": 97.4,
     "11": 95.2,
     "12": 106.2,
     "13": 89.9,
@@ -635,7 +609,7 @@
     "17": 103.3
    },
    "Martin": {
-    "9": 88.8,
+    "9": 90.9,
     "10": 96.7,
     "11": 95.8,
     "12": 99.0,
@@ -647,7 +621,7 @@
    },
    "Luke": {
     "9": 96.2,
-    "10": 75.7,
+    "10": 75.8,
     "11": 94.1,
     "12": 97.1,
     "13": 87.7,
@@ -657,7 +631,7 @@
     "17": 95.7
    },
    "Austin": {
-    "9": 95.7,
+    "9": 95.5,
     "10": 99.4,
     "11": 102.5,
     "12": 96.1,
@@ -668,8 +642,8 @@
     "17": 103.5
    },
    "Cliff": {
-    "9": 92.1,
-    "10": 82.8,
+    "9": 92.2,
+    "10": 82.9,
     "11": 99.2,
     "12": 100.7,
     "13": 96.3,
