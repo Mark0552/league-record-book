@@ -122,9 +122,9 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 <header>
   <div class="hwrap"><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
   <nav id="nav">
-    <a href="#now">League Status</a><a href="#machine">What If</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
+    <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
     <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Transactions</a>
-    <a href="#draft">Draft</a><a href="#players">Players</a><a href="#owners">Owners</a><a href="#alltime">All-Time</a>
+    <a href="#draft">Draft</a><a href="#players">Players</a><a href="#owners">Owners</a><a href="#alltime">All-Time</a><a href="#machine">What If</a>
   </nav>
 </header>
 <main>
@@ -246,15 +246,13 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <section id="luck">
     <div class="card"><h2>This season's luck meter</h2><div class="tscroll"><table id="l_season"></table></div>
       <div class="note">All-play = your record if you played everyone every week. Luck = actual wins minus expected wins from your scores. Positive = the schedule has been kind.</div></div>
-    <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
-      <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
-    <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
-      <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
     <div class="card"><h2>Schedule simulator</h2>
       <div class="selrow"><select id="schedYear"></select></div>
       <div id="schedAwards"></div>
       <div class="tscroll"><table id="schedMatrix"></table></div>
       <div class="note">Each row: that team's record if it had played the column team's schedule (their own scores, the other guy's opponents). Diagonal = actual record. Green = better than reality, red = worse.</div></div>
+    <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
+      <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
   </section>
 
   <section id="players">
@@ -1037,10 +1035,6 @@ $('l_season').innerHTML = '<tr><th>Owner</th><th class="num">Record</th><th clas
 $('l_career').innerHTML = '<tr><th>Owner</th><th class="num">All-play</th><th class="num">Luck</th><th class="num">Lucky W</th><th class="num">Unlucky L</th></tr>' +
   L.career.slice().sort((a,b)=>b.luck-a.luck).map(r=>
   `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.apw}-${r.apl}</td><td class="num">${r.luck>0?'+':''}${r.luck.toFixed(1)}</td><td class="num">${r.lucky}</td><td class="num">${r.unlucky}</td></tr>`).join('');
-const BN = DATA.bench;
-$('l_bench').innerHTML = '<tr><th>Owner</th><th class="num">Left on bench</th><th class="num">Per week</th><th class="num">Efficiency</th></tr>' +
-  BN.career.slice().sort((a,b)=>b.eff-a.eff).map(r=>
-  `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.left.toFixed(0)}</td><td class="num">${r.pg.toFixed(1)}</td><td class="num">${r.eff.toFixed(1)}%</td></tr>`).join('');
 
 /* ---------------- MOVES ---------------- */
 function posGroups(obj, line){
@@ -1207,12 +1201,19 @@ function renderProfile(){
   const sigRows = Object.entries(sig).filter(([,s])=>s.pos!=='DEF').sort((x,y)=>y[1].n-x[1].n).slice(0,10)
     .map(([nm,s])=>`<li><span class="v">${s.n}×</span><span><b>${esc(nm)}</b> <span class="d">${esc(s.pos)} · ${s.pts.toFixed(0)} pts started</span></span></li>`);
   const pct = a.w+a.l ? (100*a.w/(a.w+a.l)).toFixed(1)+'%' : '—';
+  const bnC = (DATA.bench.career||[]).slice().sort((x,y)=>y.eff-x.eff);
+  const bnS = (DATA.bench.season||[]).slice().sort((x,y)=>y.eff-x.eff);
+  const bci = bnC.findIndex(r=>r.owner===o), bsi = bnS.findIndex(r=>r.owner===o);
+  const effTiles =
+    (bsi>=0?`<div class="tile"><div class="v">${bnS[bsi].eff.toFixed(1)}%</div><div class="k">${YEARS[0]} lineup efficiency · #${bsi+1}</div></div>`:'') +
+    (bci>=0?`<div class="tile"><div class="v">${bnC[bci].eff.toFixed(1)}%</div><div class="k">lifetime lineup efficiency · #${bci+1} (since 2020)</div></div>`:'');
   $('profile').innerHTML = `
     <div class="tiles">
       <div class="tile"><div class="v">${a.w||0}-${a.l||0}</div><div class="k">career record (${pct})</div></div>
       <div class="tile"><div class="v">${a.pw||0}-${a.pl||0}</div><div class="k">playoffs · ${titles.length} title${titles.length===1?'':'s'}</div></div>
       <div class="tile"><div class="v">${(a.pf/(a.g||1)).toFixed(1)}</div><div class="k">points per game</div></div>
       <div class="tile"><div class="v">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):'—'}</div><div class="k">career luck (wins)</div></div>
+      ${effTiles}
     </div>
     ${titles.length?`<div class="note" style="color:var(--gold)">🏆 Buck Wong Bowls: ${titles.join(', ')}</div>`:''}
     ${lasts.length?`<div class="note" style="color:var(--red)">🥄 Lerch Cups: ${lasts.join(', ')}</div>`:''}
