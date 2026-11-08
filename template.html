@@ -467,11 +467,13 @@ function seasonRosterHTML(year, o){
     }
   }
   const rows = Object.entries(agg).sort((x,y)=>y[1].pts-x[1].pts);
+  const gapNote = (year===2015||year===2016)
+    ? '<div class="note" style="margin-top:4px">A few starters from this season are missing — ESPN lost pieces of its 2015–16 boxscore data.</div>' : '';
   return `<b style="font-size:13px">${esc(o)}'s ${year} starters</b>` +
     (rows.length ? rows.map(([nm,a])=>
       `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0">
         <span><span style="color:var(--ink3)">${esc(a.pos)}</span> ${esc(nm)}</span>
-        <span style="font-variant-numeric:tabular-nums">${a.n} start${a.n>1?'s':''} · ${a.pts.toFixed(1)} pts</span></div>`).join('')
+        <span style="font-variant-numeric:tabular-nums">${a.n} start${a.n>1?'s':''} · ${a.pts.toFixed(1)} pts</span></div>`).join('') + gapNote
       : '<div class="note">No lineup data for this season.</div>');
 }
 // tap an owner in the season standings -> their roster usage that year
