@@ -1,8 +1,7 @@
 name: Daily update
 on:
   schedule:
-    - cron: '0 9 * * *'    # 5:00 AM ET during daylight time
-    - cron: '0 10 * * *'   # 5:00 AM ET during standard time
+    - cron: '0 10 * * *'   # ~5:00 AM ET (GitHub may run it late; late beats never)
   workflow_dispatch:
 permissions:
   contents: write
@@ -11,22 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Skip the duplicate DST cron (only run at 5am ET)
-        if: github.event_name == 'schedule'
-        run: |
-          H=$(TZ=America/New_York date +%H)
-          if [ "$H" != "05" ]; then echo "SKIP=1" >> $GITHUB_ENV; echo "Not 5am ET (hour=$H), skipping"; fi
       - uses: actions/setup-python@v5
-        if: env.SKIP != '1'
         with:
           python-version: '3.12'
       - name: Refresh data, run simulations, rebuild site
-        if: env.SKIP != '1'
         run: |
           python refresh.py
           cp site/index.html index.html
       - name: Commit and publish
-        if: env.SKIP != '1'
         run: |
           git config user.name "record-book-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"

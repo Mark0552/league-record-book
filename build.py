@@ -654,8 +654,19 @@ for e in espn_swaps:
         e["how"] = "trade or waiver"
 espn_pickups.sort(key=lambda e: -e["pts"])
 espn_swaps.sort(key=lambda e: -e["pts"])
-moves = dict(trades=trade_list, waivers=steals[:15],
-             espn_pickups=espn_pickups[:15], espn_swaps=espn_swaps[:15])
+
+def by_position(items, per_pos=5):
+    out = {}
+    for it in items:   # already sorted by points desc
+        out.setdefault(it["pos"], [])
+        if len(out[it["pos"]]) < per_pos:
+            out[it["pos"]].append(it)
+    return {p: out[p] for p in ("QB", "RB", "WR", "TE", "K", "DEF") if out.get(p)}
+
+moves = dict(trades=trade_list,
+             waivers=by_position(steals),
+             espn_pickups=by_position(espn_pickups, 4),
+             espn_swaps=espn_swaps[:15])
 
 # ================= DRAFT REPORT CARDS (2020+) =================
 draft_data = []
@@ -808,6 +819,8 @@ for season in SLEEPER_SEASONS:
             o = ro.get(x["roster_id"])
             lu = []
             for pid in starters:
+                if not pid or pid == "0":   # Sleeper's marker for an EMPTY starter slot
+                    continue
                 info = players.get(pid) or {}
                 lu.append([info.get("full_name") or info.get("last_name") or pid,
                            info.get("position", "?"), round(pp.get(pid, 0) or 0, 1)])

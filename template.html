@@ -99,7 +99,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <nav id="nav">
     <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
     <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Transactions</a>
-    <a href="#draft">Draft</a><a href="#alltime">All-Time</a><a href="#champs">Champs</a>
+    <a href="#draft">Draft</a><a href="#owners">Owners</a><a href="#alltime">All-Time</a>
   </nav>
 </header>
 <main>
@@ -178,9 +178,9 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <section id="moves">
     <div class="card"><h2>Trade history</h2><div id="v_trades"></div>
       <div class="note">The complete recorded history. ESPN did not retain transaction logs, so trades before 2018 are lost to time. Points = scored by the acquired players after the trade, that season (Sleeper era only).</div></div>
-    <div class="card"><h2>Best waiver pickups, Sleeper era (2020&ndash;present)</h2><ol class="rec" id="v_waivers"></ol>
+    <div class="card"><h2>Best waiver pickups by position, Sleeper era (2020&ndash;present)</h2><div id="v_waivers"></div>
       <div class="note">Points scored while on the claiming team's roster, from pickup week on. FAAB bid shown for waiver claims. Updates daily.</div></div>
-    <div class="card"><h2>Best undrafted pickups, ESPN era</h2><ol class="rec" id="v_epick"></ol>
+    <div class="card"><h2>Best undrafted pickups by position, ESPN era</h2><div id="v_epick"></div>
       <div class="note">Reconstructed from drafts vs weekly lineups (ESPN deleted the actual logs): players nobody drafted who were picked up and started. Points = while starting for that team; week = first start.</div></div>
     <div class="card"><h2>Changed hands mid-season, ESPN era</h2><ol class="rec" id="v_eswap"></ol>
       <div class="note">Players who started for a team other than the one that drafted them. "trade" = confirmed in the league trade log; "likely trade" = a player moved the other way between the same two teams within two weeks; "trade or waiver" = ESPN's logs are gone, so no one will ever know.</div></div>
@@ -207,16 +207,16 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
   </section>
 
-  <section id="alltime">
+  <section id="owners">
     <div class="card"><h2>Owner profile</h2>
       <div class="selrow"><select id="profSel"></select></div>
       <div id="profile"></div></div>
+  </section>
+
+  <section id="alltime">
     <div class="card"><h2>All-time table</h2><div class="tscroll"><table id="master"></table></div>
       <div class="note">Regular-season records and points since 2015. Playoffs = winner's-bracket games; Apps = seasons reaching the bracket. AP = all-play record. Net $ from league payouts.</div>
       <div class="note">Franchise history (per the league's own payout ledger): two seats have changed hands &mdash; Austin (2015) &rarr; Alex (2016) &rarr; Luke (2017&ndash;present), and Neville (2015&ndash;2023) &rarr; Austin (2024&ndash;present). Careers tracked per person.</div></div>
-  </section>
-
-  <section id="champs">
     <div class="card"><h2>🏆 Buck Wong Bowl game history</h2><div id="bwbhist"></div>
       <div class="note">Every championship game on record. Tap one for both starting lineups.</div></div>
     <div class="card"><h2>🥄 Lerch Cup game history</h2><div id="lchist"></div>
@@ -242,6 +242,7 @@ $('foot').textContent = 'Built from the Sleeper API, ESPN league history & the l
 function show(){
   let h = (location.hash||'#now').slice(1);
   if(h === 'h2h') h = 'games';
+  if(h === 'champs') h = 'alltime';
   if(!document.getElementById(h)) h = 'now';
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id===h));
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+h));
@@ -618,10 +619,14 @@ $('l_bench').innerHTML = '<tr><th>Owner</th><th class="num">Left on bench</th><t
   `<tr><td><b>${esc(r.owner)}</b></td><td class="num">${r.left.toFixed(0)}</td><td class="num">${r.pg.toFixed(1)}</td><td class="num">${r.eff.toFixed(1)}%</td></tr>`).join('');
 
 /* ---------------- MOVES ---------------- */
-$('v_waivers').innerHTML = (DATA.moves.waivers||[]).map(s=>
-  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · ${esc(s.owner)} · ${s.year} wk${s.week}${s.bid?' · $'+s.bid+' FAAB':''}</span></span></li>`).join('');
-$('v_epick').innerHTML = (DATA.moves.espn_pickups||[]).map(s=>
-  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · ${esc(s.owner)} · ${s.year}, first start wk${s.week} · ${s.games} starts</span></span></li>`).join('');
+function posGroups(obj, line){
+  return Object.entries(obj||{}).map(([pos, list]) =>
+    `<h2 style="margin:12px 0 2px">${esc(pos)}</h2><ol class="rec">${list.map(line).join('')}</ol>`).join('');
+}
+$('v_waivers').innerHTML = posGroups(DATA.moves.waivers, s=>
+  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.owner)} · ${s.year} wk${s.week}${s.bid?' · $'+s.bid+' FAAB':''}</span></span></li>`);
+$('v_epick').innerHTML = posGroups(DATA.moves.espn_pickups, s=>
+  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.owner)} · ${s.year}, first start wk${s.week} · ${s.games} starts</span></span></li>`);
 $('v_eswap').innerHTML = (DATA.moves.espn_swaps||[]).map(s=>
   `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · drafted by ${esc(s.src)}, played for ${esc(s.owner)} · ${s.year}, from wk${s.week} · <span style="color:${s.how==='trade'?'var(--accent)':s.how==='likely trade'?'var(--gold)':'var(--ink3)'}">${esc(s.how)}</span></span></span></li>`).join('');
 const byYr = {};
