@@ -89,6 +89,13 @@ ol.rec .d{color:var(--ink2);font-size:12.5px;white-space:normal}
 .champ .tm{font-size:12.5px;color:var(--ink2);white-space:normal}
 .btn{display:block;width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid var(--line);
   background:var(--surface2);color:var(--ink2);font-size:14px;font-weight:600;cursor:pointer}
+/* expandable-row affordances */
+tr.grow td:first-child::before, tr.srow td:first-child::before{content:"▸ ";color:var(--ink3);font-size:10px}
+tr.grow.open td:first-child::before, tr.srow.open td:first-child::before{content:"▾ ";color:var(--accent)}
+li.lurow::after, .meet.lurow::after, #champlist .champ::after, #shamelist .champ::after, .plrow::after{
+  content:"▸";color:var(--ink3);font-size:11px;margin-left:auto;padding-left:8px;align-self:center}
+li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #shamelist .champ.open::after{
+  content:"▾";color:var(--accent)}
 .wk-w{color:var(--ink);font-weight:700}
 .wk-l{color:var(--ink3)}
 .wk-top{color:var(--gold);font-weight:800}
@@ -451,7 +458,8 @@ $('ss_stand').addEventListener('click', e=>{
   const tr = e.target.closest('tr.srow');
   if(!tr) return;
   const next = tr.nextElementSibling;
-  if(next && next.classList.contains('detailrow')){ next.remove(); return; }
+  if(next && next.classList.contains('detailrow')){ next.remove(); tr.classList.remove('open'); return; }
+  tr.classList.add('open');
   const year = +$('seasonSel').value, o = tr.dataset.o;
   const agg = {};
   for(const [k, lu] of Object.entries(DATA.lineups||{})){
@@ -545,25 +553,27 @@ $('gTable').addEventListener('click', e=>{
   const tr = e.target.closest('tr.grow');
   if(!tr) return;
   const next = tr.nextElementSibling;
-  if(next && next.classList.contains('detailrow')){ next.remove(); return; }
+  if(next && next.classList.contains('detailrow')){ next.remove(); tr.classList.remove('open'); return; }
   const {y,w,a,b} = tr.dataset;
   const d = document.createElement('tr');
   d.className = 'detailrow';
   d.innerHTML = `<td colspan="2" style="background:var(--surface2)">${lineupPanel(y,w,a,b)}</td>`;
   tr.after(d);
+  tr.classList.add('open');
 });
-// generic div-based lineup rows (finals histories)
+// generic div/li-based lineup rows (record lists, finals histories)
 document.addEventListener('click', e=>{
   const row = e.target.closest('.lurow');
   if(!row) return;
   const next = row.nextElementSibling;
-  if(next && next.classList.contains('ludetail')){ next.remove(); return; }
+  if(next && next.classList.contains('ludetail')){ next.remove(); row.classList.remove('open'); return; }
   const {y,w,a,b} = row.dataset;
   const d = document.createElement('div');
   d.className = 'ludetail';
   d.style.cssText = 'background:var(--surface2);border-radius:8px;padding:8px;margin:4px 0';
   d.innerHTML = lineupPanel(y,w,a,b);
   row.after(d);
+  row.classList.add('open');
 });
 ['gOwner','gOpp','gYear','gType'].forEach(id=>$(id).addEventListener('change', ()=>{gShowAll=false; renderGames();}));
 $('gMore').addEventListener('click', ()=>{gShowAll=true; renderGames();});
@@ -907,7 +917,7 @@ $('champlist').addEventListener('click', e=>{
   const row = e.target.closest('.champ');
   if(!row) return;
   const d = row.querySelector('.croster');
-  if(d) d.style.display = d.style.display==='none' ? 'block' : 'none';
+  if(d){ const open = d.style.display==='none'; d.style.display = open ? 'block' : 'none'; row.classList.toggle('open', open); }
 });
 $('ringlist').innerHTML = (DATA.rings||[]).map(r=>
   `<li><span class="v">${'🏆'.repeat(Math.min(r.rings,4))}</span><span><b>${esc(r.player)}</b> <span class="d">${esc(r.pos)} · ${r.rings} rings</span></span></li>`).join('');
@@ -917,7 +927,7 @@ $('shamelist').addEventListener('click', e=>{
   const row = e.target.closest('.shrow');
   if(!row) return;
   const d = row.querySelector('.croster');
-  if(d) d.style.display = d.style.display==='none' ? 'block' : 'none';
+  if(d){ const open = d.style.display==='none'; d.style.display = open ? 'block' : 'none'; row.classList.toggle('open', open); }
 });
 
 show();
