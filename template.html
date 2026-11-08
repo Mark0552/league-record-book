@@ -127,8 +127,6 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Playoff results</h2><div id="ss_playoffs"></div></div>
     <div class="card"><h2>Consolation bracket</h2><div id="ss_consol"></div>
       <div class="note">The road to the Lerch Cup.</div></div>
-    <div class="card"><h2>Draft</h2><div class="tscroll"><table id="ss_draft"></table></div>
-      <div class="note" id="ss_draft_note"></div></div>
     <div class="card"><h2>Trades</h2><div id="ss_trades"></div></div>
   </section>
 
@@ -448,13 +446,6 @@ function renderSeason(){
     return `<div class="meet"><span>wk${g[1]}${isCup?' · <span style="color:var(--red);font-weight:700">Lerch Cup</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
   }).join('')
     : '<div class="note">No consolation games recorded.</div>';
-  // draft
-  const picks = (DATA.draft.all||[]).filter(d=>d.season===year);
-  if(picks.length){
-    $('ss_draft').innerHTML = '<tr><th>Pick</th><th>Player</th><th></th><th>Owner</th><th class="num">Pts</th></tr>' +
-      picks.map(d=>`<tr><td>${d.pick}</td><td><b>${esc(d.player)}</b></td><td style="color:var(--ink3);font-size:12px">${esc(d.pos)}</td><td>${esc(d.owner)}</td><td class="num">${d.pts!=null?d.pts.toFixed(0):''}</td></tr>`).join('');
-    $('ss_draft_note').textContent = year<2020 ? 'Points = scored while started (ESPN era).' : 'Season fantasy points while rostered.';
-  } else { $('ss_draft').innerHTML=''; $('ss_draft_note').textContent='No draft data for this season.'; }
   // trades
   const tr = (DATA.moves.trades||[]).filter(t=>t.year===year);
   $('ss_trades').innerHTML = tr.length ? tr.map(t=>
