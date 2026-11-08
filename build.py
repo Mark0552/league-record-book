@@ -172,6 +172,11 @@ def longest_run(seq, ch):
         best = max(best, cur)
     return best
 
+def two_tiers(rows, key):
+    """Keep only the rows holding the top two distinct values of key."""
+    vals = sorted({key(r) for r in rows}, reverse=True)[:2]
+    return [r for r in rows if key(r) in vals]
+
 # ---------------- champions / shame / payouts (sheet) ----------------
 def read_transposed(path):
     rows = list(csv.reader(open(path, encoding="utf-8")))
@@ -254,8 +259,8 @@ season_rows = [dict(owner=o, year=y, pf=round(v["pf"], 2), g=v["g"], ppg=round(v
 season_high = sorted(season_rows, key=lambda r: -r["pf"])[:10]
 season_low = sorted(season_rows, key=lambda r: r["pf"])[:10]
 
-win_streaks = sorted(((longest_run(streak_seq[o], "W"), o) for o in OWNERS), reverse=True)[:5]
-loss_streaks = sorted(((longest_run(streak_seq[o], "L"), o) for o in OWNERS), reverse=True)[:5]
+win_streaks = two_tiers(sorted(((longest_run(streak_seq[o], "W"), o) for o in OWNERS), reverse=True), key=lambda p: p[0])
+loss_streaks = two_tiers(sorted(((longest_run(streak_seq[o], "L"), o) for o in OWNERS), reverse=True), key=lambda p: p[0])
 loss_high = sorted([e for e in expand if e[0] < e[2]], key=lambda x: -x[0])[:10]   # heartbreakers
 win_low = sorted([e for e in expand if e[0] > e[2]], key=lambda x: x[0])[:10]      # daylight robberies
 
@@ -1248,8 +1253,7 @@ payload = dict(
         win_low=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in win_low],
         players=top_players,
         adj=adj,
-        clinches=dict(spot=clinch_rows["spot"][:10], bye=clinch_rows["bye"][:10],
-                      elim=clinch_rows["elim"][:10]),
+        clinches={k: two_tiers(v, key=lambda r: r["spare"]) for k, v in clinch_rows.items()},
     ),
     rings=rings,
     money=money,
