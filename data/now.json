@@ -103,39 +103,39 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 96.9
+   "pct": 95.8
   },
   {
    "owner": "Austin",
-   "pct": 94.0
+   "pct": 95.8
   },
   {
    "owner": "Lerch",
-   "pct": 90.5
+   "pct": 91.1
   },
   {
    "owner": "Cliff",
-   "pct": 86.4
-  },
-  {
-   "owner": "Martin",
-   "pct": 75.9
+   "pct": 84.3
   },
   {
    "owner": "Steve",
-   "pct": 73.6
+   "pct": 81.0
+  },
+  {
+   "owner": "Martin",
+   "pct": 72.2
   },
   {
    "owner": "Mark",
-   "pct": 53.0
+   "pct": 53.4
   },
   {
    "owner": "Clancy",
-   "pct": 25.2
+   "pct": 18.5
   },
   {
    "owner": "Luke",
-   "pct": 4.2
+   "pct": 7.5
   },
   {
    "owner": "Will",
@@ -155,39 +155,39 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 88.2,
+   "pa": 86.4,
    "b": "Steve",
-   "pb": 93.4
+   "pb": 93.1
   },
   {
    "a": "Mark",
-   "pa": 107.2,
+   "pa": 108.9,
    "b": "Timmy",
-   "pb": 84.2
+   "pb": 84.3
   },
   {
    "a": "Will",
-   "pa": 96.2,
+   "pa": 99.9,
    "b": "Bob",
-   "pb": 101.4
+   "pb": 100.8
   },
   {
    "a": "Lerch",
-   "pa": 95.2,
+   "pa": 93.6,
    "b": "Austin",
-   "pb": 92.1
+   "pb": 96.1
   },
   {
    "a": "Clancy",
-   "pa": 90.8,
+   "pa": 87.8,
    "b": "Luke",
-   "pb": 93.4
+   "pb": 96.2
   },
   {
    "a": "Martin",
-   "pa": 97.7,
+   "pa": 93.9,
    "b": "Cliff",
-   "pb": 93.0
+   "pb": 92.4
   }
  ],
  "elim": [
