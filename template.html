@@ -146,10 +146,6 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   </section>
 
   <section id="records">
-    <div class="card"><h2>Player league careers</h2>
-      <input class="flt" id="pSearch" type="search" placeholder="Search any player ever started (e.g. Derrick Henry)...">
-      <div id="pResults"></div><div id="pCareer"></div>
-      <div class="note">Every player started in this league since 2015: who owned them, when, and what they produced. Defenses may appear under each era's naming.</div></div>
     <div class="card"><h2>Scoring mode</h2>
       <div class="selrow"><select id="rMode">
         <option value="raw">Raw scores (as actually played)</option>
@@ -215,6 +211,10 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   </section>
 
   <section id="players">
+    <div class="card"><h2>Player league careers</h2>
+      <input class="flt" id="pSearch" type="search" placeholder="Search any player ever started (e.g. Derrick Henry)...">
+      <div id="pResults"></div><div id="pCareer"></div>
+      <div class="note">Every player started in this league since 2015: who owned them, when, and what they produced. Defenses may appear under each era's naming.</div></div>
     <div class="selrow"><select id="plPos">
       <option value="">All positions</option><option>QB</option><option>RB</option>
       <option>WR</option><option>TE</option><option value="FLEX">FLEX (RB/WR/TE)</option>
@@ -770,10 +770,10 @@ $('plPos').addEventListener('change', renderPlayersTab);
 document.getElementById('players').addEventListener('click', e=>{
   const r = e.target.closest('.plrow');
   if(!r) return;
-  location.hash = '#records';
   $('pSearch').value = r.dataset.pn;
   $('pResults').innerHTML = '';
   showPlayer(r.dataset.pn);
+  $('pCareer').scrollIntoView({behavior:'smooth', block:'start'});
 });
 renderPlayersTab();
 
