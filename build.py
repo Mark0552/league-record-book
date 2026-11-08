@@ -393,10 +393,15 @@ payouts.update({o: money_s(v["out"] - v["in"]) for o, v in person_money.items()}
 print(f"payouts split: Austin {payouts.get('Austin')}, Alex {payouts.get('Alex')}, "
       f"Luke {payouts.get('Luke')}, Neville {payouts.get('Neville')}")
 
+highs_detail = defaultdict(list)
+for y in sorted(weekly_top):
+    for e in weekly_top[y]:
+        highs_detail[e["owner"]].append([y, e["week"], e["pts"]])
 money = dict(
     year=CUR_SEASON, perweek=40,
     weekly=weekly_top[CUR_SEASON],
     counts=[dict(owner=o, n=n) for o, n in topcounts.most_common()],
+    detail=highs_detail,
     payouts=payout_rows,
 )
 

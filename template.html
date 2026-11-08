@@ -89,13 +89,15 @@ ol.rec .d{color:var(--ink2);font-size:12.5px;white-space:normal}
 .champ .tm{font-size:12.5px;color:var(--ink2);white-space:normal}
 .btn{display:block;width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid var(--line);
   background:var(--surface2);color:var(--ink2);font-size:14px;font-weight:600;cursor:pointer}
-/* expandable-row affordances */
-tr.grow td:first-child::before, tr.srow td:first-child::before{content:"▸ ";color:var(--ink3);font-size:10px}
-tr.grow.open td:first-child::before, tr.srow.open td:first-child::before{content:"▾ ";color:var(--accent)}
-li.lurow::after, .meet.lurow::after, #champlist .champ::after, #shamelist .champ::after, .plrow::after{
-  content:"▸";color:var(--ink3);font-size:11px;margin-left:auto;padding-left:8px;align-self:center}
-li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #shamelist .champ.open::after{
-  content:"▾";color:var(--accent)}
+/* expandable-row affordances: green = tap to expand, red = tap to close */
+tr.grow td:first-child::before, tr.srow td:first-child::before, tr.yrow td:first-child::before{
+  content:"▸ ";color:#22c55e;font-size:14px}
+tr.grow.open td:first-child::before, tr.srow.open td:first-child::before, tr.yrow.open td:first-child::before{
+  content:"▾ ";color:#ef4444}
+li.lurow::after, .meet.lurow::after, #champlist .champ::after, #shamelist .champ::after, .plrow::after, li.hirow::after{
+  content:"▸";color:#22c55e;font-size:15px;margin-left:auto;padding-left:8px;align-self:center}
+li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #shamelist .champ.open::after, li.hirow.open::after{
+  content:"▾";color:#ef4444}
 .wk-w{color:var(--ink);font-weight:700}
 .wk-l{color:var(--ink3)}
 .wk-top{color:var(--gold);font-weight:800}
@@ -176,9 +178,9 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="money">
     <div class="card"><h2 id="m_hdr">Weekly high scores</h2><div id="m_weekly"></div>
-      <div class="note">$40 to the top score each week.</div></div>
-    <div class="card"><h2>2026 weekly-win money</h2><ol class="rec" id="m_tally"></ol></div>
-    <div class="card"><h2>Career weekly highs</h2><ol class="rec" id="m_counts"></ol></div>
+      <div class="note">$40 to the top score each week. (n) = that owner's nth weekly win this season.</div></div>
+    <div class="card"><h2>Career weekly highs</h2><ol class="rec" id="m_counts"></ol>
+      <div class="note">Tap an owner for every weekly high they've ever hit.</div></div>
     <div class="card"><h2>Career money</h2><div class="tscroll"><table id="m_pay"></table></div>
       <div class="note">Recomputed from the payout ledger's yearly columns, 2014&ndash;2026 buy-ins included (the sheet's own Total column stopped updating after 2023). Shared-seat money is split by year to whoever held the seat (Austin: seat-A 2014&ndash;15 + seat-B 2024+; Alex: 2016; Luke: 2017+; Neville: 2014&ndash;23). 2026 winnings land after the season.</div></div>
   </section>
@@ -453,14 +455,8 @@ function renderSeason(){
   }).join('')
     : '<div class="note">No consolation games recorded.</div>';
 }
-// tap an owner in the season standings -> their roster usage that year
-$('ss_stand').addEventListener('click', e=>{
-  const tr = e.target.closest('tr.srow');
-  if(!tr) return;
-  const next = tr.nextElementSibling;
-  if(next && next.classList.contains('detailrow')){ next.remove(); tr.classList.remove('open'); return; }
-  tr.classList.add('open');
-  const year = +$('seasonSel').value, o = tr.dataset.o;
+// season roster usage: who started for an owner in a given year
+function seasonRosterHTML(year, o){
   const agg = {};
   for(const [k, lu] of Object.entries(DATA.lineups||{})){
     const parts = k.split('|');
@@ -471,15 +467,23 @@ $('ss_stand').addEventListener('click', e=>{
     }
   }
   const rows = Object.entries(agg).sort((x,y)=>y[1].pts-x[1].pts);
-  const d = document.createElement('tr');
-  d.className = 'detailrow';
-  d.innerHTML = `<td colspan="5" style="background:var(--surface2)">
-    <b style="font-size:13px">${esc(o)}'s ${year} starters</b>` +
+  return `<b style="font-size:13px">${esc(o)}'s ${year} starters</b>` +
     (rows.length ? rows.map(([nm,a])=>
       `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0">
         <span><span style="color:var(--ink3)">${esc(a.pos)}</span> ${esc(nm)}</span>
         <span style="font-variant-numeric:tabular-nums">${a.n} start${a.n>1?'s':''} · ${a.pts.toFixed(1)} pts</span></div>`).join('')
-      : '<div class="note">No lineup data for this season.</div>') + '</td>';
+      : '<div class="note">No lineup data for this season.</div>');
+}
+// tap an owner in the season standings -> their roster usage that year
+$('ss_stand').addEventListener('click', e=>{
+  const tr = e.target.closest('tr.srow');
+  if(!tr) return;
+  const next = tr.nextElementSibling;
+  if(next && next.classList.contains('detailrow')){ next.remove(); tr.classList.remove('open'); return; }
+  tr.classList.add('open');
+  const d = document.createElement('tr');
+  d.className = 'detailrow';
+  d.innerHTML = `<td colspan="5" style="background:var(--surface2)">${seasonRosterHTML(+$('seasonSel').value, tr.dataset.o)}</td>`;
   tr.after(d);
 });
 $('seasonSel').addEventListener('change', renderSeason);
@@ -685,14 +689,28 @@ $('r_streaks').innerHTML =
 /* ---------------- MONEY ---------------- */
 const M = DATA.money;
 $('m_hdr').textContent = M.year + ' weekly high scores';
-$('m_weekly').innerHTML = M.weekly.map(e=>
-  `<div class="meet"><span>week ${e.week}</span><span><span class="w">${esc(e.owner)}</span> · ${e.pts.toFixed(2)}</span></div>`).join('');
-const tally = {};
-M.weekly.forEach(e=>tally[e.owner]=(tally[e.owner]||0)+1);
-$('m_tally').innerHTML = Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([o,n])=>
-  `<li><span class="v">$${n*M.perweek}</span><span><b>${esc(o)}</b> <span class="d">${n} weekly win${n>1?'s':''}</span></span></li>`).join('');
-$('m_counts').innerHTML = M.counts.slice(0,14).map(c=>
-  `<li><span class="v">${c.n}</span><span><b>${esc(c.owner)}</b> <span class="d">weekly highs since 2015</span></span></li>`).join('');
+const wkCnt = {};
+$('m_weekly').innerHTML = M.weekly.map(e=>{
+  wkCnt[e.owner] = (wkCnt[e.owner]||0) + 1;
+  const pref = wkCnt[e.owner] > 1 ? `(${wkCnt[e.owner]}) ` : '';
+  return `<div class="meet"><span>week ${e.week}</span><span><span class="w">${pref}${esc(e.owner)}</span> · ${e.pts.toFixed(2)}</span></div>`;
+}).join('');
+$('m_counts').innerHTML = M.counts.map(c=>
+  `<li class="hirow" style="cursor:pointer" data-o="${esc(c.owner)}"><span class="v">${c.n}</span><span><b>${esc(c.owner)}</b> <span class="d">weekly highs since 2015</span></span></li>`).join('');
+$('m_counts').addEventListener('click', e=>{
+  const row = e.target.closest('li.hirow');
+  if(!row) return;
+  const next = row.nextElementSibling;
+  if(next && next.classList.contains('ludetail')){ next.remove(); row.classList.remove('open'); return; }
+  const list = (M.detail||{})[row.dataset.o] || [];
+  const d = document.createElement('div');
+  d.className = 'ludetail';
+  d.style.cssText = 'background:var(--surface2);border-radius:8px;padding:8px;margin:4px 0';
+  d.innerHTML = list.slice().reverse().map(h=>
+    `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span>${h[0]} week ${h[1]}</span><span style="font-variant-numeric:tabular-nums">${h[2].toFixed(2)}</span></div>`).join('');
+  row.after(d);
+  row.classList.add('open');
+});
 $('m_pay').innerHTML = '<tr><th>Owner</th><th class="num">Paid in</th><th class="num">Earned</th><th class="num">Net</th></tr>' +
   M.payouts.slice().sort((a,b)=>parseFloat(String(b.net).replace(/[$,]/g,''))-parseFloat(String(a.net).replace(/[$,]/g,''))).map(p=>
   `<tr><td><b>${esc(p.owner)}</b></td><td class="num">${esc(p.paid)}</td><td class="num">${esc(p.earned)}</td><td class="num">${esc(p.net)}</td></tr>`).join('');
@@ -848,7 +866,7 @@ function renderProfile(){
     if(i < 0) continue;
     const r = st[i];
     const flag = titles.includes(y) ? ' 🏆' : lasts.includes(y) ? ' 🥄' : '';
-    yrRows.push(`<tr><td>${y}${flag}</td><td class="num">${i+1}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td></tr>`);
+    yrRows.push(`<tr class="yrow" style="cursor:pointer" data-y="${y}"><td>${y}${flag}</td><td class="num">${i+1}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td></tr>`);
   }
   // head-to-head vs everyone (regular + playoffs)
   const vs = {};
@@ -892,6 +910,17 @@ function renderProfile(){
     <div class="tscroll"><table>${vsRows.join('')}</table></div>`;
 }
 $('profSel').addEventListener('change', renderProfile);
+$('profile').addEventListener('click', e=>{
+  const tr = e.target.closest('tr.yrow');
+  if(!tr) return;
+  const next = tr.nextElementSibling;
+  if(next && next.classList.contains('detailrow')){ next.remove(); tr.classList.remove('open'); return; }
+  tr.classList.add('open');
+  const d = document.createElement('tr');
+  d.className = 'detailrow';
+  d.innerHTML = `<td colspan="4" style="background:var(--surface2)">${seasonRosterHTML(+tr.dataset.y, $('profSel').value)}</td>`;
+  tr.after(d);
+});
 renderProfile();
 
 /* ---------------- FINALS HISTORIES ---------------- */
