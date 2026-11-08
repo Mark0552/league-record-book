@@ -91,11 +91,11 @@ ol.rec .d{color:var(--ink2);font-size:12.5px;white-space:normal}
   background:var(--surface2);color:var(--ink2);font-size:14px;font-weight:600;cursor:pointer}
 /* expandable-row affordances: green = tap to expand, red = tap to close */
 tr.grow td:first-child::before, tr.srow td:first-child::before, tr.yrow td:first-child::before{
-  content:"▸ ";color:#22c55e;font-size:14px}
+  content:"▸ ";color:#22c55e;font-size:19px;line-height:1}
 tr.grow.open td:first-child::before, tr.srow.open td:first-child::before, tr.yrow.open td:first-child::before{
   content:"▾ ";color:#ef4444}
 li.lurow::after, .meet.lurow::after, #champlist .champ::after, #shamelist .champ::after, .plrow::after, li.hirow::after{
-  content:"▸";color:#22c55e;font-size:15px;margin-left:auto;padding-left:8px;align-self:center}
+  content:"▸";color:#22c55e;font-size:20px;line-height:1;margin-left:auto;padding-left:8px;align-self:center}
 li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #shamelist .champ.open::after, li.hirow.open::after{
   content:"▾";color:#ef4444}
 .wk-w{color:var(--ink);font-weight:700}
@@ -890,7 +890,7 @@ function renderProfile(){
       s.n++; s.pts += p[2];
     }
   }
-  const sigRows = Object.entries(sig).sort((x,y)=>y[1].n-x[1].n).slice(0,8)
+  const sigRows = Object.entries(sig).filter(([,s])=>s.pos!=='DEF').sort((x,y)=>y[1].n-x[1].n).slice(0,10)
     .map(([nm,s])=>`<li><span class="v">${s.n}×</span><span><b>${esc(nm)}</b> <span class="d">${esc(s.pos)} · ${s.pts.toFixed(0)} pts started</span></span></li>`);
   const pct = a.w+a.l ? (100*a.w/(a.w+a.l)).toFixed(1)+'%' : '—';
   $('profile').innerHTML = `
