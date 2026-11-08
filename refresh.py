@@ -607,6 +607,26 @@ for i, t in enumerate(seed_order, 1):
                           **({"status": status[t]} if t in status else {})))
 matchup_cards = [dict(a=OWNER[a], pa=round(WP[a][cur_week], 1), b=OWNER[b], pb=round(WP[b][cur_week], 1))
                  for a, b in future.get(cur_week, [])]
+
+# Playoff Machine payload: everything the client needs to run pick-conditioned sims
+# with the exact house seeding (contextual_rank). Owner lists keep roster-id order
+# so stable-sort tie handling matches Python.
+machine = None
+if weeks_left:
+    machine = dict(
+        weeks={str(w): [[OWNER[a], OWNER[b]] for a, b in future[w]] for w in weeks_left},
+        pweeks=PLAYOFF_WEEKS,
+        proj={OWNER[t]: {str(w): round(WP[t][w], 1) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS},
+        sd={OWNER[t]: round(sdv[t], 1) for t in TEAMS},
+        wins={OWNER[t]: wins0[t] for t in TEAMS},
+        pf={OWNER[t]: round(pf0[t], 2) for t in TEAMS},
+        h2hw={OWNER[t]: {OWNER[u]: h2h0[t][u][0] for u in TEAMS if u != t} for t in TEAMS},
+        scnt={OWNER[t]: {OWNER[u]: season_cnt[t][u] for u in TEAMS if u != t} for t in TEAMS},
+        divs=[[OWNER[t] for t in D[1]], [OWNER[t] for t in D[2]]],
+        divnames=[DIVNAME[1], DIVNAME[2]],
+        torder=[OWNER[t] for t in TEAMS],
+        played=last_scored,
+    )
 now = dict(
     asof=(f"entering week {cur_week}, {season}" if weeks_left
           else f"playoffs, {season} — regular season complete"),
@@ -623,6 +643,7 @@ now = dict(
     clinch=clinch_cards,
     clinchnote="Lock up a playoff spot no matter what happens the rest of the season." if clinch_cards else "",
     brackets=brackets,
+    machine=machine,
 )
 json.dump(now, open("data/now.json", "w", encoding="utf-8"), indent=1)
 print("wrote data/now.json")

@@ -101,6 +101,20 @@ li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #s
 .wk-w{color:var(--ink);font-weight:700}
 .wk-l{color:var(--ink3)}
 .wk-top{color:var(--gold);font-weight:800}
+.pickrow{display:flex;align-items:center;gap:8px;margin:5px 0}
+.pickrow .vs{color:var(--ink3);font-size:11px;flex:none}
+.pick{flex:1;display:flex;justify-content:space-between;align-items:center;gap:6px;background:var(--surface2);
+  border:1px solid var(--line);color:var(--ink);padding:8px 10px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.pick .pp{color:var(--ink3);font-weight:400;font-size:11.5px}
+.pick.sel{border-color:var(--accent);background:rgba(45,212,191,.14);color:var(--accent)}
+.pick.sel .pp{color:var(--accent)}
+.boxrow{display:flex;align-items:center;gap:8px;margin:5px 0}
+.bnm{width:52px;font-size:12px;font-weight:600;flex:none}
+.bplot{flex:1;position:relative;height:16px}
+.bwhisk{position:absolute;top:7px;height:2px;background:var(--line)}
+.bbox{position:absolute;top:3px;height:10px;background:rgba(45,212,191,.35);border-radius:3px}
+.bmed{position:absolute;top:1px;height:14px;width:2px;background:var(--accent)}
+.blab{width:92px;font-size:10.5px;color:var(--ink3);text-align:right;flex:none;font-variant-numeric:tabular-nums}
 footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4px}
 </style>
 </head>
@@ -108,7 +122,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 <header>
   <div class="hwrap"><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
   <nav id="nav">
-    <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
+    <a href="#now">League Status</a><a href="#machine">What If</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
     <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Transactions</a>
     <a href="#draft">Draft</a><a href="#players">Players</a><a href="#owners">Owners</a><a href="#alltime">All-Time</a>
   </nav>
@@ -127,12 +141,32 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note" id="lcnote">The toilet bowl: losers advance, and the Lerch Cup game's loser-of-losers takes last place.</div></div>
   </section>
 
+  <section id="machine">
+    <div class="card"><h2>Playoff Machine</h2>
+      <div class="note" id="pmIntro">Tap the winner of any remaining regular-season game. Odds re-simulate instantly under league tiebreak rules (division winners get the byes) — unpicked games play out by projection. Tap a picked team again to clear it.</div>
+      <div id="pmWeeks"></div>
+      <button class="btn" id="pmReset" style="display:none">Reset all picks</button>
+    </div>
+    <div class="card"><h2>Scenario odds</h2>
+      <div class="tscroll"><table id="pmOdds"></table></div>
+      <div class="note" id="pmOddsNote"></div></div>
+    <div class="card"><h2>Seed distribution</h2>
+      <div class="tscroll"><table id="pmSeeds"></table></div>
+      <div class="note">How often each team lands at each final seed in this scenario. Seeds 1&ndash;2 = division winners with byes; 1&ndash;6 make the Buck Wong Bowl bracket; 7&ndash;12 go to the toilet bowl.</div></div>
+  </section>
+
   <section id="seasons">
     <div class="selrow"><select id="seasonSel"></select></div>
     <div class="card"><h2 id="ss_hdr">Season</h2><div class="tscroll"><table id="ss_stand"></table></div>
       <div class="note" id="ss_note"></div></div>
     <div class="card"><h2>Week-by-week scores</h2><div class="tscroll"><table id="ss_matrix"></table></div>
       <div class="note">Bold = won that week. Gold = league's top score of the week.</div></div>
+    <div class="card"><h2>Weekly rank heatmap</h2><div class="tscroll"><table id="ss_heat"></table></div>
+      <div class="note">Where each score ranked league-wide that week: 1 (green) = best of the week, 12 (red) = worst. Regular season only.</div></div>
+    <div class="card"><h2>Scoring distribution</h2><div id="ss_dist"></div>
+      <div class="note">Each team's weekly scores: whisker = min to max, box = middle half (Q1&ndash;Q3), bright tick = median. Sorted by median.</div></div>
+    <div class="card"><h2>All-play &amp; median standings</h2><div class="tscroll"><table id="ss_lenses"></table></div>
+      <div class="note">All-play = record if you played all 11 teams every week. vs Median = record against each week's league median score. Big gaps from the real record = schedule luck.</div></div>
     <div class="card"><h2>Playoff results</h2><div id="ss_playoffs"></div></div>
     <div class="card"><h2>Consolation bracket</h2><div id="ss_consol"></div>
       <div class="note">The road to the Lerch Cup.</div></div>
@@ -216,6 +250,11 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
     <div class="card"><h2>Lineup efficiency (since 2020)</h2><div class="tscroll"><table id="l_bench"></table></div>
       <div class="note">Points left on bench vs the perfect lineup each week. 100% = never benched the wrong guy. Starts in 2020 because ESPN never recorded what benched players scored each week.</div></div>
+    <div class="card"><h2>Schedule simulator</h2>
+      <div class="selrow"><select id="schedYear"></select></div>
+      <div id="schedAwards"></div>
+      <div class="tscroll"><table id="schedMatrix"></table></div>
+      <div class="note">Each row: that team's record if it had played the column team's schedule (their own scores, the other guy's opponents). Diagonal = actual record. Green = better than reality, red = worse.</div></div>
   </section>
 
   <section id="players">
@@ -355,6 +394,153 @@ if(now.standings){
   }
 }
 
+/* ---------------- PLAYOFF MACHINE (What If) ---------------- */
+(function(){
+  const M = now.machine;
+  if(!M){
+    $('machine').innerHTML = '<div class="card"><h2>Playoff Machine</h2><div class="note">The regular season is over — seeds are locked in. See the live brackets on League Status.</div></div>';
+    return;
+  }
+  const T = M.torder, n = T.length;
+  const idx = {}; T.forEach((t,i)=>idx[t]=i);
+  const div1 = M.divs[0].map(t=>idx[t]), div2 = M.divs[1].map(t=>idx[t]);
+  const scntA = new Int8Array(n*n), h2hBase = new Int16Array(n*n);
+  for(const a of T) for(const b of T) if(a!==b){
+    scntA[idx[a]*n+idx[b]] = M.scnt[a][b];
+    h2hBase[idx[a]*n+idx[b]] = M.h2hw[a][b];
+  }
+  const winsBase = new Int16Array(n), pfBase = new Float64Array(n), sdA = new Float64Array(n);
+  T.forEach((t,i)=>{ winsBase[i]=M.wins[t]; pfBase[i]=M.pf[t]; sdA[i]=M.sd[t]; });
+  const pavg = {}; T.forEach(t=>{ const v=Object.values(M.proj[t]); pavg[t]=v.reduce((s,x)=>s+x,0)/v.length; });
+  const mproj = (t,w)=>{ const v=M.proj[t][String(w)]; return v!=null?v:pavg[t]; };
+  const wkList = Object.keys(M.weeks).map(Number).sort((a,b)=>a-b);
+  const sched = [];
+  for(const w of wkList) for(const [a,b] of M.weeks[String(w)])
+    sched.push({w, a:idx[a], b:idx[b], an:a, bn:b, key:w+'|'+a+'|'+b, ma:mproj(a,w), mb:mproj(b,w)});
+  const PW = M.pweeks;
+  const pwMean = PW.map(w => T.map(t => mproj(t,w)));   // pwMean[round][teamIdx]
+  const picks = {};   // key -> owner name
+
+  // RNG (deterministic per run) + gauss
+  function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  let rnd, spare;
+  function gauss(mu, sd){
+    if(spare!==null){ const v=spare; spare=null; return mu+sd*v; }
+    let u,v,s;
+    do{ u=rnd()*2-1; v=rnd()*2-1; s=u*u+v*v; }while(s>=1||s===0);
+    const m=Math.sqrt(-2*Math.log(s)/s);
+    spare=v*m; return mu+sd*u*m;
+  }
+
+  // exact port of the solver's contextual_rank (house tiebreaks);
+  // subset arrays stay in roster order so stable-sort ties match Python
+  function ctxRank(subset, wins, pf, h2h){
+    const byW = new Map();
+    for(const t of subset){ const w=wins[t]; if(!byW.has(w)) byW.set(w,[]); byW.get(w).push(t); }
+    const out = [];
+    for(const wc of [...byW.keys()].sort((a,b)=>b-a)){
+      const g = byW.get(wc);
+      if(g.length===1){ out.push(g[0]); continue; }
+      let balanced = true; const c0 = scntA[g[0]*n+g[1]];
+      outer: for(let i=0;i<g.length;i++) for(let j=i+1;j<g.length;j++)
+        if(scntA[g[i]*n+g[j]]!==c0){ balanced=false; break outer; }
+      if(balanced){
+        const gw = new Map();
+        for(const t of g){ let s=0; for(const u of g) if(u!==t) s+=h2h[t*n+u]; gw.set(t,s); }
+        g.sort((x,y)=> (gw.get(y)-gw.get(x)) || (pf[y]-pf[x]));
+      } else {
+        g.sort((x,y)=> pf[y]-pf[x]);
+      }
+      out.push(...g);
+    }
+    return out;
+  }
+  function seedsFor(wins, pf, h2h){
+    const w1 = ctxRank(div1, wins, pf, h2h)[0];
+    const w2 = ctxRank(div2, wins, pf, h2h)[0];
+    const byes = ctxRank([w1,w2], wins, pf, h2h);
+    const rest = []; for(let t=0;t<n;t++) if(t!==w1 && t!==w2) rest.push(t);
+    return [...byes, ...ctxRank(rest, wins, pf, h2h)];
+  }
+
+  function runSims(N){
+    rnd = mulberry32(7); spare = null;
+    const pickCode = sched.map(g => picks[g.key]===g.an ? 1 : picks[g.key]===g.bn ? 2 : 0);
+    const seedCount = Array.from({length:n}, ()=>new Int32Array(n));
+    const champC = new Int32Array(n), lastC = new Int32Array(n);
+    const bg = (x,y,r)=> gauss(pwMean[r][x], sdA[x]) >= gauss(pwMean[r][y], sdA[y]) ? x : y;   // score winner
+    const bl = (x,y,r)=> gauss(pwMean[r][x], sdA[x]) >= gauss(pwMean[r][y], sdA[y]) ? y : x;   // score loser
+    for(let s=0;s<N;s++){
+      const wins = winsBase.slice(), pf = pfBase.slice(), h2h = h2hBase.slice();
+      for(let i=0;i<sched.length;i++){
+        const g = sched[i];
+        let pa = gauss(g.ma, sdA[g.a]), pb = gauss(g.mb, sdA[g.b]);
+        const pc = pickCode[i];
+        if((pc===1 && pa<=pb) || (pc===2 && pb<=pa)){ const t=pa; pa=pb; pb=t; }
+        if(pa>pb){ wins[g.a]++; h2h[g.a*n+g.b]++; } else { wins[g.b]++; h2h[g.b*n+g.a]++; }
+        pf[g.a]+=Math.max(30,pa); pf[g.b]+=Math.max(30,pb);
+      }
+      const S = seedsFor(wins, pf, h2h);
+      for(let i=0;i<n;i++) seedCount[S[i]][i]++;
+      // Buck Wong Bowl: QFs s4v s5, s3v s6; SFs s1 v W(4v5), s2 v W(3v6); final
+      const q1 = bg(S[3],S[4],0), q2 = bg(S[2],S[5],0);
+      champC[bg(bg(S[0],q1,1), bg(S[1],q2,1), 2)]++;
+      // Toilet bowl: losers advance; Lerch Cup game's score loser takes last place
+      const a1 = bl(S[8],S[6],0), a2 = bl(S[7],S[9],0);
+      lastC[bl(bl(S[11],a1,1), bl(S[10],a2,1), 2)]++;
+    }
+    return {seedCount, champC, lastC, N};
+  }
+
+  function renderPicks(){
+    $('pmWeeks').innerHTML = wkList.map(w =>
+      `<h2 style="margin:12px 0 4px">Week ${w}</h2>` + M.weeks[String(w)].map(([a,b])=>{
+        const key = w+'|'+a+'|'+b;
+        const btn = t => `<button class="pick${picks[key]===t?' sel':''}" data-k="${esc(key)}" data-t="${esc(t)}">${esc(t)}<span class="pp">${mproj(t,w).toFixed(1)}</span></button>`;
+        return `<div class="pickrow">${btn(a)}<span class="vs">vs</span>${btn(b)}</div>`;
+      }).join('')).join('');
+    $('pmReset').style.display = Object.keys(picks).length ? '' : 'none';
+  }
+  const fmtPct = v => v>=99.995 ? '100%' : v<=0.005 ? '—' : v.toFixed(1)+'%';
+  function renderOdds(res){
+    const rows = T.map((t,i)=>{
+      const sc = res.seedCount[i];
+      let made=0; for(let k=0;k<6;k++) made+=sc[k];
+      return {t, sc, made: made/res.N*100, bye:(sc[0]+sc[1])/res.N*100,
+              champ: res.champC[i]/res.N*100, last: res.lastC[i]/res.N*100};
+    }).sort((a,b)=> b.made-a.made || b.champ-a.champ);
+    $('pmOdds').innerHTML = '<tr><th>Owner</th><th class="num">Playoffs</th><th class="num">Bye</th><th class="num">Champ</th><th class="num">Lerch Cup</th></tr>' +
+      rows.map(r=>{
+        const chip = r.made>=99.995 ? ' <span class="badge" style="background:rgba(45,212,191,.16);color:var(--accent)">✓ IN</span>'
+                   : r.made<=0.005 ? ' <span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">OUT</span>' : '';
+        return `<tr><td><b>${esc(r.t)}</b>${chip}</td><td class="num">${fmtPct(r.made)}</td><td class="num">${fmtPct(r.bye)}</td><td class="num">${fmtPct(r.champ)}</td><td class="num">${fmtPct(r.last)}</td></tr>`;
+      }).join('');
+    $('pmSeeds').innerHTML = '<tr><th>Owner</th>' + T.map((_,i)=>`<th class="num">${i+1}</th>`).join('') + '</tr>' +
+      rows.map(r=>`<tr><td><b>${esc(r.t)}</b></td>` + Array.from(r.sc, c=>{
+        const p = c/res.N*100;
+        return `<td class="num"${p?'':' style="color:var(--ink3)"'}>${p ? (p>=9.95 ? p.toFixed(0) : p.toFixed(1)) : '·'}</td>`;
+      }).join('') + '</tr>').join('');
+    const np = Object.keys(picks).length;
+    $('pmOddsNote').textContent = `${res.N.toLocaleString()} simulations of the remaining schedule and both brackets, conditioned on your picks (forced winners keep realistic scores). House tiebreaks and division byes applied. ` +
+      (np ? `${np} pick${np>1?'s':''} locked in.` : 'No picks yet — this is the pure projection.');
+  }
+  let res = runSims(10000);
+  renderPicks(); renderOdds(res);
+  $('pmWeeks').addEventListener('click', e=>{
+    const b = e.target.closest('button.pick');
+    if(!b) return;
+    const k = b.dataset.k, t = b.dataset.t;
+    if(picks[k]===t) delete picks[k]; else picks[k] = t;
+    renderPicks();
+    renderOdds(runSims(10000));
+  });
+  $('pmReset').addEventListener('click', ()=>{
+    for(const k of Object.keys(picks)) delete picks[k];
+    renderPicks(); renderOdds(runSims(10000));
+  });
+  window.__pmTest = {ctxRank, seedsFor, idx, T, n};   // used by the fixture validator
+})();
+
 /* ---------------- SEASONS ---------------- */
 $('seasonSel').innerHTML = YEARS.map(y=>`<option>${y}</option>`).join('');
 function regStandings(year){
@@ -437,6 +623,66 @@ function renderSeason(){
     }).join('') + '</tr>';
   }
   $('ss_matrix').innerHTML = m;
+  // weekly rank heatmap (diverging green -> neutral -> red, rank printed in every cell)
+  const rk = {};
+  for(const w of weeks){
+    owners.map(o=>({o, p: cell[o+'|'+w] ? cell[o+'|'+w].pts : null}))
+      .filter(x=>x.p!=null).sort((a,b)=>b.p-a.p)
+      .forEach((x,i)=> rk[x.o+'|'+w] = i+1);
+  }
+  const nT = owners.length;
+  const heatColor = r => {
+    const t = nT>1 ? (r-1)/(nT-1) : 0;
+    let c, a;
+    if(t<0.5){ const u=t*2; c=[34+66*u, 197-81*u, 94+45*u]; a=.42-.30*u; }
+    else { const u=t*2-1; c=[100+139*u, 116-48*u, 139-71*u]; a=.12+.30*u; }
+    return `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a.toFixed(2)})`;
+  };
+  let hm = '<tr><th>Owner</th>' + weeks.map(w=>`<th class="num">${w}</th>`).join('') + '</tr>';
+  for(const o of owners){
+    hm += `<tr><td><b>${esc(o)}</b></td>` + weeks.map(w=>{
+      const r = rk[o+'|'+w];
+      return r ? `<td class="num" style="background:${heatColor(r)}">${r}</td>`
+               : '<td class="num" style="color:var(--ink3)">—</td>';
+    }).join('') + '</tr>';
+  }
+  $('ss_heat').innerHTML = hm;
+  // scoring distribution (box plots)
+  const quant = (a, p) => { const i=(a.length-1)*p, lo=Math.floor(i), hi=Math.ceil(i); return a[lo]+(a[hi]-a[lo])*(i-lo); };
+  const dist = owners.map(o=>{
+    const s = weeks.map(w=>cell[o+'|'+w]).filter(Boolean).map(c=>c.pts).sort((a,b)=>a-b);
+    return s.length ? {o, min:s[0], max:s[s.length-1], q1:quant(s,.25), med:quant(s,.5), q3:quant(s,.75)} : null;
+  }).filter(Boolean).sort((a,b)=>b.med-a.med);
+  if(dist.length){
+    const lo = Math.min(...dist.map(d=>d.min)), hi = Math.max(...dist.map(d=>d.max)), span = (hi-lo)||1;
+    const X = v => ((v-lo)/span*100).toFixed(1)+'%';
+    const Wd = (a,b) => Math.max(.5,(b-a)/span*100).toFixed(1)+'%';
+    $('ss_dist').innerHTML = dist.map(d=>
+      `<div class="boxrow"><div class="bnm">${esc(d.o)}</div><div class="bplot">
+        <div class="bwhisk" style="left:${X(d.min)};width:${Wd(d.min,d.max)}"></div>
+        <div class="bbox" style="left:${X(d.q1)};width:${Wd(d.q1,d.q3)}"></div>
+        <div class="bmed" style="left:${X(d.med)}"></div></div>
+      <div class="blab">${d.med.toFixed(0)} · ${d.min.toFixed(0)}–${d.max.toFixed(0)}</div></div>`).join('');
+  } else $('ss_dist').innerHTML = '<div class="note">No games yet.</div>';
+  // all-play & median standings
+  const lens = owners.map(o=>{
+    let apw=0, apl=0, apt=0, mw=0, ml=0;
+    for(const w of weeks){
+      const c = cell[o+'|'+w]; if(!c) continue;
+      const others = owners.filter(x=>x!==o).map(x=>cell[x+'|'+w]).filter(Boolean).map(x=>x.pts);
+      if(!others.length) continue;
+      apw += others.filter(p=>c.pts>p).length;
+      apl += others.filter(p=>c.pts<p).length;
+      apt += others.filter(p=>c.pts===p).length;
+      const all = [c.pts, ...others].sort((a,b)=>a-b);
+      const med = (all[Math.floor((all.length-1)/2)] + all[Math.ceil((all.length-1)/2)])/2;
+      c.pts>med ? mw++ : ml++;
+    }
+    const r = rows.find(x=>x.o===o);
+    return {o, r, apw, apl, apt, mw, ml};
+  });
+  $('ss_lenses').innerHTML = '<tr><th>Owner</th><th class="num">Record</th><th class="num">All-play</th><th class="num">vs Median</th></tr>' +
+    lens.map(x=>`<tr><td><b>${esc(x.o)}</b></td><td class="num">${x.r?x.r.w+'-'+x.r.l:'—'}</td><td class="num">${x.apw}-${x.apl}${x.apt?'-'+x.apt:''}</td><td class="num">${x.mw}-${x.ml}</td></tr>`).join('');
   // playoffs
   const po = G.filter(g=>g[0]===year&&g[2]==='P');
   const lastPOwk = Math.max(0, ...po.map(g=>g[1]));
@@ -489,6 +735,72 @@ $('ss_stand').addEventListener('click', e=>{
   tr.after(d);
 });
 $('seasonSel').addEventListener('change', renderSeason);
+
+/* ---------------- SCHEDULE SIMULATOR (Luck tab) ---------------- */
+$('schedYear').innerHTML = YEARS.map(y=>`<option>${y}</option>`).join('');
+function renderSched(){
+  const year = +$('schedYear').value;
+  const sc = {}, opp = {}, wkSet = new Set(), ownSet = new Set();
+  for(const g of G){
+    if(g[0]!==year || g[2]!=='R') continue;
+    wkSet.add(g[1]); ownSet.add(g[3]); ownSet.add(g[5]);
+    sc[g[3]+'|'+g[1]] = g[4]; sc[g[5]+'|'+g[1]] = g[6];
+    opp[g[3]+'|'+g[1]] = g[5]; opp[g[5]+'|'+g[1]] = g[3];
+  }
+  const weeks = [...wkSet].sort((a,b)=>a-b);
+  const recWith = (x, y) => {   // x's scores vs y's schedule of opponents
+    let w=0,l=0,t=0;
+    for(const k of weeks){
+      const xs = sc[x+'|'+k]; let o = opp[y+'|'+k];
+      if(xs==null || o==null) continue;
+      if(o===x) o = y;
+      const os = sc[o+'|'+k]; if(os==null) continue;
+      xs>os ? w++ : xs<os ? l++ : t++;
+    }
+    return {w,l,t};
+  };
+  const wval = r => r.w + r.t*.5;
+  const owners = [...ownSet];
+  const R = {};
+  for(const x of owners) for(const y of owners) R[x+'|'+y] = recWith(x,y);
+  owners.sort((a,b)=> wval(R[b+'|'+b]) - wval(R[a+'|'+a]));
+  const fmtRec = r => `${r.w}-${r.l}${r.t?'-'+r.t:''}`;
+  let html = '<tr><th>plays sched of →</th>' + owners.map(o=>`<th class="num">${esc(o)}</th>`).join('') + '</tr>';
+  for(const x of owners){
+    html += `<tr><td><b>${esc(x)}</b></td>` + owners.map(y=>{
+      const d = wval(R[x+'|'+y]) - wval(R[x+'|'+x]);
+      const st = x===y ? 'background:rgba(148,163,184,.14);font-weight:700'
+        : d>0 ? `background:rgba(34,197,94,${Math.min(.12*d,.45).toFixed(2)})`
+        : d<0 ? `background:rgba(239,68,68,${Math.min(-.12*d,.45).toFixed(2)})` : '';
+      return `<td class="num" style="${st}">${fmtRec(R[x+'|'+y])}</td>`;
+    }).join('') + '</tr>';
+  }
+  $('schedMatrix').innerHTML = html;
+  const nO = owners.length;
+  const avgWith = y => owners.filter(x=>x!==y).reduce((s,x)=>s+wval(R[x+'|'+y]),0)/(nO-1);
+  const avgOf = x => owners.filter(y=>y!==x).reduce((s,y)=>s+wval(R[x+'|'+y]),0)/(nO-1);
+  const bySched = owners.map(y=>({y, avg:avgWith(y)}));
+  const tough = bySched.reduce((m,c)=>c.avg<m.avg?c:m), easy = bySched.reduce((m,c)=>c.avg>m.avg?c:m);
+  const draws = owners.map(x=>({x, d: wval(R[x+'|'+x]) - avgOf(x)}));
+  const lucky = draws.reduce((m,c)=>c.d>m.d?c:m), unlucky = draws.reduce((m,c)=>c.d<m.d?c:m);
+  let up = {v:-99}, down = {v:99};
+  for(const x of owners) for(const y of owners){
+    if(x===y) continue;
+    const d = wval(R[x+'|'+y]) - wval(R[x+'|'+x]);
+    if(d>up.v) up = {v:d,x,y};
+    if(d<down.v) down = {v:d,x,y};
+  }
+  $('schedAwards').innerHTML = [
+    ['🧱 Toughest schedule', `the league would average <b>${tough.avg.toFixed(1)} wins</b> playing ${esc(tough.y)}'s schedule`],
+    ['🧁 Easiest schedule', `the league would average <b>${easy.avg.toFixed(1)} wins</b> playing ${esc(easy.y)}'s schedule`],
+    ['🍀 Lucky draw', `${esc(lucky.x)} went <b>${fmtRec(R[lucky.x+'|'+lucky.x])}</b>, would average ${(wval(R[lucky.x+'|'+lucky.x])-lucky.d).toFixed(1)} wins on anyone else's schedule (+${lucky.d.toFixed(1)} W)`],
+    ['🌧️ Unlucky draw', `${esc(unlucky.x)} went <b>${fmtRec(R[unlucky.x+'|'+unlucky.x])}</b>, would average ${(wval(R[unlucky.x+'|'+unlucky.x])-unlucky.d).toFixed(1)} wins on anyone else's schedule (${unlucky.d.toFixed(1)} W)`],
+    ['📈 Biggest upgrade', `${esc(up.x)} would go <b>${fmtRec(R[up.x+'|'+up.y])}</b> with ${esc(up.y)}'s schedule (actual ${fmtRec(R[up.x+'|'+up.x])}, +${up.v.toFixed(1)} W)`],
+    ['📉 Biggest downgrade', `${esc(down.x)} would go <b>${fmtRec(R[down.x+'|'+down.y])}</b> with ${esc(down.y)}'s schedule (actual ${fmtRec(R[down.x+'|'+down.x])}, ${down.v.toFixed(1)} W)`],
+  ].map(([t,d])=>`<div class="meet"><span style="flex:none;font-weight:700">${t}</span><span style="text-align:right;color:var(--ink2)">${d}</span></div>`).join('');
+}
+$('schedYear').addEventListener('change', renderSched);
+renderSched();
 renderSeason();
 
 const owners = DATA.owners.slice().sort((a,b)=>{

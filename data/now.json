@@ -103,39 +103,39 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 95.8
+   "pct": 96.6
   },
   {
    "owner": "Austin",
-   "pct": 95.7
+   "pct": 95.8
   },
   {
    "owner": "Lerch",
-   "pct": 91.2
+   "pct": 92.7
   },
   {
    "owner": "Cliff",
-   "pct": 84.2
+   "pct": 84.5
   },
   {
    "owner": "Steve",
-   "pct": 81.0
+   "pct": 80.0
   },
   {
    "owner": "Martin",
-   "pct": 72.3
+   "pct": 70.9
   },
   {
    "owner": "Mark",
-   "pct": 53.5
+   "pct": 53.7
   },
   {
    "owner": "Clancy",
-   "pct": 18.5
+   "pct": 18.7
   },
   {
    "owner": "Luke",
-   "pct": 7.5
+   "pct": 6.8
   },
   {
    "owner": "Will",
@@ -155,39 +155,39 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 86.4,
+   "pa": 88.2,
    "b": "Steve",
-   "pb": 93.0
+   "pb": 92.9
   },
   {
    "a": "Mark",
-   "pa": 108.9,
+   "pa": 109.1,
    "b": "Timmy",
-   "pb": 84.0
+   "pb": 84.2
   },
   {
    "a": "Will",
    "pa": 99.9,
    "b": "Bob",
-   "pb": 100.8
+   "pb": 101.3
   },
   {
    "a": "Lerch",
-   "pa": 93.6,
+   "pa": 93.8,
    "b": "Austin",
    "pb": 95.7
   },
   {
    "a": "Clancy",
-   "pa": 87.8,
+   "pa": 87.7,
    "b": "Luke",
    "pb": 96.2
   },
   {
    "a": "Martin",
-   "pa": 94.0,
+   "pa": 88.8,
    "b": "Cliff",
-   "pb": 92.2
+   "pb": 92.1
   }
  ],
  "elim": [
@@ -380,5 +380,699 @@
     "w": null
    }
   ]
+ },
+ "machine": {
+  "weeks": {
+   "9": [
+    [
+     "Sam",
+     "Steve"
+    ],
+    [
+     "Mark",
+     "Timmy"
+    ],
+    [
+     "Will",
+     "Bob"
+    ],
+    [
+     "Lerch",
+     "Austin"
+    ],
+    [
+     "Clancy",
+     "Luke"
+    ],
+    [
+     "Martin",
+     "Cliff"
+    ]
+   ],
+   "10": [
+    [
+     "Sam",
+     "Lerch"
+    ],
+    [
+     "Will",
+     "Timmy"
+    ],
+    [
+     "Bob",
+     "Cliff"
+    ],
+    [
+     "Luke",
+     "Austin"
+    ],
+    [
+     "Mark",
+     "Clancy"
+    ],
+    [
+     "Steve",
+     "Martin"
+    ]
+   ],
+   "11": [
+    [
+     "Will",
+     "Sam"
+    ],
+    [
+     "Timmy",
+     "Lerch"
+    ],
+    [
+     "Bob",
+     "Luke"
+    ],
+    [
+     "Austin",
+     "Cliff"
+    ],
+    [
+     "Clancy",
+     "Steve"
+    ],
+    [
+     "Mark",
+     "Martin"
+    ]
+   ],
+   "12": [
+    [
+     "Sam",
+     "Timmy"
+    ],
+    [
+     "Bob",
+     "Austin"
+    ],
+    [
+     "Clancy",
+     "Martin"
+    ],
+    [
+     "Luke",
+     "Cliff"
+    ],
+    [
+     "Mark",
+     "Steve"
+    ],
+    [
+     "Will",
+     "Lerch"
+    ]
+   ],
+   "13": [
+    [
+     "Sam",
+     "Bob"
+    ],
+    [
+     "Clancy",
+     "Timmy"
+    ],
+    [
+     "Martin",
+     "Austin"
+    ],
+    [
+     "Mark",
+     "Cliff"
+    ],
+    [
+     "Lerch",
+     "Luke"
+    ],
+    [
+     "Will",
+     "Steve"
+    ]
+   ],
+   "14": [
+    [
+     "Sam",
+     "Austin"
+    ],
+    [
+     "Timmy",
+     "Martin"
+    ],
+    [
+     "Clancy",
+     "Bob"
+    ],
+    [
+     "Steve",
+     "Cliff"
+    ],
+    [
+     "Will",
+     "Luke"
+    ],
+    [
+     "Mark",
+     "Lerch"
+    ]
+   ]
+  },
+  "pweeks": [
+   15,
+   16,
+   17
+  ],
+  "proj": {
+   "Mark": {
+    "9": 109.1,
+    "10": 104.2,
+    "11": 84.2,
+    "12": 107.3,
+    "13": 101.5,
+    "14": 104.6,
+    "15": 109.1,
+    "16": 111.1,
+    "17": 107.2
+   },
+   "Clancy": {
+    "9": 87.7,
+    "10": 95.5,
+    "11": 90.6,
+    "12": 98.9,
+    "13": 85.4,
+    "14": 92.3,
+    "15": 97.6,
+    "16": 103.6,
+    "17": 98.4
+   },
+   "Will": {
+    "9": 99.9,
+    "10": 93.1,
+    "11": 75.2,
+    "12": 93.3,
+    "13": 97.7,
+    "14": 89.5,
+    "15": 95.7,
+    "16": 95.6,
+    "17": 99.1
+   },
+   "Sam": {
+    "9": 88.2,
+    "10": 88.9,
+    "11": 89.6,
+    "12": 90.8,
+    "13": 85.3,
+    "14": 78.7,
+    "15": 93.7,
+    "16": 93.5,
+    "17": 88.3
+   },
+   "Steve": {
+    "9": 92.9,
+    "10": 99.9,
+    "11": 107.8,
+    "12": 101.5,
+    "13": 87.9,
+    "14": 100.3,
+    "15": 98.2,
+    "16": 101.3,
+    "17": 102.7
+   },
+   "Timmy": {
+    "9": 84.2,
+    "10": 72.0,
+    "11": 87.8,
+    "12": 85.2,
+    "13": 83.2,
+    "14": 79.7,
+    "15": 87.1,
+    "16": 89.7,
+    "17": 87.7
+   },
+   "Bob": {
+    "9": 101.3,
+    "10": 102.3,
+    "11": 84.5,
+    "12": 107.3,
+    "13": 99.3,
+    "14": 95.8,
+    "15": 107.7,
+    "16": 100.7,
+    "17": 103.0
+   },
+   "Lerch": {
+    "9": 93.8,
+    "10": 97.6,
+    "11": 95.2,
+    "12": 106.2,
+    "13": 89.9,
+    "14": 93.2,
+    "15": 102.7,
+    "16": 104.0,
+    "17": 103.3
+   },
+   "Martin": {
+    "9": 88.8,
+    "10": 96.7,
+    "11": 95.8,
+    "12": 99.0,
+    "13": 101.3,
+    "14": 97.4,
+    "15": 100.6,
+    "16": 101.1,
+    "17": 103.9
+   },
+   "Luke": {
+    "9": 96.2,
+    "10": 75.7,
+    "11": 94.1,
+    "12": 97.1,
+    "13": 87.7,
+    "14": 98.0,
+    "15": 85.0,
+    "16": 92.3,
+    "17": 95.7
+   },
+   "Austin": {
+    "9": 95.7,
+    "10": 99.4,
+    "11": 102.5,
+    "12": 96.1,
+    "13": 98.4,
+    "14": 98.8,
+    "15": 100.1,
+    "16": 99.6,
+    "17": 103.5
+   },
+   "Cliff": {
+    "9": 92.1,
+    "10": 82.8,
+    "11": 99.2,
+    "12": 100.7,
+    "13": 96.3,
+    "14": 104.6,
+    "15": 98.5,
+    "16": 96.5,
+    "17": 103.5
+   }
+  },
+  "sd": {
+   "Mark": 47.3,
+   "Clancy": 12.0,
+   "Will": 24.7,
+   "Sam": 31.1,
+   "Steve": 13.4,
+   "Timmy": 22.3,
+   "Bob": 27.0,
+   "Lerch": 23.6,
+   "Martin": 28.6,
+   "Luke": 12.0,
+   "Austin": 19.1,
+   "Cliff": 21.0
+  },
+  "wins": {
+   "Mark": 4,
+   "Clancy": 4,
+   "Will": 1,
+   "Sam": 1,
+   "Steve": 5,
+   "Timmy": 1,
+   "Bob": 6,
+   "Lerch": 6,
+   "Martin": 5,
+   "Luke": 3,
+   "Austin": 6,
+   "Cliff": 6
+  },
+  "pf": {
+   "Mark": 897.66,
+   "Clancy": 873.5,
+   "Will": 778.26,
+   "Sam": 807.48,
+   "Steve": 940.74,
+   "Timmy": 644.52,
+   "Bob": 963.78,
+   "Lerch": 895.86,
+   "Martin": 861.86,
+   "Luke": 781.2,
+   "Austin": 906.7,
+   "Cliff": 857.84
+  },
+  "h2hw": {
+   "Mark": {
+    "Clancy": 0,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 0,
+    "Timmy": 0,
+    "Bob": 0,
+    "Lerch": 0,
+    "Martin": 0,
+    "Luke": 1,
+    "Austin": 1,
+    "Cliff": 0
+   },
+   "Clancy": {
+    "Mark": 0,
+    "Will": 1,
+    "Sam": 0,
+    "Steve": 0,
+    "Timmy": 1,
+    "Bob": 0,
+    "Lerch": 1,
+    "Martin": 0,
+    "Luke": 0,
+    "Austin": 0,
+    "Cliff": 1
+   },
+   "Will": {
+    "Mark": 0,
+    "Clancy": 0,
+    "Sam": 0,
+    "Steve": 0,
+    "Timmy": 0,
+    "Bob": 0,
+    "Lerch": 0,
+    "Martin": 0,
+    "Luke": 1,
+    "Austin": 0,
+    "Cliff": 0
+   },
+   "Sam": {
+    "Mark": 0,
+    "Clancy": 1,
+    "Will": 0,
+    "Steve": 0,
+    "Timmy": 0,
+    "Bob": 0,
+    "Lerch": 0,
+    "Martin": 0,
+    "Luke": 0,
+    "Austin": 0,
+    "Cliff": 0
+   },
+   "Steve": {
+    "Mark": 1,
+    "Clancy": 0,
+    "Will": 1,
+    "Sam": 0,
+    "Timmy": 1,
+    "Bob": 0,
+    "Lerch": 0,
+    "Martin": 0,
+    "Luke": 1,
+    "Austin": 0,
+    "Cliff": 1
+   },
+   "Timmy": {
+    "Mark": 0,
+    "Clancy": 0,
+    "Will": 0,
+    "Sam": 1,
+    "Steve": 0,
+    "Bob": 0,
+    "Lerch": 0,
+    "Martin": 0,
+    "Luke": 0,
+    "Austin": 0,
+    "Cliff": 0
+   },
+   "Bob": {
+    "Mark": 1,
+    "Clancy": 1,
+    "Will": 0,
+    "Sam": 1,
+    "Steve": 1,
+    "Timmy": 1,
+    "Lerch": 0,
+    "Martin": 1,
+    "Luke": 0,
+    "Austin": 0,
+    "Cliff": 0
+   },
+   "Lerch": {
+    "Mark": 1,
+    "Clancy": 0,
+    "Will": 1,
+    "Sam": 0,
+    "Steve": 1,
+    "Timmy": 0,
+    "Bob": 1,
+    "Martin": 1,
+    "Luke": 1,
+    "Austin": 0,
+    "Cliff": 0
+   },
+   "Martin": {
+    "Mark": 0,
+    "Clancy": 1,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 0,
+    "Timmy": 1,
+    "Bob": 0,
+    "Lerch": 0,
+    "Luke": 0,
+    "Austin": 1,
+    "Cliff": 0
+   },
+   "Luke": {
+    "Mark": 0,
+    "Clancy": 0,
+    "Will": 0,
+    "Sam": 1,
+    "Steve": 0,
+    "Timmy": 1,
+    "Bob": 0,
+    "Lerch": 0,
+    "Martin": 1,
+    "Austin": 0,
+    "Cliff": 0
+   },
+   "Austin": {
+    "Mark": 0,
+    "Clancy": 1,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 1,
+    "Timmy": 1,
+    "Bob": 1,
+    "Lerch": 0,
+    "Martin": 0,
+    "Luke": 0,
+    "Cliff": 0
+   },
+   "Cliff": {
+    "Mark": 1,
+    "Clancy": 0,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 0,
+    "Timmy": 1,
+    "Bob": 0,
+    "Lerch": 1,
+    "Martin": 0,
+    "Luke": 1,
+    "Austin": 0
+   }
+  },
+  "scnt": {
+   "Mark": {
+    "Clancy": 1,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 2,
+    "Timmy": 1,
+    "Bob": 1,
+    "Lerch": 2,
+    "Martin": 1,
+    "Luke": 1,
+    "Austin": 1,
+    "Cliff": 2
+   },
+   "Clancy": {
+    "Mark": 1,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 1,
+    "Timmy": 2,
+    "Bob": 2,
+    "Lerch": 1,
+    "Martin": 2,
+    "Luke": 1,
+    "Austin": 1,
+    "Cliff": 1
+   },
+   "Will": {
+    "Mark": 1,
+    "Clancy": 1,
+    "Sam": 1,
+    "Steve": 2,
+    "Timmy": 1,
+    "Bob": 1,
+    "Lerch": 2,
+    "Martin": 1,
+    "Luke": 2,
+    "Austin": 1,
+    "Cliff": 1
+   },
+   "Sam": {
+    "Mark": 1,
+    "Clancy": 1,
+    "Will": 1,
+    "Steve": 1,
+    "Timmy": 2,
+    "Bob": 2,
+    "Lerch": 1,
+    "Martin": 1,
+    "Luke": 1,
+    "Austin": 2,
+    "Cliff": 1
+   },
+   "Steve": {
+    "Mark": 2,
+    "Clancy": 1,
+    "Will": 2,
+    "Sam": 1,
+    "Timmy": 1,
+    "Bob": 1,
+    "Lerch": 1,
+    "Martin": 1,
+    "Luke": 1,
+    "Austin": 1,
+    "Cliff": 2
+   },
+   "Timmy": {
+    "Mark": 1,
+    "Clancy": 2,
+    "Will": 1,
+    "Sam": 2,
+    "Steve": 1,
+    "Bob": 1,
+    "Lerch": 1,
+    "Martin": 2,
+    "Luke": 1,
+    "Austin": 1,
+    "Cliff": 1
+   },
+   "Bob": {
+    "Mark": 1,
+    "Clancy": 2,
+    "Will": 1,
+    "Sam": 2,
+    "Steve": 1,
+    "Timmy": 1,
+    "Lerch": 1,
+    "Martin": 1,
+    "Luke": 1,
+    "Austin": 2,
+    "Cliff": 1
+   },
+   "Lerch": {
+    "Mark": 2,
+    "Clancy": 1,
+    "Will": 2,
+    "Sam": 1,
+    "Steve": 1,
+    "Timmy": 1,
+    "Bob": 1,
+    "Martin": 1,
+    "Luke": 2,
+    "Austin": 1,
+    "Cliff": 1
+   },
+   "Martin": {
+    "Mark": 1,
+    "Clancy": 2,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 1,
+    "Timmy": 2,
+    "Bob": 1,
+    "Lerch": 1,
+    "Luke": 1,
+    "Austin": 2,
+    "Cliff": 1
+   },
+   "Luke": {
+    "Mark": 1,
+    "Clancy": 1,
+    "Will": 2,
+    "Sam": 1,
+    "Steve": 1,
+    "Timmy": 1,
+    "Bob": 1,
+    "Lerch": 2,
+    "Martin": 1,
+    "Austin": 1,
+    "Cliff": 2
+   },
+   "Austin": {
+    "Mark": 1,
+    "Clancy": 1,
+    "Will": 1,
+    "Sam": 2,
+    "Steve": 1,
+    "Timmy": 1,
+    "Bob": 2,
+    "Lerch": 1,
+    "Martin": 2,
+    "Luke": 1,
+    "Cliff": 1
+   },
+   "Cliff": {
+    "Mark": 2,
+    "Clancy": 1,
+    "Will": 1,
+    "Sam": 1,
+    "Steve": 2,
+    "Timmy": 1,
+    "Bob": 1,
+    "Lerch": 1,
+    "Martin": 1,
+    "Luke": 2,
+    "Austin": 1
+   }
+  },
+  "divs": [
+   [
+    "Mark",
+    "Will",
+    "Steve",
+    "Lerch",
+    "Luke",
+    "Cliff"
+   ],
+   [
+    "Clancy",
+    "Sam",
+    "Timmy",
+    "Bob",
+    "Martin",
+    "Austin"
+   ]
+  ],
+  "divnames": [
+   "Sphincter",
+   "Gooch"
+  ],
+  "torder": [
+   "Mark",
+   "Clancy",
+   "Will",
+   "Sam",
+   "Steve",
+   "Timmy",
+   "Bob",
+   "Lerch",
+   "Martin",
+   "Luke",
+   "Austin",
+   "Cliff"
+  ],
+  "played": 8
  }
 }
