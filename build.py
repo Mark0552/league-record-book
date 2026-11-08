@@ -224,12 +224,7 @@ titles = defaultdict(int)
 for c in champs:
     titles[c["owner"]] += 1
 
-payouts = {}
-with open(RAW / "sheet" / "payouts.csv", encoding="utf-8") as f:
-    for r in csv.DictReader(f):
-        o = canon((r.get("Owner") or "").strip())
-        if o and o in alltime and r.get("Net"):
-            payouts[o] = r["Net"]
+payouts = {}   # owner -> net $ string; filled from the per-person split in the MONEY section
 
 # ---------------- records ----------------
 # record lists count every game played — regular, playoff, and consolation alike
@@ -350,17 +345,53 @@ for (y, w), lst in sorted(byweek.items()):
     weekly_top[y].append(dict(week=w, owner=o, pts=round(pts, 2)))
 topcounts = Counter(e["owner"] for y in weekly_top for e in weekly_top[y])
 
-SEAT_LABELS = {"Luke/Auggie/Ski": "Luke / Austin / Alex (one seat)",
-               "Neville/Auggie2.0": "Neville / Austin (one seat)"}
-payout_rows = []
-with open(RAW / "sheet" / "payouts.csv", encoding="utf-8") as f:
-    for r in csv.DictReader(f):
-        raw_o = (r.get("Owner") or "").strip()
+# Shared-seat money is split to the person who held the seat each year.
+# (2014 predates the game log; seat A's 2014 is attributed to Austin, its 2015 holder.)
+SEAT_YEARS = {
+    "Luke/Auggie/Ski": {2014: "Austin", 2015: "Austin", 2016: "Alex",
+                        **{y: "Luke" for y in range(2017, 2027)}},
+    "Neville/Auggie2.0": {**{y: "Neville" for y in range(2014, 2024)},
+                          **{y: "Austin" for y in range(2024, 2027)}},
+}
+def money_f(v):
+    v = (v or "").replace("$", "").replace(",", "").strip()
+    try:
+        return float(v)
+    except ValueError:
+        return 0.0
+def money_s(v):
+    return (f"-${abs(v):,.2f}" if v < 0 else f"${v:,.2f}")
+
+pay_rows_raw = list(csv.reader(open(RAW / "sheet" / "payouts.csv", encoding="utf-8")))
+pay_hdr = pay_rows_raw[0]
+year_cols = {}
+for i, h in enumerate(pay_hdr):
+    h = h.strip()
+    if h[:4].isdigit():
+        year_cols[i] = (int(h[:4]), "out" if "Out" in h else "in")
+person_money = defaultdict(lambda: {"in": 0.0, "out": 0.0})
+for r in pay_rows_raw[1:]:
+    raw_o = (r[0] or "").strip()
+    if raw_o in SEAT_YEARS:
+        for i, (yr, kind) in year_cols.items():
+            if i < len(r):
+                p = SEAT_YEARS[raw_o].get(yr)
+                if p:
+                    person_money[p][kind] += money_f(r[i])
+    else:
+        # recompute from the yearly ledger for everyone: the sheet's own Total
+        # columns are stale (frozen after 2023), the year columns are current
         o = canon(raw_o)
-        label = o if o in alltime else SEAT_LABELS.get(raw_o)
-        if label:
-            payout_rows.append(dict(owner=label, paid=r.get("Total Paid In", ""),
-                                    earned=r.get("Total Earned", ""), net=r.get("Net", "")))
+        if o in alltime:
+            for i, (yr, kind) in year_cols.items():
+                if i < len(r):
+                    person_money[o][kind] += money_f(r[i])
+payout_rows = [dict(owner=o, paid=money_s(v["in"]), earned=money_s(v["out"]),
+                    net=money_s(v["out"] - v["in"]))
+               for o, v in person_money.items()]
+payouts.update({o: money_s(v["out"] - v["in"]) for o, v in person_money.items()})
+print(f"payouts split: Austin {payouts.get('Austin')}, Alex {payouts.get('Alex')}, "
+      f"Luke {payouts.get('Luke')}, Neville {payouts.get('Neville')}")
 
 money = dict(
     year=CUR_SEASON, perweek=40,
