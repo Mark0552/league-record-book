@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2 Many Chiefs — League Record Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0f1115; --surface:#171a21; --surface2:#1f2430; --line:#2a303d;
@@ -19,7 +21,7 @@ body{background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMac
   -webkit-font-smoothing:antialiased;padding-bottom:40px}
 header{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
 .hwrap{padding:14px 16px 8px}
-h1{font-size:17px;font-weight:800;letter-spacing:.2px}
+h1{font-family:'Schoolbell',cursive;font-size:24px;font-weight:400;letter-spacing:.5px}
 h1 small{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-top:2px}
 nav{display:flex;gap:6px;overflow-x:auto;padding:0 12px 10px;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
@@ -374,9 +376,24 @@ function renderSeason(){
   const champ = DATA.champs.find(c=>c.year===year);
   const shame = DATA.shame.find(c=>c.year===year);
   const rows = regStandings(year);
+  // seed-faithful ordering: the teams who actually made the bracket sit above the cut
+  const poSet = new Set();
+  G.forEach(g=>{ if(g[0]===year && g[2]==='P'){ poSet.add(g[3]); poSet.add(g[5]); } });
+  let ordered, cut;
+  if(year===YEARS[0] && now.standings && now.standings.length){
+    ordered = now.standings.map(s=>rows.find(r=>r.o===s.owner)).filter(Boolean);
+    cut = 6;
+  } else if(poSet.size){
+    ordered = [...rows.filter(r=>poSet.has(r.o)), ...rows.filter(r=>!poSet.has(r.o))];
+    cut = poSet.size;
+  } else {
+    ordered = rows; cut = 6;
+  }
   $('ss_stand').innerHTML = '<tr><th>#</th><th>Owner</th><th class="num">W-L</th><th class="num">PF</th><th class="num">PA</th></tr>' +
-    rows.map((r,i)=>`<tr><td>${i+1}</td><td><b>${esc(r.o)}</b>${champ&&champ.owner===r.o?' <span class="badge gold">CHAMP</span>':''}${shame&&shame.owner===r.o?' <span class="badge" style="color:var(--red)">LAST</span>':''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td><td class="num">${f1(r.pa)}</td></tr>`).join('');
-  $('ss_note').textContent = champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''})` : '';
+    ordered.map((r,i)=>`<tr${i===cut?' class="line"':''}><td>${i+1}</td><td><b>${esc(r.o)}</b>${champ&&champ.owner===r.o?' <span class="badge gold">🏆 Buck Wong Bowl</span>':''}${shame&&shame.owner===r.o?' <span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">🥄 Lerch Cup</span>':''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td><td class="num">${f1(r.pa)}</td></tr>`).join('');
+  $('ss_note').textContent = (champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''}). ` : '')
+    + 'Ordered by league tiebreakers; playoff teams above the dashed cut (division winners earn seeds regardless of record).'
+    + (year===YEARS[0] && !poSet.size ? ' Current-season order mirrors the live League Status seeding.' : '');
   // weekly matrix (regular season)
   const weeks = [...new Set(G.filter(g=>g[0]===year&&g[2]==='R').map(g=>g[1]))].sort((a,b)=>a-b);
   const owners = rows.map(r=>r.o);
