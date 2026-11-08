@@ -127,6 +127,7 @@ li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #s
 .bbox{position:absolute;top:3px;height:10px;background:rgba(45,212,191,.35);border-radius:3px}
 .bmed{position:absolute;top:1px;height:14px;width:2px;background:var(--accent)}
 .blab{width:92px;font-size:10.5px;color:var(--ink3);text-align:right;flex:none;font-variant-numeric:tabular-nums}
+.rk{font-size:9.5px;color:var(--ink2);font-weight:400}
 footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4px}
 </style>
 </head>
@@ -174,9 +175,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2 id="ss_hdr">Season</h2><div class="tscroll"><table id="ss_stand"></table></div>
       <div class="note" id="ss_note"></div></div>
     <div class="card"><h2>Week-by-week scores</h2><div class="tscroll"><table id="ss_matrix"></table></div>
-      <div class="note">Bold = won that week. Gold = league's top score of the week.</div></div>
-    <div class="card"><h2>Weekly rank heatmap</h2><div class="tscroll"><table id="ss_heat"></table></div>
-      <div class="note">Where each score ranked league-wide that week: 1 (green) = best of the week, 12 (red) = worst. Regular season only.</div></div>
+      <div class="note">Bold = won that week. Gold = league's top score of the week. (n) and the cell color = where the score ranked league-wide that week: green = best, red = worst.</div></div>
     <div class="card"><h2>Scoring distribution</h2><div id="ss_dist"></div>
       <div class="note">Each team's weekly scores: whisker = min to max, box = middle half (Q1&ndash;Q3), bright tick = median. Sorted by median.</div></div>
     <div class="card"><h2>All-play &amp; median standings</h2><div class="tscroll"><table id="ss_lenses"></table></div>
@@ -670,17 +669,7 @@ function renderSeason(){
     const t = tops[g[1]]||0;
     tops[g[1]] = Math.max(t, g[4], g[6]);
   }
-  let m = '<tr><th>Owner</th>' + weeks.map(w=>`<th class="num">${w}</th>`).join('') + '</tr>';
-  for(const o of owners){
-    m += `<tr><td><b>${esc(o)}</b></td>` + weeks.map(w=>{
-      const c = cell[o+'|'+w];
-      if(!c) return '<td class="num" style="color:var(--ink3)">—</td>';
-      const cls = c.pts===tops[w] ? 'wk-top' : (c.win?'wk-w':'wk-l');
-      return `<td class="num ${cls}">${c.pts.toFixed(1)}</td>`;
-    }).join('') + '</tr>';
-  }
-  $('ss_matrix').innerHTML = m;
-  // weekly rank heatmap (diverging green -> neutral -> red, rank printed in every cell)
+  // weekly rank (for heat coloring), diverging green -> neutral -> red
   const rk = {};
   for(const w of weeks){
     owners.map(o=>({o, p: cell[o+'|'+w] ? cell[o+'|'+w].pts : null}))
@@ -695,15 +684,17 @@ function renderSeason(){
     else { const u=t*2-1; c=[100+139*u, 116-48*u, 139-71*u]; a=.12+.30*u; }
     return `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a.toFixed(2)})`;
   };
-  let hm = '<tr><th>Owner</th>' + weeks.map(w=>`<th class="num">${w}</th>`).join('') + '</tr>';
+  let m = '<tr><th>Owner</th>' + weeks.map(w=>`<th class="num">${w}</th>`).join('') + '</tr>';
   for(const o of owners){
-    hm += `<tr><td><b>${esc(o)}</b></td>` + weeks.map(w=>{
+    m += `<tr><td><b>${esc(o)}</b></td>` + weeks.map(w=>{
+      const c = cell[o+'|'+w];
+      if(!c) return '<td class="num" style="color:var(--ink3)">—</td>';
+      const cls = c.pts===tops[w] ? 'wk-top' : (c.win?'wk-w':'wk-l');
       const r = rk[o+'|'+w];
-      return r ? `<td class="num" style="background:${heatColor(r)}">${r}</td>`
-               : '<td class="num" style="color:var(--ink3)">—</td>';
+      return `<td class="num ${cls}" style="background:${heatColor(r)};white-space:nowrap">${c.pts.toFixed(1)} <span class="rk">(${r})</span></td>`;
     }).join('') + '</tr>';
   }
-  $('ss_heat').innerHTML = hm;
+  $('ss_matrix').innerHTML = m;
   // scoring distribution (box plots)
   const quant = (a, p) => { const i=(a.length-1)*p, lo=Math.floor(i), hi=Math.ceil(i); return a[lo]+(a[hi]-a[lo])*(i-lo); };
   const dist = owners.map(o=>{
