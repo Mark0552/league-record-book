@@ -232,6 +232,15 @@ titles = defaultdict(int)
 for c in champs:
     titles[c["owner"]] += 1
 
+# modern franchise names for sheet-sourced rosters and rings
+TEAM_RENAMES = {"Redskins D/ST": "Commanders D/ST", "Redskins": "Commanders",
+                "Washington D/ST": "Commanders D/ST", "Washington Football Team": "Commanders",
+                "Football Team D/ST": "Commanders D/ST"}
+for c in champs:
+    c["roster"] = [[sl, TEAM_RENAMES.get(nm, nm)] for sl, nm in (c.get("roster") or [])]
+for ring in rings:
+    ring["player"] = TEAM_RENAMES.get(ring["player"], ring["player"])
+
 # which title teams was each multiple-ring player on? (name-match vs champ rosters)
 def _ring_key(s):
     return "".join(ch for ch in s.lower() if ch.isalpha())
@@ -886,7 +895,11 @@ def player_key(name, pos):
     s = _re.sub(r"[^a-z ]", "", name.lower())
     s = _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", s)
     if pos == "DEF":
-        s = s.replace("dst", "")
+        s = s.replace("dst", "").replace(" ", "")
+        # franchise renames: one team, one identity (Washington is the only
+        # nickname change in our window; city moves kept their nicknames)
+        return {"redskins": "commanders", "washington": "commanders",
+                "footballteam": "commanders"}.get(s, s)
     return s.replace(" ", "")
 
 variant_counts = defaultdict(Counter)
@@ -1004,11 +1017,11 @@ adj = dict(
 # so ties always count as undecided in both directions.
 
 def _ch_divmap(yr):
-    """owner -> division (1/2) for a season."""
+    """(owner -> division 1/2, [division names]) for a season."""
     if yr <= 2019:
         f = espn_dir / f"{yr}.json"
         if not f.exists():
-            return None
+            return None, None
         d = json.load(open(f, encoding="utf-8"))
         if isinstance(d, list):
             d = d[0]
@@ -1022,10 +1035,12 @@ def _ch_divmap(yr):
                      for o in (t.get("owners") or [t.get("primaryOwner")])]
             owner = next((c for c in cands if c in log_teams), cands[0] if cands else "?")
             dmap[owner] = t.get("divisionId", 0) + 1
-        return dmap
+        dvs = sorted((d.get("settings", {}).get("scheduleSettings", {}).get("divisions") or []),
+                     key=lambda v: v.get("id", 0))
+        return dmap, [v.get("name", f"Division {i+1}") for i, v in enumerate(dvs)][:2] or ["Division 1", "Division 2"]
     rost = load(yr, "rosters")
     if not rost:
-        return None
+        return None, None
     users = {u["user_id"]: u for u in (load(yr, "users") or [])}
     dmap = {}
     for r in rost:
@@ -1043,7 +1058,8 @@ def _ch_divmap(yr):
                             votes[hit] += 1
             owner = max(votes, key=votes.get) if votes else users.get(r["owner_id"], {}).get("display_name", "?")
         dmap[owner] = (r.get("settings") or {}).get("division")
-    return dmap
+    md = (load(yr, "league") or {}).get("metadata") or {}
+    return dmap, [md.get("division_1", "Division 1"), md.get("division_2", "Division 2")]
 
 def _ch_flow(glist, budget):
     """Can the games in glist be distributed so each team wins <= budget[team]?"""
@@ -1164,9 +1180,10 @@ def _ch_can_lose_division(x, wins, future, teams, div):
     return False
 
 clinch_rows = dict(spot=[], bye=[], elim=[])
+divhist = {}   # year -> division names + owner assignments, for division standings
 _ch_warn = []
 for yr in sorted({g["year"] for g in games}):
-    dmap = _ch_divmap(yr)
+    dmap, dnames = _ch_divmap(yr)
     reg = [g for g in games if g["year"] == yr and g["type"] == "Regular"]
     weeks = sorted({g["week"] for g in reg})
     teams = sorted({g["a"] for g in reg} | {g["b"] for g in reg})
@@ -1174,6 +1191,7 @@ for yr in sorted({g["year"] for g in games}):
         _ch_warn.append(f"{yr}: missing division data, skipped")
         continue
     div = {t: dmap[t] for t in teams}
+    divhist[str(yr)] = dict(names=dnames, owners=div)
     byweek = {w: [(g["a"], g["b"], g["sa"], g["sb"]) for g in reg if g["week"] == w] for w in weeks}
     extra = {}
     if yr == CUR_SEASON:   # schedule of unplayed weeks, so mid-season clinches are exact
@@ -1278,6 +1296,7 @@ payload = dict(
     draft=draft_payload,
     shame=shame,
     lineups=lineups,
+    divisions=divhist,
     now=now,
 )
 

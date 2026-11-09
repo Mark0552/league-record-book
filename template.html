@@ -31,13 +31,17 @@ body{background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMac
   -webkit-font-smoothing:antialiased;padding-bottom:40px}
 header{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
 .hwrap{padding:12px 16px;display:flex;align-items:center;gap:12px}
+.hwrap h1{flex:1;text-align:center}
+.hspace{flex:0 0 48px}
 h1{font-family:'Schoolbell',cursive;font-size:24px;font-weight:400;letter-spacing:.5px;color:#ef4444}
 @media (prefers-color-scheme: light){ h1{color:#dc2626} }
 h1 small{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-top:2px}
+.ptitle{font-size:19px;font-weight:800;letter-spacing:.2px;margin:2px 2px 12px}
 /* menu button + slide-in drawer navigation */
-#menuBtn{flex:0 0 auto;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
-  cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4.5px;padding:0}
-#menuBtn i{display:block;width:18px;height:2.5px;border-radius:2px;background:var(--ink2)}
+#menuBtn{flex:0 0 auto;width:48px;height:48px;border-radius:13px;border:1.5px solid var(--accent);
+  background:rgba(45,212,191,.12);cursor:pointer;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:5px;padding:0}
+#menuBtn i{display:block;width:21px;height:3px;border-radius:2px;background:var(--accent)}
 #navOvl{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:40}
 #navOvl.show{opacity:1;pointer-events:auto}
 nav{position:fixed;top:0;left:0;bottom:0;width:min(300px,82vw);z-index:41;background:var(--surface);
@@ -155,7 +159,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 </head>
 <body>
 <header>
-  <div class="hwrap"><button id="menuBtn" aria-label="Open menu"><i></i><i></i><i></i></button><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
+  <div class="hwrap"><button id="menuBtn" aria-label="Open menu"><i></i><i></i><i></i></button><h1>2 Many Chiefs Not Enough Indians<small id="sub"></small></h1><span class="hspace"></span></div>
 </header>
 <div id="navOvl"></div>
 <nav id="nav">
@@ -175,8 +179,12 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 </nav>
 <main>
   <section id="now">
-    <div class="card"><h2>Standings</h2><div class="tscroll"><table id="standings"></table></div>
-      <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut. &#10003; IN = clinched a spot; OUT = mathematically eliminated (house tiebreak rules).</div></div>
+    <div class="card swcard" data-sw="0"><h2>Standings</h2>
+      <div class="swtabs"><button class="swtab on">Overall</button><button class="swtab">Divisions</button></div>
+      <div class="swpane on"><div class="tscroll"><table id="standings"></table></div>
+        <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut. &#10003; IN = clinched a spot; OUT = mathematically eliminated (house tiebreak rules).</div></div>
+      <div class="swpane"><div id="standingsDiv"></div>
+        <div class="note">Division winners take seeds 1&ndash;2 and the first-round byes; everyone else fights for the four wildcards.</div></div></div>
     <div class="card swcard" data-sw="0"><h2>Playoff &amp; championship odds</h2>
       <div class="swtabs"><button class="swtab on">Now</button><button class="swtab">Playoff trend</button><button class="swtab">Title trend</button></div>
       <div class="swpane on"><div id="odds"></div><div class="note" id="oddsnote"></div></div>
@@ -215,8 +223,11 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="seasons">
     <div class="selrow"><select id="seasonSel"></select></div>
-    <div class="card"><h2 id="ss_hdr">Season</h2><div class="tscroll"><table id="ss_stand"></table></div>
-      <div class="note" id="ss_note"></div></div>
+    <div class="card swcard" data-sw="0"><h2 id="ss_hdr">Season</h2>
+      <div class="swtabs"><button class="swtab on">Overall</button><button class="swtab">Divisions</button></div>
+      <div class="swpane on"><div class="tscroll"><table id="ss_stand"></table></div>
+        <div class="note" id="ss_note"></div></div>
+      <div class="swpane"><div id="ss_divstand"></div></div></div>
     <div class="card"><h2>Week-by-week scores</h2><div class="tscroll"><table id="ss_matrix"></table></div>
       <div class="note">Bold = won that week. Gold = league's top score of the week. (n) and the cell color = where the score ranked league-wide that week: green = best, red = worst.</div></div>
     <div class="card"><h2>Scoring distribution</h2><div id="ss_dist"></div>
@@ -446,6 +457,12 @@ if(now.standings){
     r += `<tr${s.seed===7?' class="line"':''}><td>${s.seed}</td><td><b>${esc(s.owner)}</b>${s.leader?' <span class="badge div">'+esc(s.div)+'</span>':''}${st}</td><td style="color:var(--ink2);font-size:12.5px">${esc(s.team)}</td><td class="num">${s.rec}</td><td class="num">${f1(s.pf)}</td></tr>`;
   });
   $('standings').innerHTML = r;
+  const byDiv = {};
+  now.standings.forEach(s=>{ (byDiv[s.div] = byDiv[s.div] || []).push(s); });
+  $('standingsDiv').innerHTML = Object.entries(byDiv).map(([dn, rows])=>
+    `<h2 style="margin:10px 0 4px">${esc(dn)}</h2><div class="tscroll"><table><tr><th>Owner</th><th class="num">W-L</th><th class="num">PF</th></tr>` +
+    rows.map((s,i)=>`<tr><td><b>${esc(s.owner)}</b>${i===0?' <span class="badge div">leader</span>':''}</td><td class="num">${s.rec}</td><td class="num">${f1(s.pf)}</td></tr>`).join('') +
+    '</table></div>').join('');
   const title = {}; (now.title && now.title.odds || []).forEach(t=>title[t.owner]=t.champ);
   $('odds').innerHTML = now.odds.map(o=>{
     const t = title[o.owner];
@@ -828,6 +845,14 @@ function renderSeason(){
   $('ss_note').textContent = (champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''}). ` : '')
     + 'Ordered by league tiebreakers; playoff teams above the dashed cut (division winners earn seeds regardless of record). Tap an owner for who they started that season.'
     + (year===YEARS[0] && !poSet.size ? ' Current-season order mirrors the live League Status seeding.' : '');
+  const dv = (DATA.divisions||{})[String(year)];
+  $('ss_divstand').innerHTML = dv ? [1,2].map(dn=>{
+    const rws = ordered.filter(r=>dv.owners[r.o]===dn);
+    const tag = year===YEARS[0] ? 'leader' : 'winner';
+    return `<h2 style="margin:10px 0 4px">${esc(dv.names[dn-1]||('Division '+dn))}</h2><div class="tscroll"><table><tr><th>Owner</th><th class="num">W-L</th><th class="num">PF</th></tr>` +
+      rws.map((r,i)=>`<tr><td><b>${esc(r.o)}</b>${i===0?` <span class="badge div">${tag}</span>`:''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td></tr>`).join('') +
+      '</table></div>';
+  }).join('') : '<div class="note">No division data recorded for this season.</div>';
   // weekly matrix (regular season)
   const weeks = [...new Set(G.filter(g=>g[0]===year&&g[2]==='R').map(g=>g[1]))].sort((a,b)=>a-b);
   const owners = rows.map(r=>r.o);
@@ -1565,6 +1590,17 @@ $('ringlist').addEventListener('click', e=>{
     || '<span class="note">Title rosters not recorded for these years.</span>';
   row.after(d);
   row.classList.add('open');
+});
+
+// every page carries its own title (the menu labels are the source of truth)
+document.querySelectorAll('#nav a').forEach(a=>{
+  const sec = document.getElementById(a.getAttribute('href').slice(1));
+  if(sec && !sec.querySelector('.ptitle')){
+    const d = document.createElement('div');
+    d.className = 'ptitle';
+    d.textContent = a.querySelector('b').textContent;
+    sec.prepend(d);
+  }
 });
 
 show();
