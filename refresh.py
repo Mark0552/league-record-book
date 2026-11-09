@@ -358,6 +358,74 @@ else:
     except Exception as ex:
         print("playoff title sim skipped:", ex)
 
+# ---------------- 3c. odds history (for the trend graphs) ----------------
+# Entering-week playoff and championship odds for every week of the season.
+# Weeks before the book went live are reconstructed once from scores-to-date
+# (season averages as projection means) and cached; the current week is always
+# refreshed with the live 100k-sim numbers.
+ODDS_HIST = Path("data/odds_history.json")
+odds_hist = {}
+if ODDS_HIST.exists():
+    _oh = json.load(open(ODDS_HIST, encoding="utf-8"))
+    if str(_oh.get("season")) == str(season):
+        odds_hist = {int(k): v for k, v in _oh.get("weeks", {}).items()}
+if weeks_left:
+    def retro_odds(w, nsims=20000):
+        wi = {t: 0 for t in TEAMS}; pfi = {t: 0.0 for t in TEAMS}
+        h2i = {t: {u: [0, 0] for u in TEAMS} for t in TEAMS}
+        sci = {t: [] for t in TEAMS}
+        for ww in range(1, w):
+            for a, b, p, q in games[ww]:
+                if p == 0 and q == 0:
+                    continue
+                pfi[a] += p; pfi[b] += q; sci[a].append(p); sci[b].append(q)
+                if p != q:
+                    x_, y_ = (a, b) if p > q else (b, a)
+                    wi[x_] += 1; h2i[x_][y_][0] += 1
+                h2i[a][b][1] += 1; h2i[b][a][1] += 1
+        mean = {t: (sum(sci[t]) / len(sci[t]) if sci[t] else 110.0) for t in TEAMS}
+        sd_ = {t: max(12.0, statistics.stdev(sci[t])) if len(sci[t]) > 1 else 22.0 for t in TEAMS}
+        schedR = [(a, b) for ww in range(w, PSTART) for a, b, *_ in games[ww]]
+        made_ = {t: 0 for t in TEAMS}; champ_ = {t: 0 for t in TEAMS}
+        random.seed(5)
+        g_ = random.gauss
+        for _ in range(nsims):
+            wn = dict(wi); pn = dict(pfi)
+            hn = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2i.items()}
+            for a, b in schedR:
+                pa = g_(mean[a], sd_[a]); pb = g_(mean[b], sd_[b])
+                if pa > pb:
+                    wn[a] += 1; hn[a][b][0] += 1
+                else:
+                    wn[b] += 1; hn[b][a][0] += 1
+                hn[a][b][1] += 1; hn[b][a][1] += 1
+                pn[a] += max(30, pa); pn[b] += max(30, pb)
+            w1_ = contextual_rank(D[1], wn, pn, hn)[0]; w2_ = contextual_rank(D[2], wn, pn, hn)[0]
+            b_ = contextual_rank([w1_, w2_], wn, pn, hn)
+            nw_ = contextual_rank([t for t in TEAMS if t not in (w1_, w2_)], wn, pn, hn)
+            s1, s2 = b_; s3, s4, s5, s6 = nw_[:4]
+            for t in (s1, s2, s3, s4, s5, s6):
+                made_[t] += 1
+            gm = lambda x_, y_: x_ if g_(mean[x_], sd_[x_]) >= g_(mean[y_], sd_[y_]) else y_
+            champ_[gm(gm(s1, gm(s4, s5)), gm(s2, gm(s3, s6)))] += 1
+        return dict(playoffs={OWNER[t]: round(100 * made_[t] / nsims, 1) for t in TEAMS},
+                    champ={OWNER[t]: round(100 * champ_[t] / nsims, 2) for t in TEAMS})
+    _oh_changed = False
+    for w in range(2, cur_week):
+        if w not in odds_hist:
+            print(f"backfilling odds history for week {w} ...")
+            odds_hist[w] = retro_odds(w)
+            _oh_changed = True
+    _live = dict(playoffs={OWNER[t]: round(100 * title_counts["made"][t] / N_TITLE, 1) for t in TEAMS},
+                 champ={OWNER[t]: round(100 * title_counts["champs"][t] / N_TITLE, 2) for t in TEAMS})
+    if odds_hist.get(cur_week) != _live:
+        odds_hist[cur_week] = _live
+        _oh_changed = True
+    if _oh_changed:
+        json.dump(dict(season=season, weeks={str(k): v for k, v in sorted(odds_hist.items())}),
+                  open(ODDS_HIST, "w", encoding="utf-8"), indent=1)
+        print(f"odds history: {len(odds_hist)} weeks on file")
+
 # ---------------- 4. elimination solver (house rule, witness-verified) ----------------
 def maxflow_feasible(glist, budget):
     G = len(glist)
@@ -858,6 +926,7 @@ now = dict(
     brinknote="On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out." if brink_cards else "",
     paths=paths_cards,
     pathnote="The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week." if paths_cards else "",
+    oddshist=({str(k): v for k, v in sorted(odds_hist.items())} if odds_hist else None),
     clinch=clinch_cards,
     clinchnote="Lock up a playoff spot no matter what happens the rest of the season." if clinch_cards else "",
     brackets=brackets,

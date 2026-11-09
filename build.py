@@ -232,6 +232,15 @@ titles = defaultdict(int)
 for c in champs:
     titles[c["owner"]] += 1
 
+# which title teams was each multiple-ring player on? (name-match vs champ rosters)
+def _ring_key(s):
+    return "".join(ch for ch in s.lower() if ch.isalpha())
+for ring in rings:
+    k = _ring_key(ring["player"])
+    ring["detail"] = [[c["year"], c["owner"], c.get("team", "")]
+                      for c in champs
+                      if any(_ring_key(nm) == k for _, nm in (c.get("roster") or []))]
+
 payouts = {}   # owner -> net $ string; filled from the per-person split in the MONEY section
 
 # ---------------- records ----------------

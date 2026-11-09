@@ -113,6 +113,17 @@ li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #s
   content:"▾";color:#ef4444}
 .wk-w{color:var(--ink);font-weight:700}
 .wk-l{color:var(--ink3)}
+/* swipeable / tabbed cards: tap a tab or swipe horizontally */
+.swtabs{display:flex;gap:6px;margin:2px 0 10px;flex-wrap:wrap}
+.swtab{flex:1;min-width:0;padding:7px 4px;border-radius:9px;border:1px solid var(--line);background:var(--surface2);
+  color:var(--ink2);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swtab.on{background:rgba(45,212,191,.14);color:var(--accent);border-color:var(--accent)}
+.swpane{display:none}
+.swpane.on{display:block;animation:swin .18s ease}
+@keyframes swin{from{opacity:.4;transform:translateX(8px)}to{opacity:1;transform:none}}
+.lgch{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink2);padding:3px 7px;border-radius:7px;cursor:pointer;border:1px solid transparent}
+.lgch.on{border-color:var(--line);background:var(--surface2);color:var(--ink)}
+.lgch i{width:10px;height:3px;border-radius:2px;display:inline-block}
 .wk-top{color:var(--gold);font-weight:800}
 .pickrow{display:flex;align-items:center;gap:8px;margin:5px 0}
 .pickrow .vs{color:var(--ink3);font-size:11px;flex:none}
@@ -136,7 +147,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 <header>
   <div class="hwrap"><h1><img class="feather" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD0AAABICAYAAABFjf2bAAAmqklEQVR42tV7eVQUZ7r+81X1Ri8szSKbLI2gsgSBCKiIOwquETFGUaPGjBozmUWdmEmCxok3JuZqNON6R41Rohh14r4hKogiIMqqsouy0+wNdHfVe/+44PGXm5nJ4szc33tOnVOnTvXX31PvvnzAiyWu9/pbxAAwIpL7+PiciI+PHwCAJSQkcP9gTR7/H9DfAsEzxjBs2LA3eZ4nFxeXAzzP/733uf/LIBkAhISEhK1cudKz95nk+Rd6uck2bNjQ39raugGAOSAgwHjlypVQACwuLu773OQBYMSIEaN9fX0/lEgk//dAKxQK2NvbZ1haWtbHx8ePBYBRo0Y9v1Oe4zhMmjTpI8YYabXabnt7exoxYsRFpVL5/3A1JCREyvM8XnvttRlyudxka2vbSEQWz3/gfysREQOArKwsK1tb2yoANGbMGP3ixYvnAEBcXBzf987u3butnJ2dKwGI3t7egkQiEebMmdPzxRdfDO97t+9DxcbGLhw9enQbAFGj0bQvWbJk8HMS8++lvk386le/CpTJZCZLS0vBwsKC/P39e5KTk8cCwJtvvikFgNTU1PHe3t4EQPT39ydnZ2eTtbU1eXl5/Vev+EoBIC0tbWRgYKBeJpORnZ2dWSaT0fTp00f2fZh/O+i+TWzatGmcnZ0dKZVKUafTCW5ubmJAQIAxPDx8Ks/zICI2efLkz6OiokQAppCQEHJ3dxcAkFwuf5Kbm2sDAFFRUaF+fn6d3t7e5OXlJWg0GlGj0dDcuXNHPK/r37Mn/D/b6PHPi1gf6NmzZ4+RSCQEQIyMjCQ7OzsBAKlUqqZx48bpZDIZrKys0gAQx3Hm4OBg8vf3JwDilClTaPz48RHl5eUKa2vrYgCk1WrNY8aMIQCiXC4Xx40bN+x7oNm/hOtyuRwc9wwvS0hI4JKSkvhekRyzePFiUiqVoqurK02ZMoUAmH19femVV145NWXKFOXs2bOfDhkyhACI4eHh5O3tTb///e/NdXV1FBQUtCg2NnZDr/iboqOjydPTU1Sr1bRgwQLT8ePHA/s+8vNgiYiPjIycPWHChLEv0s0xAHj77bctnZ2dz7m7u3+RkpIyqA98r+Hh3nrrLZ8BAwZ0WVpaEmNMXLJkCclkMtq3b59w48YN6tev35r333+/5sKFCzRw4EDR3t6eNm/eTIIgiAaDgQICAooSExPbjxw5IvI8L77xxhvEGBMtLCzI1tbWOGfOHL9eQBIAuHjxourLL7+cZWdnl6VWqyk2Nnb6C9P5PsubkpJip9Vq2xljFBoaapg0adLR48ePh/eBv3jxosrDw6PU0tKSAAiBgYE0f/58KioqIiISIyIiuvbu3WsmIiorK6OpU6eSXq8nURTJYDBQdHQ0tbW10dOnT2nevHkUFhZGAAStVkuDBw9+vHv3bisA4Hke27dvnzJ+/Pj0QYMGEWOMrKysGjIyMmyf3+8L4TQRyezs7ApVKpVJq9VS//79KSwsjKysrA5NnjzZheM4TJs2LeXzzz+n2bNnm+VyOe3cuZMEQSBRFOmzzz6jbdu2kSiKRESUnJxMFRUVRERUWFhI27ZtE4lIFASBvv76a5LL5fTqq6+at23bRjNmzLgJAMuXL+9va2t71N/fn1xdXcnOzs6oUqkEa2vrYiJS/Fg//mPknwBwUqnU2L9//7yuri6+X79+ZhsbGyEjI4Pa29vn1dbWpg8fPjykrq7uZFhYGI4ePUqpqaloa2uDIAhgjMHd3Z06OzvBGENdXR1qampga2uLhoYGJCQkwNramgFgoiiioaEBly9fxpEjR2jYsGGoq6s7FR0dHZCdnZ3a0tIyOz8/X3BwcBBtbGxYZ2cn5+XllSGVSrt78dCLAA0AnNlshpubWxpjjBUVFTEbGxs+IiKCiaJo3rRpk9v8+fMvAwirrKwUiUgydOhQjBw5Eg0NDejs7ERFRQW7c+cOKisrwXEc6urq0NbWhrq6Ovj4+KCsrAxtbW1oa2tDSEgIRo4cCVEU+aqqKnN7e7vj6NGjk7du3eouCIJ5+PDhvFqt5oqLi5lSqYSlpeVNs9n8YmP1Phd169YtjzfeeKPN2dlZBCDOnTuXQkNDKSUlRSAi+uCDD2jMmDFERGQ2m2n//v2UmppK9+/fp9raWnr33XcpPT2durq66MKFC2Q0GomI6PPPP6fa2lq6f/8+3bp1i/bu3Uvd3d1ERBQbGyuuWLGCiIiysrKEsLAwio+PJwCio6OjuHTp0raysjL3FxatERHrNQwMAC+RSODv758ok8kIgBkAvfLKK1RbW0tms1k0Go2Ck5MTffjhh9Tc3EwPHjygo0ePPgOwdu1a6uzspKamJjp//jz19PTQuXPnaN68eUREJAgCnThxgnJzc6mtrY22bt1KNjY21NzcLAqCINbX19O8efOoV4TNEomEBgwY8F1vNMcnJCRwfVcv139Qv/9u6sIYe14/yGw2cwqFYsu4cePm6HQ6ZjQaqampid27dw8TJ05kTU1NbObMmTh16hRmz54NnU6H4uJiyOVyFBQUIC8vD5mZmfD29oZcLkdHRwe0Wi0kEglu3bqF0NBQKBQKeHp6orq6GkePHsXUqVNhMBiYtbU1CgsL0dPTg+XLl4PneVZdXY3GxsatJSUlHABh/fr1P4qZfxO0TCZDT0+Pqvedbrlc3kNEuHv3buaIESN2zps3b8WwYcMEAPxf//pXVFdXo76+HuvXr8c777yDjo4OKBQKMMZQVlYGrVaL6dOnw9LSEoIgwMLCAlqtFkqlEpGRkfD19UVlZSVEUYRSqQQRwd3dHZs3b8bjx48hkUjQ0NCAY8eOAYCQl5fHv/3221+lpaWlSKVSXLp0SS2Xy63a2trs0tLSxOPHj0usrKzqb9++/bSX4/SDhqxPJ/74xz/212g0t52dnfOHDx9eMHPmzFwPD4+7Dg4O5wMDA9eUl5cfPXLkSLXRaOQBkLu7Ow4fPgwXFxfY2trC3d0dy5cvR319PdRqNTo7O+Hk5ASFQoHGxka0tLRALpcDAPLz8yGKIqysrGAymWBhYYGmpiYsX74cdnZ2sLe3h6enJxITE+Hq6vrMmyQmJlZnZWUdCAkJ+YO9vX3yggULCv70pz/lr1mzJmf37t05lZWVd/v37z+kN2D5h7rOiEjm6uqaBYAcHR3J1dW1T48oNTWV9u3bZwgPD+986623qL6+ntra2ujq1auUm5tL7e3tdPnyZRo2bBgVFBRQQ0MDXbt2jURRpGPHjtGJEyfoq6++oqysLNLr9RQaGkpbtmwhIqIbN25QTU0NlZeX08iRI+nq1auk1+upqKiILly4QG1tbaTX62n9+vXk5+fXumfPntacnBxSKBQEgFxdXcnFxUUAQDqdLvX7efrfc1kcY8w4ZMiQP1lYWFBHR4fJ2dlZnDp1qujq6ip0d3ebFy1aZLF3717loUOH8Oqrr6KjowMREREoKipCS0sLxo8fj+joaPzpT3+C2WxGbm4uGGO4efMm9Ho9Jk6cCLPZDIVCAUEQ0NDQAEEQkJmZiZ6eHnz88ccYP348xowZg66uLuTk5Dy7X7JkCTZu3Ii//OUvlkuXLrXs6ekx29vbC9OnTxednZ2publZVCqV8PPz22EwGBAXF8d+DGgBAHf58uW/6nS6i4IgSLOzs8WcnBxu4MCBfE1NjQQA2djY4Ntvv4WdnR2OHz8Oo9EId3d3PHjwAAAwb948nDt3DuXl5bC3t0dtbS3Cw8Nx9uxZmEwmaDQa1NTUQKvVYubMmaivr4ePjw9aW1tx5MgRzJkzBwBQVFQET09PmM1mXLp0CUajEd999x2cnZ0JAD158kTi6+vLZ2dnc9nZ2SJjTDJgwID0U6dOHQXAHTt2TMAP1aF+wC+z5ORkHDlyJIeI5pWWliobGhpEs9nMPDw8IJPJWL9+/eDq6orAwEC8/vrrMJvNiI+PR3Z2NpycnCCXy5GSkoLu7m7MmjUL1dXV8Pb2xoEDBzBw4ECIooi7d+/CwsICgwYNQnNzMwYPHowtW7bA2toacXFxaGlpQVFREaKjo/Gf//mfeO+997Bjxw6EhoZCEARWWFjIMjIycPXqVVRWVooqlYqPjY3teu+99+Z4eno+TUhIYNevX6cfjKt/SMRDQkL4nJwck5+fX6TJZDq1YMECqyVLlpCDgwM7ceIEKioqsHLlSjx+/BgmkwkzZ87Ef/zHf0Cn0+HMmTNYtWoVTp06hfPnzyMqKgqenp4oKyuDXq/HvXv3AABarRaRkZFoamqCt7c37t69i8LCQsTGxiIsLAzbtm1DdHQ08vPzsW7dOpw8eRIKhQL9+/fHnj17YGdnh9deew2NjY20f/9+duDAAbNMJpubm5t7TBRFKQCx96K/x2n2P+6ZUU1NjUhEXH19fUVISEgWY2xyRESEhaWlJQYMGMBUKhVSU1MxcOBAeHp6ws3NDTNmzEBUVBSioqJQWFiIwYMHo6enB83NzTh79izu37+PsLAwiKKIefPmoaGhAY6Ojti1axfy8/MxZMgQ6HQ6DB48GHl5eZg0aRJu3LiBxYsXY/fu3Rg9ejR6enpw7tw5hISEIDIyEhKJhHp6eujUqVMGs9m8NC0t7QgRKXieNxIRPafG9L9AJyQkcNevXyepVApra+sxGo1m9cqVKxPUavUfNBrNSIlEYvfBBx8oioqKUF9fzyZPngx7e3ucP38e9vb2CAkJAcdxOHHiBBwcHGA0GrFv3z6UlJRg9erVyMrKwrJly3Dx4kVIJBLwPI8HDx5AKpVi+PDh0Gg0mDRpEg4fPowrV67A0tIS2dnZSE1NxRtvvIH4+HiUlJTg2rVrGDduHHx8fHDs2DHs2bOHrV69mllaWhqtra29bG1tV7/22mtvVlRUjNJoNCaDwfBAFEXqxUrPQCckJHDr168XV69e7fzkyZM9n3zyyWczZswYOnPmTJdFixZpDQaD09q1axWMMbS3t7PS0lLcvHkTXl5emDRpEvbu3Yv29nbEx8fj0aNHsLKyQlJSEl555RUAgMlkQkdHB/R6PXJzcyGRSDB//nyUlJQgNzcXGo0Gra2taG5uBhFhxIgRSE9Px4QJE2AwGLBs2TKkpKTg9u3bWLZsGR4/foxNmzbh5s2bkEgkGDFiBLZs2SIzGo0uCQkJti+99JLdhAkT/CZNmjQnIyNjTFhY2L3i4uKauLg4vrCwkPi4uDh+x44dYmJiYtDmzZsvVFVVjSwtLRXDw8MFPz8/8DxPTk5O1NnZiaioKDZixAjMmTMHly9fxsaNG1FdXY2IiAio1WrcuHEDjx49QldXF+bOnYvr168jKCgIV69eBQC8/vrrqKqqgsFgwMSJE5GYmAhbW1vEx8cjOTkZpaWlCAsLw507d7Bo0SIcOXIETU1NePr0KVxdXaHRaLBnzx6sXbsW9vb2+OqrrxATE/PMLjg5OYmWlpZkaWlJOTk54h//+EcqKCjw1Ov1cz/66KP7W7dufRQXF8fzhYWF2L17t1NWVtb5iooKL41GY3JycpIUFBRwKSkpTKVSsZycHFZWVsYaGhrQ0NAAuVyO2NhYjBgxAidPnkRubi60Wi2uX78Of39/REZG4uTJk6itrUVgYCA4jsONGzfw8ssvIysrCykpKYiKisK5c+cgCALGjh2LL7/8EhEREXB0dMTNmzdRUFCA2NhYSKVS5OXlwcbGBo8ePcLDhw+xfv16rF69Gnq9HtnZ2SgrK8P9+/dRWFjIWlpa2IYNG1hqaiqnVCo5xpgZgIW1tXVMfHz8uS1bttTyUqkUbm5unx09ejRKpVJ1a7VaSUlJCeXm5lJYWBhbtWoV8/Pzg7+/P1xcXMDzPIqLi3HixAk4OTnh1VdfRVpaGhQKBSZMmIDS0lIIgoDp06dj9+7dyMvLw8KFC/HnP/8ZDg4OaG5uxs2bN/Hpp5/i4MGDICJ0dHTg7NmzWLVqFTZt2oTy8nJ88sknKCoqQnV1NRYtWoTa2lrk5ORg1apVUKlUSExMBBGhf//+8PX1RUBAAIKCguDn54e0tDQcPnxYaG9vJ1dXV04qlZpu376tdnZ29szMzDzCR0VFjUtKStrW09OD1tZWSVVVFafVajmpVMotXryYeXp6ora2Fp9//vkzwL6+vpBKpbC1tcX58+fR0tKCiRMn4uLFizAajThz5gzMZjPee+89HDlyBPHx8aisrMStW7dgbW2NzMxMaDQaHD9+HAEBAcjKysKAAQMwffp0HDhwAAcPHsT58+dx9OhR2Nvb486dOwgODsajR4+g1+vh6OgImUwGR0dHZGRkoK6uDgcOHIBOp4NCoUB7eztu3LjB8TzPPXz4kOn1el4QBNy5c2dASkpKERs0aFCy0Wi0A1CpVCplgwYNgqurq3Du3LkqPz+/GU+ePOn38OFD8vT0ZC4uLigvL0dXVxe0Wi28vLzg4eHxLKEICAhAa2srqqqq8Oc//xkJCQkoLS3FnTt3MHXqVEilUjg7O8PNzQ11dXWws7NDXV0dnj59iq6uLly4cAEBAQEYPHgw1q9fj2XLlsHDwwNWVlbIy8tDbW0t1Go1ampq8ODBAzx9+hQKhQI6nQ4NDQ0oLS2Fh4cHvLy8qLS09Pzo0aNVjY2NLtnZ2XqO4ywMBoMIwMiWLVs2dufOnTfkcrmZ4zgIggCj0aiIjo5+jzH221/96lcqDw8PmM1mFhISAkEQ8ODBA3R1dWHbtm3w8vKCUqnEV199hfr6esTExGD58uV4/PgxfvOb32DDhg2wsrJCe3s7DAYDGGNITk6Gv78/8vPzMXbsWIiiCLVaDbVajY6ODnzwwQf49NNP4eXlhd27d+PMmTOws7PDggULYDab8ejRI6xcuRJqtRpeXl6QyWTIzc2FIAiorq6mPXv2EGPsLyNHjnzv97//fdPzvnrJkiWB7Hu5tQjA3tfX98yRI0dednNzQ1VVFdRqNaqrq2EwGCCVSlFZWYmBAwdi9+7deP/999HZ2YnCwkJ4eXmhvLwcq1atwty5cxEWFob8/HwolUoEBgYiMDAQ9+7dQ2ZmJtauXYtPP/0UL730EoYOHYr79+/j/v376OzshL+/PzIzM3H48GFs3LgRAwcORGlpKQYOHAgrKyskJCRgxYoVKC4uhouLCwRBgFwuh5ubG9ra2uDs7EwlJSXs3XffLXny5MmkkpKS0udzapaQkMCtW7eOGGMsKSmJffPNN2dXrFgxccCAASZra2vplStXoNfrMXLkSLS1taG8vBzl5eVobGzEyZMnoVKpYG9vD5VKhbi4OJSUlEAqlaJfv35oaWnBlClT4OvrCwBob2/H6tWrsXHjRqhUKnR1deHdd9/FJ598AmtrawDAgwcPcPr0aWg0GjQ1NaG7uxs+Pj5ISkpCZ2cnGhsb0dnZiZiYmGeq4uXlBUtLS6Snp0OtVmPChAnged7U0dEhXbNmTZbZbI709fXtWbduHa1bt46x5yIzwcfHZ35ra+tBNzc3c0hIiKSnpwfbtm3DgwcPcPHiReTl5WH48OEYPnw4vvzySzg5OWHs2LGorKzEw4cPYWVlhcLCQqjVamg0GmzatAnPN9M//vhjTJkyBYGBgc+eFRQU4MSJE/jggw+ePRNFEe+++y5aWlpgMBjg7e0Ng8EAnU4HLy8vpKSkoKqqCm+//Tbu3r2L69evw9fXF+PGjUNgYCDWrFkDk8mEzMxMU11dnVSj0bzz6NGjbUTEAxDYc4UDREREpGZkZAwPDQ0VCwoKeAcHB0ybNg1KpRJz5syBr68v8vLyUF1dDbPZjAMHDqC9vR1tbW0IDw9HZ2cnOjo6AADTpk1DTk4OnJ2dMWLECDx48ACZmZm0aNEiqq6uhiAI4HkeTk5OOHjwIBsyZAgLCAhAWloanj59iiFDhuD8+fMwGo2wtraGUqnE7du3oVKpYGVlhblz50Kj0cDW1hZBQUEoLi5GYmIiWltbnwU6wcHBYnp6Ohs6dGjRrVu3ghhjpmcVxOvXr9PcuXN1169f/4iIpG1tbay2tpYNGzYMw4cPx/jx4zFgwADcuHEDWVlZ0Ol02L59OxQKBUaNGoWgoCAYjUaUlJTAxcUFM2bMwCuvvILx48ejtLRU3Lx5s/Dw4UMWHh7OWltbWV+V1Wg0spqaGqbRaNjp06dx7tw5c1hYGP32t79lAQEBzMLCAjU1NaiqqoKrqytGjBgBT09P6PV6pKamYvz48cjMzERLSwsGDx4MZ2dn9PT0PAt3AcDe3h5OTk5ad3f3E/v3769LSkrieQcHB66wsJCCgoL8zpw5s/Tx48dcQ0MDc3V1xUcffYS4uDhIJBKcPn0anp6eCA0NxZo1a0BEeP3113Hv3j2kp6ejqKgIXl5eEEURsbGxqKioEPbt28e6u7u5MWPGcP7+/qyjo6OhoaGh+MmTJzV1dXW1tbW1NR0dHfU8z/OhoaGq0NBQrq6ujktJSWFqtVrQ6XRcSkoK1Go1MjIyUFFRAalUiilTpqCgoACXLl3CmjVrIJPJcPXqVQwaNAiRkZHPfHtpaSnr7OwkAMzf3//6X//61wJfX1++r6EtREZGjsnIyLhqZWUlurm5cbt370a/fv3Ql1ysWLECPT09WLFiBV599VUkJydDqVTi3r178Pb2hkKhQFRUFLZu3YpZs2ZRfn4+U6lU6OzsvF1RUXEmOzv7Wk1NzUMATd/LbxkAW61W6zVs2LDRbm5uUSqVamxPTw98fX3p+PHj7Ne//jWuXLkCo9GIBw8eYOjQoWhubkZMTAwSExOxefNm2NvbY9u2bQgODoafnx+qqqrwzjvv4PHjx0JLSwsfGhq68MaNGwcBSPi4uDiusLCQXF1dvVUqlfXkyZP3ODs7T4yLixNVKhW7e/cuYmJi0NLSgrfeegszZsyAp6cn7Ozs8PDhQ7z22mvo6OiAyWRCT08PGGNIS0tjUqn0eFFR0dtJSUnvP3r0KLWjo6OKMWZgjH2/tg7GmKG7u/vpo0ePbmZlZR00Go2XraystBkZGYM9PT3BGKP29nZmZWWF6dOno7i4GJGRkXB1dYWjoyM+++wz+Pv7Y/jw4SgtLcXgwYOhVqvF4uJiFhgY+L5erzd3dXXVNDQ03ALAcceOHRMBIDg4+F5eXt78oqIiq5UrV+Lq1avi8uXL0dvDwo0bNxAeHg6pVIquri58/fXXYIzBYDDg9OnT+OKLL6i8vJzUarWhvLz81UOHDs1KSUm52hcDxMXF8aIoPt8x6RukY6Iosg8//JADICEilp2dnf7111/PrKmpeU2j0XRUVlZi69atdOrUKXR0dIAxhq+//hpdXV0QBAERERFITU2Fi4sL5HI5fv3rXyMjI0NcvXo1ysrK+l27dm2Wv7//pT7nIOkTte3btzfs2LED4eHhkRMnToSNjQ2rqalBZWUlJBIJnjx5gsDAQIwePRp/+ctf0NTUhAEDBuDYsWPgOA4cx9Hjx485T0/PytLS0qSEhATu2rVr3PXr180AzMeOHcP3ufw8t3v3IfbeS4hIKCgoODJ27Nh1lZWVAzmOE+VyOTt58iTc3d1hNBpx7do1rFq1CsnJycjPz8c333yDQ4cO4datW8jNzWX19fVwcXEJdnR07CCi/OdBP9+ZJLVaLevs7MTgwYNRUlKC1NRU2NjYYOnSpdDpdGhpacG2bdtw5coVVFVVIT8/H+np6bh79y7kcjnKy8t7Ro0aJVm/fr3QW1n9OST0FjdkOTk5PTKZjERRhE6nQ0REBLy8vPDb3/4WkZGRiI2NRXBwMFQqFfbv34+LFy+C53lotVrcu3cP1dXVJiJi7H++pvj9EjDxPE/z5s0z9rVORVHE7NmzsXTpUtTW1sLV1RX79+/H2rVrwRhDQUEBlEolFi5cCDs7O9HS0hIFBQU5aWlp5h/bK/57PfGPP/7YeP/+/VsajYbZ2tqKCxcuhFKpRElJCbq6uvDRRx/h8OHD0Gq1qKmpwcKFCzF37lzwPI/S0lL4+PggPj7ezHEc/a22DkdEcHR0LDWZTNTY2EgKhQIbN26Ek5MT/Pz8wHEc7t+/j2XLlkGv12PgwIHQ6/WYPHkyzZw5k7906ZIhKipqlyiKiIuL+6XtYTKbzZgwYcL2S5cutU+bNo2PiYmhlpYWeHt7o6GhAa+//joePnwIs9mMwMBAWFlZ4bPPPoNGo0FzczMZjUZoNJrH38f67CYpKQlEBB8fn/MymayvAgFPT0+cOXPmWRVTq9WitLQUHR0dUKlUMJlMAEDBwcHM39+/eteuXXeJCH0G8ufSunXrCAD27t1bHBAQ0BgcHMwAkCiKkEgkMBqNKCsrg52dHUwmE4KCgpCcnAytVosNGzagra2NMcbg4+NzhYiQlJT0v7uWcXFxIgDExMQkv/XWW7VSqdTx9u3bYk1NDXfgwAFUVVVBp9NhypQp0Gq1qKurA2MMUqkUAJiDgwMAuH3wwQcDARQkJCSw9evX0y8AzQDQqlWrXAA4ODo6AgCTyWTgOA5qtRoKhQKzZs3Cnj170NTUhMTERHR1daGpqYlkMhnf0NDQpVQqb/TG+P9bvBljlJCQwNna2rbOnTv3q5EjRxoOHz6MCxcukFwux969e3H06FHY2NggIyMDJpMJDx8+fBZr8zwPQRDM7e3tnQDwY3vF/4gUCgUnCMKzUnV3dzeKiopgNpuRkZEBrVbb5zIhl8uRnJwsHjp0CD4+PqWjR48+9uabb9b37kf8wV7W+vXrRSKS7Nix4488z2/pteiiKIoAQA0NDeTo6Ih+/frBxcUFo0aNglqtBgBIpVKoVCoegLxXJ18IaJPJJFMqlXyvREEmkyEyMhJubm5wc3ODg4MD9Hr9M9cniqJoMBgYgIOnT59exn7AT3I/YEBExpjQr1+/I+Hh4ebOzk5mMBhgaWnJ/Pz8mCAIEEURT548gUQi6ZsgZLdu3RKLi4vlarXaBQAKCwt/0TxX3++lUqnto0ePJBkZGdTbfYFCocDTp09hNpthaWkJnU4HS0tL6u7uRnNzMxcWFkYvv/zyFcZYV1xcHP3oIVeJRIINGzYc7t+/P0mlUjE4OPjm5MmTz+3bt0/ctWuX2cHBgWJiYujzzz+n+vp68vX1Nffv359CQkL2ExH3AiZ9OJ7nERYWdqB///40aNAgc21tLe3atYtiYmLIwcGBtm/fbj5x4oQ4ceLE00FBQWcVCoXo6upKa9asOUFEf3N29Ac35uvrS2azmS1YsOBDf3//alEUmU6n+y+TybTnwoULbP/+/VCpVDh37hykUikyMzMRHR3N/+EPf0BwcPDrZWVl/gDEXvA/d5pJLC0t9Q0ICIhfs2YNpk2bxt2+fRsKhQLnzp2DQqFAYmIiTp8+zdra2pI8PT23mc1m5uzsXBEdHf07xhh8fX3pZ400Dxs2bJGtra2YlJTkkp+fr3ZycqqRSqVCQECAoNVqKTU1lfbv30/ffvstlZWV0a5du+idd94J63WD/C8Z4Zo8ebL39u3buyorK+n48ePi3r17KTs7m+zt7emll14SlUql4ODgoE9JSbFLSkrS2traCuHh4Qv/0Yzo3+REr59l06dPP+Hn5/dFZ2dnk7+/f0f//v0/trKy4oxGo6DX65GXl4euri5YWlrCYDCIGo0GR48edeld42frM2MMmZmZgzUajby9vV3UaDTMaDSisLAQjY2NMJlMZpVKxbm7u28ZO3Zs4zfffCMZOnTo5lu3bn2dkJDwg834nzpPxj0XtfHvv//+CZ1OR4wx84cffkg7duyggwcPUmFhoenOnTs0ZMiQnb0G7udO5PIcxyEkJGRHeno6FRYWmvbv3087d+6kTZs2EcdxRjc3N1qzZs3Z3plQLikpiZfJZP+08xqMiDTLli27yvM8/eY3vzGfOXOGKisrKTMzUyAiWrZs2f2+40g/46BJn5dhS5cuzeybFKysrKSzZ8/S2rVrBalUSgsWLLhCRNY/Z/KX+ymTwL0BDGOMte/cuXOKi4tLPgC+pqZGNBqNaGlpYW1tbdDpdF4KhcK1d0M/VZ8ZAFhYWDh7eXn5tLW1obW1lRmNRlRXV4t1dXWcr6/v8a+++moyY6wlISGB+96Q3wsDTc8HMHFxcTxjzLB27dpXbWxsCkNCQpi1tbVoNpuZyWQSGxoaVC4uLoG9xxy4n6rPRAQnJ6chdXV1liaTSRRFkVlZWQlhYWGcyWQ6VFxcPIsxZuzrq//LDqyEhIRIAWDq1KnvHT16lJqbm03fffcdEZGpoqKCIiIiPvoxo5jfp74jSqGhoWtLSkrIbDabvvvuO2pubjZ9++235OPj85vn//9FHg/8h5SdnU1ExJWVlcn69euH7u5uVFVV4cmTJygqKoJWq/VijOFHR0S95ODgQL2lW93Dhw9RWVnJKioq0NXVBQcHB6hUKt/ekpL4Lwc9atQoMMZELy8vCg8Ph52dXV/tmdnZ2aGlpcWF5/mfnGIeO3ZM5DgOLS0tnvb29s8Gb+zt7REaGooBAwYoGGP0S/L1Xzwf3d3d/SzHLS8vB8dxePnllxEUFGRhNpvxU41MX84cHBxsO3ToUABgVVVVz9pDZrNZwD/p9OuPpvb2dj4tLQ2LFy/Grl27UFFRAQBobW01/ZJoTK/X1wFAZWUl7d27F/Pnz0daWhrq6+sfA0B9fT37l4O+fv06AMDS0rL1k08+of379/fVy+j+/fvo6ekpAYBZs2b9pADl2rVrXK8Elebm5mLRokWkUChw6NAhfPzxxySVSvXP//+/mtMEAB0dHXm9xX1eKpUiNzcXkydPRnNz851eHWU/52Majcb8yZMnIzs7m8lkMkilUi49PZ3xPF/RG1vTvxx0QkICAcDvfve7ogULFrQyxlhnZ6doNpv5p0+fCh4eHrf68vOfuK4IAB4eHtefPHliEgSB7+joEBljXHx8fMuiRYvu9WWC+DcR02g0iIiISAUg+vj49Hh7e4vR0dHZvb3gn6t3jIi46Ojo2wMHDhQHDRrUA0AMCgpK7p3hZv82QxYXF8e1t7fD1dV1v4WFBWtsbGSMMbZ8+fK9jDEhKSnpZ62flJTEMcbEt99+eycAVl9fzywsLJiHh8c3BoOB/ZhJffyzD4zn5uba2NnZPeU4Tpw9e3bp5cuXbfv6VL8ksTlz5ozNnDlzSjiOE+3t7RuysrLsXuTRwl9CPGMMY8aMWWphYUExMTG/6s2S+Bex7pQpU+b3rrv6F6arLz7d/OKLLywjIyP33r592/KXcPn766anp1uMGTPmwI4dOxxexLoA8N8WkWwJS4JjtwAAAABJRU5ErkJggg==">2 Many Chiefs Not Enough Indians<small id="sub"></small></h1></div>
   <nav id="nav">
-    <a href="#now">League Status</a><a href="#seasons">Seasons</a><a href="#games">H2H / Games</a>
+    <a href="#now">League Status</a><a href="#seasons">Season History</a><a href="#games">Game History</a>
     <a href="#records">Records</a><a href="#money">Money</a><a href="#luck">Luck</a><a href="#moves">Transactions</a>
     <a href="#draft">Draft</a><a href="#players">Players</a><a href="#owners">Owners</a><a href="#alltime">All-Time</a><a href="#machine">What If</a>
   </nav>
@@ -145,15 +156,24 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <section id="now">
     <div class="card"><h2>Standings</h2><div class="tscroll"><table id="standings"></table></div>
       <div class="note">Top of each division (badged) gets a bye. Dashed line = playoff cut. &#10003; IN = clinched a spot; OUT = mathematically eliminated (house tiebreak rules).</div></div>
-    <div class="card"><h2>Playoff &amp; championship odds</h2><div id="odds"></div>
-      <div class="note" id="oddsnote"></div></div>
+    <div class="card swcard" data-sw="0"><h2>Playoff &amp; championship odds</h2>
+      <div class="swtabs"><button class="swtab on">Now</button><button class="swtab">Playoff trend</button><button class="swtab">Title trend</button></div>
+      <div class="swpane on"><div id="odds"></div><div class="note" id="oddsnote"></div></div>
+      <div class="swpane"><div id="oddsTrendP"></div>
+        <div class="note">Playoff odds entering each week. Early weeks are reconstructed from scores to date; recent weeks use the live projection model. Tap a name to spotlight a line.</div></div>
+      <div class="swpane"><div id="oddsTrendC"></div>
+        <div class="note">Championship odds entering each week. Tap a name to spotlight a line.</div></div></div>
     <div class="card" id="clinchcard" style="display:none"><h2>Clinch watch</h2><div id="clinches"></div><div class="note" id="clinchnote"></div></div>
-    <div class="card" id="elimcard"><h2>Elimination watch</h2><div id="elims"></div><div class="note" id="elimnote"></div></div>
-    <div class="card" id="pathcard" style="display:none"><h2>Longshot survival paths</h2><div id="paths"></div><div class="note" id="pathnote"></div></div>
-    <div class="card" id="bwbcard" style="display:none"><h2 id="bwbhdr">🏆 Buck Wong Bowl bracket</h2><div id="bwb"></div>
-      <div class="note" id="bwbnote">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
-    <div class="card" id="lccard" style="display:none"><h2 id="lchdr">🥄 Lerch Cup bracket</h2><div id="lc"></div>
-      <div class="note" id="lcnote">The toilet bowl: losers advance, and the Lerch Cup game's loser-of-losers takes last place.</div></div>
+    <div class="card swcard" id="elimcard" data-sw="0"><h2>Elimination watch</h2>
+      <div class="swtabs"><button class="swtab on" id="tabElims">This week</button><button class="swtab" id="tabPaths">Survival paths</button></div>
+      <div class="swpane on"><div id="elims"></div><div class="note" id="elimnote"></div></div>
+      <div class="swpane"><div id="paths"></div><div class="note" id="pathnote"></div></div></div>
+    <div class="card swcard" id="brcard" style="display:none" data-sw="0"><h2 id="brhdr">Season brackets</h2>
+      <div class="swtabs"><button class="swtab on">🏆 Buck Wong Bowl</button><button class="swtab">🥄 Lerch Cup</button></div>
+      <div class="swpane on"><div id="bwb"></div>
+        <div class="note" id="bwbnote">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
+      <div class="swpane"><div id="lc"></div>
+        <div class="note" id="lcnote">The toilet bowl: losers advance, and the Lerch Cup game's loser-of-losers takes last place.</div></div></div>
   </section>
 
   <section id="machine">
@@ -180,9 +200,11 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Bold = won that week. Gold = league's top score of the week. (n) and the cell color = where the score ranked league-wide that week: green = best, red = worst.</div></div>
     <div class="card"><h2>Scoring distribution</h2><div id="ss_dist"></div>
       <div class="note">Each team's weekly scores: whisker = min to max, box = middle half (Q1&ndash;Q3), bright tick = median. Sorted by median.</div></div>
-    <div class="card"><h2>Playoff results</h2><div id="ss_playoffs"></div></div>
-    <div class="card"><h2>Consolation bracket</h2><div id="ss_consol"></div>
-      <div class="note">The road to the Lerch Cup.</div></div>
+    <div class="card swcard" data-sw="0"><h2>Brackets</h2>
+      <div class="swtabs"><button class="swtab on">🏆 Playoffs</button><button class="swtab">🥄 Consolation</button></div>
+      <div class="swpane on"><div id="ss_playoffs"></div></div>
+      <div class="swpane"><div id="ss_consol"></div>
+        <div class="note">The road to the Lerch Cup.</div></div></div>
   </section>
 
   <section id="games">
@@ -207,26 +229,38 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
         <option value="adj">Adjusted for inflation</option>
       </select></div>
       <div class="note" id="rModeNote">Raw: every score exactly as it counted at the time.</div></div>
-    <div class="card"><h2 id="r_top_h">Highest team scores</h2><ol class="rec" id="r_top"></ol></div>
+    <div class="card swcard" data-sw="0"><h2 id="r_top_h">Team scores</h2>
+      <div class="swtabs"><button class="swtab on">Highest</button><button class="swtab">Lowest</button></div>
+      <div class="swpane on"><ol class="rec" id="r_top"></ol></div>
+      <div class="swpane"><ol class="rec" id="r_low"></ol></div></div>
     <div class="card"><h2>Best player games (starters, since 2015)</h2><ol class="rec" id="r_players"></ol>
       <div class="note">Scored under that season's league settings (ESPN era 2015-2019, Sleeper era 2020+).</div></div>
-    <div class="card"><h2>Biggest blowouts</h2><ol class="rec" id="r_blow"></ol></div>
-    <div class="card"><h2>Closest finishes</h2><ol class="rec" id="r_close"></ol></div>
+    <div class="card swcard" data-sw="0"><h2>Margins</h2>
+      <div class="swtabs"><button class="swtab on">Biggest blowouts</button><button class="swtab">Closest finishes</button></div>
+      <div class="swpane on"><ol class="rec" id="r_blow"></ol></div>
+      <div class="swpane"><ol class="rec" id="r_close"></ol></div></div>
     <div class="card"><h2>Highest-scoring matchups</h2><ol class="rec" id="r_shoot"></ol>
       <div class="note">Tap any game on this tab for both starting lineups.</div></div>
-    <div class="card"><h2>Lowest team scores</h2><ol class="rec" id="r_low"></ol></div>
-    <div class="card"><h2>Highest-scoring seasons</h2><ol class="rec" id="r_seasonhi"></ol>
-      <div class="note">Regular season only, completed seasons. Seasons were 13 games through 2020 and 14 games since 2021 &mdash; the per-game average is the fair comparison.</div></div>
-    <div class="card"><h2>Lowest-scoring seasons</h2><ol class="rec" id="r_seasonlo"></ol></div>
-    <div class="card"><h2>Heartbreakers (most points in a loss)</h2><ol class="rec" id="r_losshi"></ol></div>
-    <div class="card"><h2>Daylight robberies (fewest points in a win)</h2><ol class="rec" id="r_winlo"></ol></div>
+    <div class="card swcard" data-sw="0"><h2>Scoring seasons</h2>
+      <div class="swtabs"><button class="swtab on">Highest</button><button class="swtab">Lowest</button></div>
+      <div class="swpane on"><ol class="rec" id="r_seasonhi"></ol>
+        <div class="note">Regular season only, completed seasons. Seasons were 13 games through 2020 and 14 games since 2021 &mdash; the per-game average is the fair comparison.</div></div>
+      <div class="swpane"><ol class="rec" id="r_seasonlo"></ol></div></div>
+    <div class="card swcard" data-sw="0"><h2>Cruel games</h2>
+      <div class="swtabs"><button class="swtab on">Heartbreakers</button><button class="swtab">Daylight robberies</button></div>
+      <div class="swpane on"><ol class="rec" id="r_losshi"></ol>
+        <div class="note">Most points in a loss.</div></div>
+      <div class="swpane"><ol class="rec" id="r_winlo"></ol>
+        <div class="note">Fewest points in a win.</div></div></div>
     <div class="card"><h2>Longest streaks</h2><div class="tiles" id="r_streaks"></div><ol class="rec" id="r_streaktie"></ol></div>
-    <div class="card"><h2>Earliest playoff clinches</h2><ol class="rec" id="r_clinch"></ol>
-      <div class="note">First week a playoff spot was locked no matter how every remaining game <em>and</em> every tiebreaker fell. Spots that came down to a points-for tiebreak never mathematically lock, so they can't appear here.</div></div>
-    <div class="card"><h2>Earliest bye clinches</h2><ol class="rec" id="r_byec"></ol>
-      <div class="note">First week the division title (and the first-round bye that comes with it) was locked outright.</div></div>
-    <div class="card"><h2>Earliest eliminations</h2><ol class="rec" id="r_elim"></ol>
-      <div class="note">First week a team was mathematically dead &mdash; no combination of remaining results or tiebreakers could have saved them.</div></div>
+    <div class="card swcard" data-sw="0"><h2>Earliest clinches &amp; eliminations</h2>
+      <div class="swtabs"><button class="swtab on">Playoff clinches</button><button class="swtab">Byes</button><button class="swtab">Eliminations</button></div>
+      <div class="swpane on"><ol class="rec" id="r_clinch"></ol>
+        <div class="note">First week a playoff spot was locked no matter how every remaining game <em>and</em> every tiebreaker fell. Spots that came down to a points-for tiebreak never mathematically lock, so they can't appear here.</div></div>
+      <div class="swpane"><ol class="rec" id="r_byec"></ol>
+        <div class="note">First week the division title (and the first-round bye that comes with it) was locked outright.</div></div>
+      <div class="swpane"><ol class="rec" id="r_elim"></ol>
+        <div class="note">First week a team was mathematically dead &mdash; no combination of remaining results or tiebreakers could have saved them.</div></div></div>
   </section>
 
   <section id="money">
@@ -253,8 +287,11 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <section id="draft">
     <div class="card"><h2>Draft report card (2015&ndash;2026)</h2><div class="tscroll"><table id="d_grades"></table></div>
       <div class="note">Value = player's season points minus the average return for that draft slot and position, within that season. ESPN-era values use official season totals under that year's scoring.</div></div>
-    <div class="card"><h2>Best picks</h2><ol class="rec" id="d_steals"></ol></div>
-    <div class="card"><h2>Biggest busts (top-60 picks)</h2><ol class="rec" id="d_busts"></ol></div>
+    <div class="card swcard" data-sw="0"><h2>Draft outcomes</h2>
+      <div class="swtabs"><button class="swtab on">Best picks</button><button class="swtab">Biggest busts</button></div>
+      <div class="swpane on"><ol class="rec" id="d_steals"></ol></div>
+      <div class="swpane"><ol class="rec" id="d_busts"></ol>
+        <div class="note">Top-60 picks only.</div></div></div>
     <div class="card"><h2>Every pick, every draft</h2>
       <div class="selrow"><select id="dYear"></select><select id="dOwnerSel"></select></div>
       <input class="flt" id="dSearch" type="search" placeholder="Search player name...">
@@ -302,15 +339,14 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>All-time table</h2><div class="tscroll"><table id="master"></table></div>
       <div class="note">Regular-season records and points since 2015. Playoffs = winner's-bracket games; Apps = seasons reaching the bracket. AP = all-play record. Net $ from league payouts; shared-seat years are split to whoever held the seat that season (2014's seat money is credited to its 2015 holder).</div>
       <div class="note">Franchise history (per the league's own payout ledger): two seats have changed hands &mdash; Austin (2015) &rarr; Alex (2016) &rarr; Luke (2017&ndash;present), and Neville (2015&ndash;2023) &rarr; Austin (2024&ndash;present). Careers tracked per person.</div></div>
-    <div class="card"><h2>🏆 Buck Wong Bowl game history</h2><div id="bwbhist"></div>
-      <div class="note">Every championship game on record. Tap one for both starting lineups.</div></div>
-    <div class="card"><h2>🥄 Lerch Cup game history</h2><div id="lchist"></div>
-      <div class="note">Every last-place game on record. Tap one for the lineups that earned it.</div></div>
-    <div class="card"><h2>The Buck Wong Bowl &mdash; Hall of Fame</h2><div id="champlist"></div>
-      <div class="note">Buck Wong Bowl champions, 2014&ndash;present. Tap a champion for the full title-winning roster.</div></div>
-    <div class="card"><h2>Players with multiple rings</h2><ol class="rec" id="ringlist"></ol></div>
-    <div class="card"><h2>The Lerch Cup &mdash; Hall of Shame</h2><div id="shamelist"></div>
-      <div class="note">Lerch Cup "winners" (last place), 2014&ndash;present.</div></div>
+    <div class="card swcard" data-sw="0"><h2>Finals history</h2>
+      <div class="swtabs"><button class="swtab on">🏆 Buck Wong Bowl</button><button class="swtab">🥄 Lerch Cup</button></div>
+      <div class="swpane on"><div id="bwbhist"></div>
+        <div class="note">Every championship game on record, 2014&ndash;present. (n) = that owner's nth title at the time. Tap a game for both starting lineups.</div></div>
+      <div class="swpane"><div id="lchist"></div>
+        <div class="note">Every last-place game on record, 2014&ndash;present. (n) = that owner's nth Lerch Cup at the time. Tap a game for the lineups that earned it.</div></div></div>
+    <div class="card"><h2>Players with multiple rings</h2><ol class="rec" id="ringlist"></ol>
+      <div class="note">Tap a player for the title teams they rode to glory.</div></div>
   </section>
 </main>
 <footer id="foot"></footer>
@@ -325,6 +361,39 @@ $('sub').textContent = 'League record book · last updated ' + (DATA.built_ts
   ? new Date(DATA.built_ts).toLocaleString(undefined, {month:'long', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'}) + ' local'
   : (DATA.built || DATA.updated));
 $('foot').textContent = 'Built from the Sleeper API, ESPN league history & the league record sheet · auto-updates every morning · ' + DATA.updated;
+
+/* swipeable / tabbed cards: tap a tab, or swipe horizontally anywhere in the card */
+function swSet(card, i){
+  const tabs = [...card.querySelectorAll('.swtabs .swtab')], panes = [...card.querySelectorAll('.swpane')];
+  const vis = tabs.map(t=>t.style.display!=='none');
+  if(i<0 || i>=panes.length || !vis[i]) return;
+  tabs.forEach((t,j)=>t.classList.toggle('on', j===i));
+  panes.forEach((p,j)=>p.classList.toggle('on', j===i));
+  card.dataset.sw = i;
+}
+document.addEventListener('click', e=>{
+  const t = e.target.closest('.swtab'); if(!t) return;
+  const card = t.closest('.swcard');
+  swSet(card, [...card.querySelectorAll('.swtabs .swtab')].indexOf(t));
+});
+let _swX=null, _swY=null, _swC=null;
+document.addEventListener('touchstart', e=>{
+  const c = e.target.closest('.swcard');
+  if(!c || e.target.closest('.tscroll')) return;
+  _swC=c; _swX=e.touches[0].clientX; _swY=e.touches[0].clientY;
+}, {passive:true});
+document.addEventListener('touchend', e=>{
+  if(!_swC) return;
+  const dx = e.changedTouches[0].clientX-_swX, dy = e.changedTouches[0].clientY-_swY;
+  if(Math.abs(dx)>55 && Math.abs(dx)>2*Math.abs(dy)){
+    const cur = +_swC.dataset.sw||0, dir = dx<0?1:-1;
+    const tabs = [..._swC.querySelectorAll('.swtabs .swtab')];
+    let i = cur+dir;
+    while(i>=0 && i<tabs.length && tabs[i].style.display==='none') i += dir;
+    swSet(_swC, i);
+  }
+  _swC=null;
+}, {passive:true});
 
 function show(){
   let h = (location.hash||'#now').slice(1);
@@ -357,6 +426,50 @@ if(now.standings){
       </div><div class="pc">${o.pct.toFixed(1)}%${t!=null?`<div style="font-size:10.5px;color:var(--gold)">${t.toFixed(1)}%</div>`:''}</div></div>`;
   }).join('');
   $('oddsnote').textContent = (now.oddsnote||'') + (now.title ? ' Teal bar = make the playoffs, gold bar = win the championship.' : '');
+  // odds trend charts (entering-week playoff / championship odds)
+  (function(){
+    const H = now.oddshist;
+    const elP = $('oddsTrendP'), elC = $('oddsTrendC');
+    if(!H){ elP.innerHTML = elC.innerHTML = '<div class="note">Trends appear once a few weeks are on file.</div>'; return; }
+    const wks = Object.keys(H).map(Number).sort((a,b)=>a-b);
+    const lastW = String(wks[wks.length-1]);
+    const owners = Object.keys(H[lastW].playoffs);
+    const PAL = ['#60a5fa','#f87171','#34d399','#fbbf24','#a78bfa','#f472b6','#2dd4bf','#fb923c','#a3e635','#38bdf8','#e879f9','#94a3b8'];
+    const colorOf = {}; owners.slice().sort().forEach((o,i)=>colorOf[o]=PAL[i%PAL.length]);
+    function draw(el, key, fixed100){
+      const last = H[lastW][key];
+      const ord = owners.slice().sort((a,b)=>(last[b]||0)-(last[a]||0));
+      const ymax = fixed100 ? 100 : Math.max(10, ...wks.flatMap(w=>ord.map(o=>H[String(w)][key][o]||0))) * 1.1;
+      const W=360, Hh=195, L=28, R=8, T=8, B=20;
+      const xs = w => L + (W-L-R) * (w - wks[0]) / Math.max(1, wks[wks.length-1]-wks[0]);
+      const ys = v => T + (Hh-T-B) * (1 - v/ymax);
+      let svg = `<svg viewBox="0 0 ${W} ${Hh}" style="width:100%;height:auto;display:block">`;
+      for(const gv of (fixed100 ? [0,25,50,75,100] : [0, Math.round(ymax/2)])){
+        svg += `<line x1="${L}" x2="${W-R}" y1="${ys(gv)}" y2="${ys(gv)}" stroke="var(--line)" stroke-width="1"/>`
+             + `<text x="${L-4}" y="${ys(gv)+3.5}" text-anchor="end" font-size="9" fill="var(--ink3)">${gv}</text>`;
+      }
+      for(const w of wks) svg += `<text x="${xs(w)}" y="${Hh-6}" text-anchor="middle" font-size="9" fill="var(--ink3)">${w}</text>`;
+      for(const o of ord.slice().reverse()){
+        const pts = wks.map(w=>`${xs(w).toFixed(1)},${ys(H[String(w)][key][o]||0).toFixed(1)}`).join(' ');
+        svg += `<polyline data-o="${esc(o)}" points="${pts}" fill="none" stroke="${colorOf[o]}" stroke-width="2" stroke-linejoin="round" opacity=".88"/>`;
+      }
+      svg += '</svg>';
+      el.innerHTML = svg + `<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:6px">`
+        + ord.map(o=>`<span class="lgch" data-o="${esc(o)}"><i style="background:${colorOf[o]}"></i>${esc(o)} ${(last[o]||0).toFixed(key==='champ'?1:0)}%</span>`).join('') + '</div>';
+      el.addEventListener('click', e=>{
+        const ch = e.target.closest('.lgch'); if(!ch) return;
+        const on = !ch.classList.contains('on');
+        el.querySelectorAll('.lgch').forEach(c=>c.classList.remove('on'));
+        if(on) ch.classList.add('on');
+        el.querySelectorAll('polyline').forEach(p=>{
+          p.setAttribute('opacity', !on ? '.88' : (p.dataset.o===ch.dataset.o ? '1' : '.12'));
+          p.setAttribute('stroke-width', on && p.dataset.o===ch.dataset.o ? '3' : '2');
+        });
+      });
+    }
+    draw(elP, 'playoffs', true);
+    draw(elC, 'champ', false);
+  })();
   if((now.elim||[]).length || (now.brink||[]).length){
     $('elims').innerHTML = (now.elim||[]).map(e=>
       `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('')
@@ -367,15 +480,19 @@ if(now.standings){
         return `<div class="elim" style="border-left-color:${eff?'var(--red)':'var(--gold)'}"><b>${esc(e.owner)}</b> is ${eff?'effectively out':'on the brink'} if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul>${oddsTxt}</div>`;
       }).join('');
     $('elimnote').textContent = [(now.elim||[]).length ? now.elimnote : '', now.brinknote || ''].filter(Boolean).join(' ');
-  } else {
-    $('elimcard').style.display = 'none';
   }
-  if((now.paths||[]).length){
-    $('pathcard').style.display = '';
+  const hasWatch = (now.elim||[]).length + (now.brink||[]).length > 0;
+  const hasPaths = (now.paths||[]).length > 0;
+  if(hasPaths){
     $('paths').innerHTML = now.paths.map(p=>
       `<div class="elim" style="border-left-color:var(--gold)"><b>${esc(p.owner)} (${esc(p.rec)})</b><div style="margin-top:4px;font-size:13px;color:var(--ink2);line-height:1.45">${esc(p.text)}</div></div>`).join('');
     $('pathnote').textContent = now.pathnote || '';
   }
+  $('elimcard').style.display = (hasWatch || hasPaths) ? '' : 'none';
+  $('tabElims').style.display = hasWatch ? '' : 'none';
+  $('tabPaths').style.display = hasPaths ? '' : 'none';
+  if(!(hasWatch && hasPaths)) $('elimcard').querySelector('.swtabs').style.display = 'none';
+  swSet($('elimcard'), hasWatch ? 0 : 1);
   if((now.clinch||[]).length){
     $('clinchcard').style.display = '';
     $('clinches').innerHTML = now.clinch.map(e=>
@@ -399,13 +516,11 @@ if(now.standings){
     renderBracket(now.brackets.bwb, $('bwb'));
     renderBracket(now.brackets.lerch, $('lc'));
     if(now.brackets.projected){
-      $('bwbhdr').textContent = '🏆 Buck Wong Bowl bracket (projected)';
-      $('lchdr').textContent = '🥄 Lerch Cup bracket (projected)';
+      $('brhdr').textContent = 'Season brackets (projected)';
       $('bwbnote').textContent = 'Projected from today’s standings — seeds lock in after week 14. Seeds 1-2 (division winners) get byes.';
       $('lcnote').textContent = 'Projected from today’s standings. The toilet bowl: losers advance, and the Lerch Cup game decides last place.';
     }
-    $('bwbcard').style.display = '';
-    $('lccard').style.display = '';
+    $('brcard').style.display = '';
   }
 }
 
@@ -1359,38 +1474,40 @@ renderProfile();
 
 /* ---------------- FINALS HISTORIES ---------------- */
 function finalsHistory(kind, el){
-  const src = kind==='P' ? DATA.champs : DATA.shame;
-  el.innerHTML = src.slice().sort((x,y)=>y.year-x.year).map(c=>{
+  const src = (kind==='P' ? DATA.champs : DATA.shame).slice().sort((x,y)=>x.year-y.year);
+  const cnt = {};
+  el.innerHTML = src.map(c=>{
+    cnt[c.owner] = (cnt[c.owner]||0) + 1;
+    const tag = `${kind==='P'?'🏆':'🥄'} <b>${esc(c.owner)}</b>${cnt[c.owner]>1?` <span class="d">(${cnt[c.owner]})</span>`:''}`;
     const pool = G.filter(g=>g[0]===c.year && g[2]===kind);
-    if(!pool.length) return `<div class="meet"><span>${c.year}</span><span class="note">no game data (pre-2015)</span></div>`;
+    if(!pool.length) return `<div class="meet"><span><b>${c.year}</b> ${tag}</span><span class="note">no game data (pre-2015)</span></div>`;
     const lastWk = Math.max(...pool.map(g=>g[1]));
     const g = pool.find(g=> g[1]===lastWk &&
       (kind==='P' ? ((g[4]>g[6]?g[3]:g[5])===c.owner) : ((g[4]<g[6]?g[3]:g[5])===c.owner)));
-    if(!g) return `<div class="meet"><span>${c.year}</span><span class="note">game not identified</span></div>`;
-    return `<div class="meet lurow" style="cursor:pointer" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><span><b>${c.year}</b> wk${g[1]}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
-  }).join('');
+    if(!g) return `<div class="meet"><span><b>${c.year}</b> ${tag}</span><span class="note">game not identified</span></div>`;
+    return `<div class="meet lurow" style="cursor:pointer" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><span><b>${c.year}</b> ${tag}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
+  }).reverse().join('');
 }
 finalsHistory('P', $('bwbhist'));
 finalsHistory('C', $('lchist'));
 
-/* ---------------- CHAMPS ---------------- */
-$('champlist').innerHTML = DATA.champs.map((c,i)=>
-  `<div class="champ" data-ci="${i}" style="cursor:pointer"><div class="yr">${c.year}</div><div style="flex:1"><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div><div class="croster" style="display:none;margin-top:6px">${(c.roster||[]).map(r=>`<div style="display:flex;gap:8px;font-size:12.5px;padding:1px 0"><span style="color:var(--ink3);min-width:36px">${esc(r[0])}</span><span>${esc(r[1])}</span></div>`).join('')||'<span class="note">No roster recorded.</span>'}</div></div></div>`).join('');
-$('champlist').addEventListener('click', e=>{
-  const row = e.target.closest('.champ');
+/* ---------------- MULTIPLE RINGS ---------------- */
+$('ringlist').innerHTML = (DATA.rings||[]).map((r,i)=>
+  `<li class="hirow" style="cursor:pointer" data-ri="${i}"><span class="v">${'🏆'.repeat(Math.min(r.rings,4))}</span><span><b>${esc(r.player)}</b> <span class="d">${esc(r.pos)} · ${r.rings} rings</span></span></li>`).join('');
+$('ringlist').addEventListener('click', e=>{
+  const row = e.target.closest('li.hirow');
   if(!row) return;
-  const d = row.querySelector('.croster');
-  if(d){ const open = d.style.display==='none'; d.style.display = open ? 'block' : 'none'; row.classList.toggle('open', open); }
-});
-$('ringlist').innerHTML = (DATA.rings||[]).map(r=>
-  `<li><span class="v">${'🏆'.repeat(Math.min(r.rings,4))}</span><span><b>${esc(r.player)}</b> <span class="d">${esc(r.pos)} · ${r.rings} rings</span></span></li>`).join('');
-$('shamelist').innerHTML = DATA.shame.map((c,i)=>
-  `<div class="champ shrow" style="cursor:pointer"><div class="yr" style="color:var(--red)">${c.year}</div><div style="flex:1"><b>${esc(c.owner)}</b><div class="tm">${esc(c.team)} ${c.record?'· '+esc(c.record):''}</div><div class="croster" style="display:none;margin-top:6px">${(c.roster||[]).map(r=>`<div style="display:flex;gap:8px;font-size:12.5px;padding:1px 0"><span style="color:var(--ink3);min-width:36px">${esc(r[0])}</span><span>${esc(r[1])}</span></div>`).join('')||'<span class="note">No roster recorded.</span>'}</div></div></div>`).join('');
-$('shamelist').addEventListener('click', e=>{
-  const row = e.target.closest('.shrow');
-  if(!row) return;
-  const d = row.querySelector('.croster');
-  if(d){ const open = d.style.display==='none'; d.style.display = open ? 'block' : 'none'; row.classList.toggle('open', open); }
+  const next = row.nextElementSibling;
+  if(next && next.classList.contains('ludetail')){ next.remove(); row.classList.remove('open'); return; }
+  const r = (DATA.rings||[])[+row.dataset.ri] || {};
+  const d = document.createElement('div');
+  d.className = 'ludetail';
+  d.style.cssText = 'background:var(--surface2);border-radius:8px;padding:8px;margin:4px 0';
+  d.innerHTML = (r.detail||[]).map(x=>
+    `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span><b>${x[0]}</b> · ${esc(x[1])}</span><span style="color:var(--ink2)">${esc(x[2]||'')}</span></div>`).join('')
+    || '<span class="note">Title rosters not recorded for these years.</span>';
+  row.after(d);
+  row.classList.add('open');
 });
 
 show();
