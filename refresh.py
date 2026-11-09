@@ -47,12 +47,13 @@ def refresh_feeds():
     import xml.etree.ElementTree as _ET
     from email.utils import parsedate_to_datetime
     fp = Path("data/feeds.json")
-    old = {}
+    prev_feeds = []
     if fp.exists():
         try:
-            old = {f["name"]: f for f in json.load(open(fp, encoding="utf-8")).get("feeds", [])}
+            prev_feeds = json.load(open(fp, encoding="utf-8")).get("feeds", [])
         except Exception:
-            old = {}
+            prev_feeds = []
+    old = {f["name"]: f for f in prev_feeds}
     out = []
     for name, url in FEEDS:
         try:
@@ -82,6 +83,11 @@ def refresh_feeds():
             print(f"  feed failed ({name}): {e}")
             if name in old:
                 out.append(old[name])
+    # only rewrite the file when a headline actually changed, so news-only
+    # runs produce a commit exactly when there is news
+    if [(f["name"], f["items"]) for f in out] == [(f.get("name"), f.get("items")) for f in prev_feeds]:
+        print(f"publications: no new headlines ({len(out)} feeds)")
+        return
     json.dump(dict(at=int(__import__("time").time()), feeds=out),
               open(fp, "w", encoding="utf-8"))
     print(f"publications: {len(out)} feeds, {sum(len(f['items']) for f in out)} headlines")
@@ -89,10 +95,7 @@ print("fetching news feeds ...")
 refresh_feeds()
 
 if '--news-only' in sys.argv:
-    # headlines-only run: fetch the player map the builder needs, rebuild, done
-    get('https://api.sleeper.app/v1/players/nfl', RAW / 'players.json')
-    import subprocess
-    subprocess.run([sys.executable, '-I', 'build.py', 'data/raw'], check=True)
+    # headlines-only run: the page fetches data/feeds.json live, so no rebuild
     print('news-only refresh complete')
     sys.exit(0)
 

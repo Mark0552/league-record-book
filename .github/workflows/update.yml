@@ -51,8 +51,9 @@ jobs:
                   if ko - timedelta(minutes=10) <= now <= ko + timedelta(hours=4, minutes=30):
                       live = True
                       break
-          # no game on: refresh just the news tab on the half-hour ticks
-          news = (not live) and now.minute % 30 < 5
+          # no game on: every tick still checks the news feeds (the news-only
+          # run commits data/feeds.json only when a headline actually changed)
+          news = not live
           # did a rostered player's injury status change since the last full run?
           inj_changed = False
           if not live:
@@ -89,9 +90,7 @@ jobs:
           cp site/index.html index.html
       - name: Refresh headlines only
         if: steps.live.outputs.news == 'true' && steps.live.outputs.injuries != 'true'
-        run: |
-          python refresh.py --news-only
-          cp site/index.html index.html
+        run: python refresh.py --news-only
       - name: Commit and publish
         if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true' || steps.live.outputs.news == 'true' || steps.live.outputs.injuries == 'true'
         run: |

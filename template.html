@@ -1525,7 +1525,7 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
 
 /* ---------------- PUBLICATIONS ---------------- */
 (function(){
-  const PB = DATA.pubs || [];
+  function renderPubs(PB){
   if(!PB.length){
     $('pubPanes').innerHTML = '<div class="note">Headlines appear after the next pipeline update.</div>';
     return;
@@ -1547,6 +1547,15 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
   $('pubPanes').innerHTML =
     `<div class="swpane on">${all.map(i=>row(i, i.src)).join('')}</div>` +
     PB.map(f=>`<div class="swpane">${f.items.map(i=>row(i, '')).join('')}</div>`).join('');
+  const card = $('pubTabs').closest('.swcard');
+  if(card) card.dataset.sw = 0;
+  }
+  renderPubs(DATA.pubs || []);
+  // headlines update on their own cadence: pull the freshest committed copy
+  fetch('data/feeds.json', {cache: 'no-store'})
+    .then(r => r.ok ? r.json() : null)
+    .then(d => { if(d && d.feeds && d.feeds.length) renderPubs(d.feeds); })
+    .catch(()=>{});
 })();
 
 /* ---------------- DRAFT ---------------- */
