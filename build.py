@@ -254,13 +254,16 @@ payouts = {}   # owner -> net $ string; filled from the per-person split in the 
 
 # ---------------- records ----------------
 # record lists count every game played — regular, playoff, and consolation alike
-# (the league's own Best tab does: see Neville's 182.22 in the 2023 fifth-place game)
+# (the league's own Best tab does: see Neville's 182.22 in the 2023 fifth-place game).
+# EXCEPT lowest-score records, which skip consolation: those rosters often
+# weren't even set, so the lows would just be forfeits.
 expand = []
 for g in games:
     expand.append((g["sa"], g["a"], g["sb"], g["b"], g))
     expand.append((g["sb"], g["b"], g["sa"], g["a"], g))
+no_consol = [e for e in expand if e[4]["type"] != "Consolation"]
 top_games = sorted(expand, key=lambda x: -x[0])[:10]
-low_games = sorted(expand, key=lambda x: x[0])[:10]
+low_games = sorted(no_consol, key=lambda x: x[0])[:10]
 blowouts = sorted(games, key=lambda g: -abs(g["sa"] - g["sb"]))[:10]
 closest = sorted([g for g in games if g["sa"] != g["sb"]], key=lambda g: abs(g["sa"] - g["sb"]))[:10]
 shootouts = sorted(games, key=lambda g: -(g["sa"] + g["sb"]))[:10]
@@ -283,7 +286,7 @@ season_low = sorted(season_rows, key=lambda r: r["pf"])[:10]
 win_streaks = two_tiers(sorted(((longest_run(streak_seq[o], "W"), o) for o in OWNERS), reverse=True), key=lambda p: p[0])
 loss_streaks = two_tiers(sorted(((longest_run(streak_seq[o], "L"), o) for o in OWNERS), reverse=True), key=lambda p: p[0])
 loss_high = sorted([e for e in expand if e[0] < e[2]], key=lambda x: -x[0])[:10]   # heartbreakers
-win_low = sorted([e for e in expand if e[0] > e[2]], key=lambda x: x[0])[:10]      # daylight robberies
+win_low = sorted([e for e in no_consol if e[0] > e[2]], key=lambda x: x[0])[:10]   # daylight robberies
 
 # ---------------- player records (Sleeper 2020+, starters only) ----------------
 players = json.load(open(RAW / "players.json", encoding="utf-8"))
@@ -1019,7 +1022,7 @@ for g in games:
     adj_expand.append((g["sa"] + da, g["a"], g["sb"] + db, g["b"], g))
     adj_expand.append((g["sb"] + db, g["b"], g["sa"] + da, g["a"], g))
 adj_top = sorted(adj_expand, key=lambda x: -x[0])[:10]
-adj_low = sorted(adj_expand, key=lambda x: x[0])[:10]
+adj_low = sorted([e for e in adj_expand if e[4]["type"] != "Consolation"], key=lambda x: x[0])[:10]
 
 adj_season = defaultdict(lambda: dict(pf=0.0, g=0))
 for g in games:

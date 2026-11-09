@@ -258,7 +258,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card"><h2>Scoring distribution</h2><div id="ss_dist"></div>
       <div class="note">Each team's weekly scores: whisker = min to max, box = middle half (Q1&ndash;Q3), bright tick = median. Sorted by median.</div></div>
     <div class="card"><h2 id="ss_rec_h">Season records</h2><div id="ss_records"></div>
-      <div class="note">That season only &mdash; every game counts, playoffs and consolation included; streaks are regular-season. Tap a game for both lineups.</div></div>
+      <div class="note">That season only &mdash; every game counts, playoffs and consolation included, except the lowest-score lines, which skip consolation games (those rosters often weren't set). Streaks are regular-season. Tap a game for both lineups.</div></div>
     <div class="card swcard" data-sw="0"><h2>Brackets</h2>
       <div class="swtabs"><button class="swtab on">🏆 Playoffs</button><button class="swtab">🥄 Consolation</button></div>
       <div class="swpane on"><div id="ss_playoffs"></div></div>
@@ -291,7 +291,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
     <div class="card swcard" data-sw="0"><h2 id="r_top_h">Team scores</h2>
       <div class="swtabs"><button class="swtab on">Highest</button><button class="swtab">Lowest</button></div>
       <div class="swpane on"><ol class="rec" id="r_top"></ol></div>
-      <div class="swpane"><ol class="rec" id="r_low"></ol></div></div>
+      <div class="swpane"><ol class="rec" id="r_low"></ol>
+        <div class="note">Consolation games don't count here &mdash; those rosters often weren't even set, and a forfeit isn't a record.</div></div></div>
     <div class="card"><h2>Best player games (starters, since 2015)</h2><ol class="rec" id="r_players"></ol>
       <div class="note">Scored under that season's league settings (ESPN era 2015-2019, Sleeper era 2020+).</div></div>
     <div class="card swcard" data-sw="0"><h2>Margins</h2>
@@ -310,7 +311,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="swpane on"><ol class="rec" id="r_losshi"></ol>
         <div class="note">Most points in a loss.</div></div>
       <div class="swpane"><ol class="rec" id="r_winlo"></ol>
-        <div class="note">Fewest points in a win.</div></div></div>
+        <div class="note">Fewest points in a win. Consolation games excluded &mdash; beating an unset roster doesn't count.</div></div></div>
     <div class="card"><h2>Longest streaks</h2><div class="tiles" id="r_streaks"></div><ol class="rec" id="r_streaktie"></ol></div>
     <div class="card swcard" data-sw="0"><h2>Earliest clinches &amp; eliminations</h2>
       <div class="swtabs"><button class="swtab on">Playoff clinches</button><button class="swtab">Byes</button><button class="swtab">Eliminations</button></div>
@@ -443,7 +444,7 @@ const YEARS = [...new Set(G.map(g=>g[0]))].sort((a,b)=>b-a);
 $('sub').textContent = 'League record book · last updated ' + (DATA.built_ts
   ? new Date(DATA.built_ts).toLocaleString(undefined, {month:'long', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'}) + ' local'
   : (DATA.built || DATA.updated));
-$('foot').textContent = 'Built from the Sleeper API, ESPN league history & the league record sheet · auto-updates every morning · ' + DATA.updated;
+$('foot').textContent = 'Built from the Sleeper API, ESPN league history & the league record sheet · updates live on game days, every few hours otherwise · ' + DATA.updated;
 
 /* drawer navigation */
 const navEl = $('nav'), navOvl = $('navOvl');
@@ -921,13 +922,15 @@ function renderSeason(){
     const li = (v, g, body) => `<li ${att(g)}><span class="v">${v}</span><span>${body}</span></li>`;
     const sub = t => `<div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink2);margin:10px 0 2px">${t}</div>`;
     const srt = ex.slice().sort((a,b)=>b.pts-a.pts);
+    const exNC = ex.filter(e=>e.g[2]!=='C');   // lows skip consolation: rosters often weren't set
+    const srtNC = exNC.slice().sort((a,b)=>b.pts-a.pts);
     const scoreRow = e => li(f2(e.pts), e.g, `<b>${esc(e.o)}</b> <span class="d">vs ${esc(e.opp)} · wk${e.g[1]}</span>`);
     const margins = yg.map(g=>({m:Math.abs(g[4]-g[6]), g})).filter(x=>x.m>0).sort((a,b)=>b.m-a.m);
     const mRow = (x, verb) => { const g=x.g, w=g[4]>g[6]?g[3]:g[5], l=g[4]>g[6]?g[5]:g[3];
       return li(f2(x.m), g, `<b>${esc(w)}</b> <span class="d">${verb} ${esc(l)} (${f1(Math.max(g[4],g[6]))}–${f1(Math.min(g[4],g[6]))}) · wk${g[1]}</span>`); };
     const shoot = yg.map(g=>({t:g[4]+g[6], g})).sort((a,b)=>b.t-a.t)[0];
     const hb = ex.filter(e=>e.pts<e.op).sort((a,b)=>b.pts-a.pts)[0];
-    const rob = ex.filter(e=>e.pts>e.op).sort((a,b)=>a.pts-b.pts)[0];
+    const rob = exNC.filter(e=>e.pts>e.op).sort((a,b)=>a.pts-b.pts)[0];
     const seq = {};
     for(const g of G.filter(g=>g[0]===year&&g[2]==='R').sort((a,b)=>a[1]-b[1])){
       if(g[4]===g[6]) continue;
@@ -943,7 +946,7 @@ function renderSeason(){
     }
     $('ss_records').innerHTML =
       sub('Top scores') + `<ol class="rec">${srt.slice(0,3).map(scoreRow).join('')}</ol>` +
-      sub('Lowest scores') + `<ol class="rec">${srt.slice(-3).reverse().map(scoreRow).join('')}</ol>` +
+      sub('Lowest scores') + `<ol class="rec">${srtNC.slice(-3).reverse().map(scoreRow).join('')}</ol>` +
       sub('Margins') + `<ol class="rec">${margins.length?mRow(margins[0],'blew out')+mRow(margins[margins.length-1],'edged'):''}</ol>` +
       sub('Highest-scoring matchup') + `<ol class="rec">${shoot?li(f1(shoot.t), shoot.g, `<b>${esc(shoot.g[3])} ${f1(shoot.g[4])}</b> <span class="d">vs</span> <b>${f1(shoot.g[6])} ${esc(shoot.g[5])}</b> <span class="d">· wk${shoot.g[1]}</span>`):''}</ol>` +
       sub('Cruel games') + `<ol class="rec">${hb?li(f2(hb.pts), hb.g, `<b>${esc(hb.o)}</b> <span class="d">lost to ${esc(hb.opp)}'s ${f2(hb.op)} · wk${hb.g[1]} (heartbreaker)</span>`):''}${rob?li(f2(rob.pts), rob.g, `<b>${esc(rob.o)}</b> <span class="d">beat ${esc(rob.opp)}'s ${f2(rob.op)} · wk${rob.g[1]} (daylight robbery)</span>`):''}</ol>` +
