@@ -1334,6 +1334,8 @@ payload = dict(
     divisions=divhist,
     pubs=(json.load(open("data/feeds.json", encoding="utf-8")).get("feeds", [])
           if Path("data/feeds.json").exists() else []),
+    trade=(json.load(open("data/values.json", encoding="utf-8")).get("players", [])
+           if Path("data/values.json").exists() else []),
     now=now,
 )
 

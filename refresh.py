@@ -104,6 +104,83 @@ def refresh_feeds():
 print("fetching news feeds ...")
 refresh_feeds()
 
+def refresh_trade_values(ros_pts):
+    """Trade-calculator value tables: FantasyCalc (league-matched settings),
+    Dynasty Daddy, DynastyProcess open data, and our own rest-of-season Sleeper
+    projections, keyed by Sleeper id. A failed fetch keeps the last copy."""
+    fp = Path("data/values.json")
+    old = {}
+    if fp.exists():
+        try:
+            old = json.load(open(fp, encoding="utf-8"))
+        except Exception:
+            old = {}
+    def grab(url):
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return json.loads(r.read())
+    players_v = {}
+    for e in (old.get("players") or []):
+        players_v[e["id"]] = e
+    try:
+        fc = grab("https://api.fantasycalc.com/values/current?isDynasty=false&numQbs=1&numTeams=12&ppr=0.5")
+        for e in players_v.values():
+            e.pop("fc", None)
+        for p in fc:
+            sid = str(p["player"].get("sleeperId") or "")
+            if not sid:
+                continue
+            e = players_v.setdefault(sid, dict(id=sid, n=p["player"]["name"],
+                                               p=p["player"].get("position", "?"),
+                                               t=p["player"].get("maybeTeam") or ""))
+            e["fc"] = p["value"]
+        print(f"trade values: FantasyCalc {len(fc)} players")
+    except Exception as ex:
+        print(f"  trade values failed (FantasyCalc): {ex}")
+    try:
+        dd = grab("https://dynasty-daddy.com/api/v1/player/all/today")
+        for e in players_v.values():
+            e.pop("dd", None)
+        for p in dd:
+            sid = str(p.get("sleeper_id") or "")
+            if not sid or not p.get("trade_value"):
+                continue
+            e = players_v.setdefault(sid, dict(id=sid, n=p.get("full_name", "?"),
+                                               p=p.get("position", "?"), t=p.get("team") or ""))
+            e["dd"] = p["trade_value"]
+        print(f"trade values: Dynasty Daddy {len(dd)} players")
+    except Exception as ex:
+        print(f"  trade values failed (Dynasty Daddy): {ex}")
+    try:
+        import csv as _csv
+        import io as _io
+        req = urllib.request.Request(
+            "https://raw.githubusercontent.com/dynastyprocess/data/master/files/values-players.csv",
+            headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            rows = list(_csv.DictReader(_io.StringIO(r.read().decode("utf-8"))))
+        norm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
+        byname = {(norm(e["n"]), e["p"]): e for e in players_v.values()}
+        for e in players_v.values():
+            e.pop("dp", None)
+        hits = 0
+        for row in rows:
+            e = byname.get((norm(row["player"]), row["pos"]))
+            if e and row.get("value_1qb"):
+                e["dp"] = int(row["value_1qb"]); hits += 1
+        print(f"trade values: DynastyProcess matched {hits} players")
+    except Exception as ex:
+        print(f"  trade values failed (DynastyProcess): {ex}")
+    for e in players_v.values():
+        rs = ros_pts.get(e["id"], 0.0)
+        if rs > 1:
+            e["rs"] = round(rs, 1)
+        else:
+            e.pop("rs", None)
+    json.dump(dict(at=int(__import__("time").time()),
+                   players=sorted(players_v.values(), key=lambda e: -(e.get("fc", 0) + e.get("dd", 0)))),
+              open(fp, "w", encoding="utf-8"))
+
 scoring = lg["scoring_settings"]
 PSTART = lg["settings"]["playoff_week_start"]       # regular season = weeks 1..PSTART-1
 last_scored = lg["settings"].get("last_scored_leg") or 0
@@ -209,6 +286,16 @@ def wproj(rid, w):
         out += v
     return out
 WP = {t: {w: wproj(t, w) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS}
+
+# rest-of-season projection per player (for the trade calculator's house column)
+ros_pts = defaultdict(float)
+for w in weeks_left + PLAYOFF_WEEKS:
+    for pid, st in proj[w].items():
+        v = lpoints(st)
+        if v:
+            ros_pts[pid] += v
+print("fetching trade values ...")
+refresh_trade_values(dict(ros_pts))
 
 # ---------------- 3. one simulation to rule them all: 100k full seasons incl. bracket ----------------
 sdv = {t: max(12.0, statistics.stdev(sc[t])) if len(sc[t]) > 1 else 20.0 for t in TEAMS}

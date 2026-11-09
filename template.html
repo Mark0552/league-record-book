@@ -194,6 +194,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <a href="#luck"><b>Luck</b><span>Luck meters &amp; the schedule simulator</span></a>
   <a href="#moves"><b>Transactions</b><span>Every trade &amp; the best pickups ever</span></a>
   <a href="#pubs"><b>Publications</b><span>NFL &amp; fantasy headlines from around the league</span></a>
+  <a href="#trade"><b>Trade Calculator</b><span>Value any trade across four calculators + average</span></a>
   <a href="#draft"><b>Draft</b><span>Report cards, steals, busts, every pick</span></a>
   <a href="#players"><b>Players</b><span>Every player ever started: careers &amp; records</span></a>
   <a href="#owners"><b>Owners</b><span>Owner profiles, year by year</span></a>
@@ -344,6 +345,23 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="swtabs" id="pubTabs"></div>
       <div id="pubPanes"></div>
       <div class="note" id="pubNote">Headlines pulled by the site's update pipeline — same cadence as the odds, so they're freshest on game days. Links open at the source.</div></div>
+  </section>
+
+  <section id="trade">
+    <div class="card"><h2>Build the trade</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div style="font-weight:700;margin-bottom:6px;color:var(--accent)">Side A gets</div>
+          <input class="flt" id="tcA" type="search" placeholder="Add player..." autocomplete="off">
+          <div id="tcAsug"></div><div id="tcAlist"></div></div>
+        <div><div style="font-weight:700;margin-bottom:6px;color:var(--gold)">Side B gets</div>
+          <input class="flt" id="tcB" type="search" placeholder="Add player..." autocomplete="off">
+          <div id="tcBsug"></div><div id="tcBlist"></div></div>
+      </div>
+      <button class="btn" id="tcReset" style="display:none">Clear the trade</button></div>
+    <div class="card" id="tcVcard" style="display:none"><h2>Verdict</h2>
+      <div id="tcVerdict"></div>
+      <div class="tscroll"><table id="tcTable"></table></div>
+      <div class="note">Values refresh daily: FantasyCalc is computed for this league's settings (12-team, 1 QB, 0.5 PPR redraft); Dynasty Daddy and DynastyProcess are market values; Sleeper ROS = rest-of-season projected points. The verdict averages each player's share of the top value in every source that lists them. &mdash; = not listed by that source.</div></div>
   </section>
 
   <section id="draft">
@@ -1402,6 +1420,60 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
   }).join('');
   return `<details><summary style="cursor:pointer;font-weight:700;padding:8px 2px;font-size:15px">${yr} <span style="color:var(--ink3);font-weight:500;font-size:12.5px">· ${byYr[yr].length} trade${byYr[yr].length>1?'s':''}</span></summary>${list}</details>`;
 }).join('');
+
+/* ---------------- TRADE CALCULATOR ---------------- */
+(function(){
+  const TC = DATA.trade || [];
+  if(!TC.length){ $('tcA').placeholder = $('tcB').placeholder = 'Values arrive with the next update'; return; }
+  const SRC = [['fc','FantasyCalc'],['dd','Dynasty Daddy'],['dp','DynastyProcess'],['rs','Sleeper ROS']];
+  const MAX = {}; SRC.forEach(([k])=>MAX[k] = Math.max(...TC.map(p=>p[k]||0)));
+  const byId = {}; TC.forEach(p=>byId[p.id]=p);
+  const sides = {A:[], B:[]};
+  const score = p => { const s = SRC.filter(([k])=>p[k]); return s.length ? s.reduce((a,[k])=>a+p[k]/MAX[k]*100,0)/s.length : 0; };
+  function sug(side){
+    const q = $('tc'+side).value.trim().toLowerCase();
+    const box = $('tc'+side+'sug');
+    if(q.length < 2){ box.innerHTML=''; return; }
+    const hits = TC.filter(p=>p.n.toLowerCase().includes(q) && !sides.A.includes(p.id) && !sides.B.includes(p.id)).slice(0,8);
+    box.innerHTML = hits.map(p=>`<div class="meet" style="cursor:pointer" data-add="${p.id}" data-side="${side}"><span><b>${esc(p.n)}</b> <span class="d">${esc(p.p)}${p.t?' · '+esc(p.t):''}</span></span><span class="d">${Math.round(score(p))}</span></div>`).join('');
+  }
+  function chips(side){
+    $('tc'+side+'list').innerHTML = sides[side].map(id=>{ const p = byId[id];
+      return `<div class="elim" style="border-left-color:${side==='A'?'var(--accent)':'var(--gold)'};padding:8px 10px">`+
+        `<div style="display:flex;justify-content:space-between;align-items:center"><b>${esc(p.n)}</b><span data-del="${id}" data-side="${side}" style="cursor:pointer;color:var(--red);font-weight:700;padding:0 4px">×</span></div>`+
+        `<div style="font-size:11.5px;color:var(--ink2)">${esc(p.p)}${p.t?' · '+esc(p.t):''} · ${SRC.map(([k,n])=>`${n.split(' ')[0]} ${p[k]!=null?(k==='rs'?p[k].toFixed(0):p[k]):'—'}`).join(' · ')}</div></div>`;
+    }).join('');
+  }
+  function verdict(){
+    const any = sides.A.length || sides.B.length;
+    $('tcVcard').style.display = any ? '' : 'none';
+    $('tcReset').style.display = any ? '' : 'none';
+    if(!any) return;
+    const rows = SRC.map(([k, name])=>{
+      const tot = s => sides[s].reduce((a,id)=>a+(byId[id][k]||0),0);
+      const miss = s => sides[s].some(id=>byId[id][k]==null);
+      const fmt = (v,s) => (k==='rs'?v.toFixed(0):Math.round(v).toLocaleString()) + (miss(s)?' *':'');
+      return `<tr><td>${name}</td><td class="num">${fmt(tot('A'),'A')}</td><td class="num">${fmt(tot('B'),'B')}</td></tr>`;
+    }).join('');
+    const avg = s => sides[s].reduce((a,id)=>a+score(byId[id]),0);
+    const a = avg('A'), b = avg('B');
+    $('tcTable').innerHTML = `<tr><th>Source</th><th class="num">Side A</th><th class="num">Side B</th></tr>${rows}`+
+      `<tr style="font-weight:700"><td>Average (0&ndash;100/player)</td><td class="num">${a.toFixed(1)}</td><td class="num">${b.toFixed(1)}</td></tr>`;
+    const hi = Math.max(a,b), diff = hi ? (Math.abs(a-b)/hi*100) : 0;
+    const win = a>b?'A':'B';
+    $('tcVerdict').innerHTML = `<div class="elim" style="border-left-color:${diff<7?'var(--accent)':'var(--red)'}"><b>${
+      diff<2?'Dead even.':diff<7?'Fair trade.':`Side ${win} wins by ${diff.toFixed(0)}%.`}</b>`+
+      `<div style="font-size:12.5px;color:var(--ink2);margin-top:3px">By the averaged value share across every source. * = a player missing from that source's table.</div></div>`;
+  }
+  ['A','B'].forEach(s=>$('tc'+s).addEventListener('input', ()=>sug(s)));
+  $('trade').addEventListener('click', e=>{
+    const add = e.target.closest('[data-add]');
+    if(add){ sides[add.dataset.side].push(add.dataset.add); $('tc'+add.dataset.side).value=''; sug(add.dataset.side); chips(add.dataset.side); verdict(); return; }
+    const del = e.target.closest('[data-del]');
+    if(del){ const s = del.dataset.side; sides[s] = sides[s].filter(x=>x!==del.dataset.del); chips(s); verdict(); }
+  });
+  $('tcReset').addEventListener('click', ()=>{ sides.A=[]; sides.B=[]; chips('A'); chips('B'); verdict(); });
+})();
 
 /* ---------------- PUBLICATIONS ---------------- */
 (function(){
