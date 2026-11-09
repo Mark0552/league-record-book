@@ -20,12 +20,12 @@
 :root{
   --bg:#0f1115; --surface:#171a21; --surface2:#1f2430; --line:#2a303d;
   --ink:#e8eaf0; --ink2:#9aa3b2; --ink3:#6b7383;
-  --accent:#2dd4bf; --gold:#fbbf24; --red:#f87171;
+  --accent:#2dd4bf; --gold:#fbbf24; --bwb:#fbbf24; --red:#f87171;
 }
 @media (prefers-color-scheme: light){
   :root{ --bg:#f5f6f8; --surface:#ffffff; --surface2:#eef0f4; --line:#dcdfe6;
     --ink:#1a1d24; --ink2:#525a68; --ink3:#8a92a1; --accent:#0d9488;
-    --gold:#b45309; --red:#dc2626; }
+    --gold:#b45309; --bwb:#ca8a04; --red:#dc2626; }
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -74,13 +74,13 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;padding:2px 6px;border-radius:5px;
   background:var(--surface2);color:var(--ink2);vertical-align:1px}
 .badge.div{background:rgba(45,212,191,.16);color:var(--accent)}
-.badge.gold{background:rgba(251,191,36,.15);color:var(--gold)}
+.badge.gold{background:rgba(251,191,36,.15);color:var(--bwb)}
 tr.line td{border-top:2px dashed var(--ink3)}
 .bar{display:flex;align-items:center;gap:10px;margin:7px 0}
 .bar .nm{width:58px;font-size:13.5px;font-weight:600;flex:0 0 auto}
 .bar .tr{flex:1;height:13px;background:var(--surface2);border-radius:7px;overflow:hidden}
 .bar .fl{height:100%;background:var(--accent);border-radius:7px;min-width:2px}
-.bar .fl.g{background:var(--gold)}
+.bar .fl.g{background:var(--bwb)}
 .bar .pc{width:54px;text-align:right;font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums;flex:0 0 auto}
 .mu{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;border-top:1px solid var(--line)}
 .mu:first-of-type{border-top:none}
@@ -114,7 +114,7 @@ ol.rec .v{font-weight:800;font-variant-numeric:tabular-nums;min-width:62px;color
 ol.rec .d{color:var(--ink2);font-size:12.5px;white-space:normal}
 .champ{display:flex;align-items:center;gap:12px;padding:10px 2px;border-top:1px solid var(--line)}
 .champ:first-of-type{border-top:none}
-.champ .yr{font-size:17px;font-weight:800;min-width:52px;color:var(--gold)}
+.champ .yr{font-size:17px;font-weight:800;min-width:52px;color:var(--bwb)}
 .champ .tm{font-size:12.5px;color:var(--ink2);white-space:normal}
 .btn{display:block;width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid var(--line);
   background:var(--surface2);color:var(--ink2);font-size:14px;font-weight:600;cursor:pointer}
@@ -471,7 +471,7 @@ if(now.standings){
     return `<div class="bar"><div class="nm">${esc(o.owner)}</div><div style="flex:1">
       <div class="tr"><div class="fl" style="width:${Math.max(o.pct,.6)}%"></div></div>
       ${t!=null?`<div class="tr" style="margin-top:3px;height:7px"><div class="fl g" style="width:${Math.max(t,.4)}%"></div></div>`:''}
-      </div><div class="pc">${o.pct.toFixed(1)}%${t!=null?`<div style="font-size:10.5px;color:var(--gold)">${t.toFixed(1)}%</div>`:''}</div></div>`;
+      </div><div class="pc">${o.pct.toFixed(1)}%${t!=null?`<div style="font-size:10.5px;color:var(--bwb)">${t.toFixed(1)}%</div>`:''}</div></div>`;
   }).join('');
   $('oddsnote').textContent = (now.oddsnote||'') + (now.title ? ' Teal bar = make the playoffs, gold bar = win the championship.' : '');
   // odds trend charts (entering-week playoff / championship odds)
@@ -576,7 +576,7 @@ if(now.standings){
           const won = mt.w && mt.w === t;
           return `<span class="${won?'wk-w':''}" style="${t.startsWith('Winner of')||t.startsWith('Loser of')||t==='TBD'?'color:var(--ink3)':''}">${esc(t)}${s!=null?' '+s.toFixed(2):''}</span>`;
         };
-        html += `<div class="meet"><span style="${fin?'color:var(--gold);font-weight:700':''}">${esc(mt.label)}</span><span>${cell(mt.t1, mt.s1)} — ${cell(mt.t2, mt.s2)}</span></div>`;
+        html += `<div class="meet"><span style="${fin?'color:var(--bwb);font-weight:700':''}">${esc(mt.label)}</span><span>${cell(mt.t1, mt.s1)} — ${cell(mt.t2, mt.s2)}</span></div>`;
       });
       el.innerHTML = html;
     };
@@ -914,7 +914,7 @@ function renderSeason(){
   const lastPOwk = Math.max(0, ...po.map(g=>g[1]));
   $('ss_playoffs').innerHTML = po.length ? po.map(g=>{
     const isFinal = champ && g[1]===lastPOwk && ((g[4]>g[6]?g[3]:g[5])===champ.owner);
-    return `<div class="meet"><span>wk${g[1]}${isFinal?' · <span style="color:var(--gold);font-weight:700">Buck Wong Bowl</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
+    return `<div class="meet"><span>wk${g[1]}${isFinal?' · <span style="color:var(--bwb);font-weight:700">Buck Wong Bowl</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
   }).join('')
     : '<div class="note">No playoff games recorded for this season yet.</div>';
   // consolation
@@ -1524,7 +1524,7 @@ function renderProfile(){
       <div class="tile"><div class="v">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):'—'}</div><div class="k">career luck (wins)</div></div>
       ${effTiles}
     </div>
-    ${titles.length?`<div class="note" style="color:var(--gold)">🏆 Buck Wong Bowls: ${titles.join(', ')}</div>`:''}
+    ${titles.length?`<div class="note" style="color:var(--bwb)">🏆 Buck Wong Bowls: ${titles.join(', ')}</div>`:''}
     ${lasts.length?`<div class="note" style="color:var(--red)">🥄 Lerch Cups: ${lasts.join(', ')}</div>`:''}
     <h2 style="margin:14px 0 4px">Season by season</h2>
     <div class="tscroll"><table><tr><th>Year</th><th class="num">Finish</th><th class="num">W-L</th><th class="num">PF</th></tr>${yrRows.join('')}</table></div>
