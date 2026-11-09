@@ -52,8 +52,9 @@ FEEDS = [
     ("Yahoo Fantasy", "https://sports.yahoo.com/fantasy/rss.xml"),
     ("CBS NFL", "https://www.cbssports.com/rss/headlines/nfl"),
     ("RotoWire", "https://www.rotowire.com/rss/news.php?sport=NFL"),
-    ("RotoBaller News", "https://www.rotoballer.com/player-news/feed"),
-    ("RotoBaller NFL", "https://www.rotoballer.com/category/nfl/feed"),
+    # one RotoBaller feed: the NFL category (their player-news wire feeds into
+    # it anyway, and the standalone news feed mixes in other sports)
+    ("RotoBaller", "https://www.rotoballer.com/category/nfl/feed"),
     ("PFF", "https://www.pff.com/feed"),
     ("PFT Rumors", "https://www.profootballrumors.com/feed"),
 ]
