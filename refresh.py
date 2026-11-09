@@ -152,6 +152,99 @@ WP = {t: {w: wproj(t, w) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS}
 
 # ---------------- 3. one simulation to rule them all: 100k full seasons incl. bracket ----------------
 sdv = {t: max(12.0, statistics.stdev(sc[t])) if len(sc[t]) > 1 else 20.0 for t in TEAMS}
+
+# ---------------- 2a. lock in the part of the current week already played ----------------
+# Starters whose NFL game has kicked off are locked into their slot at their
+# actual points: a banked score can't be benched, a benched player can't come
+# in, and only not-yet-kicked-off players fill the remaining slots (Sleeper's
+# own lineup-lock rules). Variance shrinks to the unlocked share of the lineup.
+WSD = {t: {w: sdv[t] for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS}
+NFL_ALIAS = {"LA": "LAR"}   # nflverse -> Sleeper team codes
+blended = False
+
+def nfl_game_state():
+    """(started, finished) NFL team sets for the current week. Kickoffs are in
+    ET (EST offset is close enough: no kickoff falls near the 5am run). A game
+    counts as finished 4.5h after kickoff; in between, players are locked into
+    their slot but valued at their full pre-game projection, because partial
+    live points are not a final score."""
+    get("https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+        RAW / "nfl_games.csv")
+    import csv as _csv
+    from datetime import datetime, timedelta, timezone
+    now_et = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(hours=5)
+    started, finished = set(), set()
+    with open(RAW / "nfl_games.csv", encoding="utf-8") as f:
+        for r in _csv.DictReader(f):
+            if r["season"] == str(season) and r["week"] == str(cur_week) and r["game_type"] == "REG":
+                ko = datetime.strptime(r["gameday"] + " " + (r.get("gametime") or "13:00"), "%Y-%m-%d %H:%M")
+                teams_ = {NFL_ALIAS.get(r[s], r[s]) for s in ("home_team", "away_team")}
+                if ko <= now_et:
+                    started.update(teams_)
+                if ko + timedelta(hours=4, minutes=30) <= now_et:
+                    finished.update(teams_)
+    return started, finished
+
+if weeks_left:
+    try:
+        started_nfl, finished_nfl = nfl_game_state()
+    except Exception as e:
+        print(f"current-week blend skipped ({e}); using pure projections")
+        started_nfl, finished_nfl = set(), set()
+    if started_nfl:
+        SKILL = {"QB", "RB", "WR", "TE"}
+        slots_all = [s for s in lg["roster_positions"] if s not in ("BN", "IR")]
+        mrows = {x["roster_id"]: x for x in json.load(open(yr_dir / f"matchups_{cur_week}.json"))}
+        rposmap = {r["roster_id"]: r for r in rosters}
+        for rid in TEAMS:
+            m = mrows.get(rid)
+            if not m:
+                continue
+            starters = m.get("starters") or []
+            ppts = m.get("players_points") or {}
+            locked_sum, open_slots, locked_pids, inplay = 0.0, [], set(), 0
+            for slot, pid in zip(slots_all, starters):
+                nflteam = (players.get(pid) or {}).get("team")
+                if pid and pid != "0" and nflteam in finished_nfl:
+                    locked_sum += ppts.get(pid) or 0.0        # final score, banked
+                    locked_pids.add(pid)
+                elif pid and pid != "0" and nflteam in started_nfl:
+                    locked_sum += lpoints(proj[cur_week].get(pid) or {})   # locked slot, game live
+                    locked_pids.add(pid)
+                    inplay += 1
+                else:
+                    open_slots.append((slot, pid))
+            # unlocked candidates: active roster, game not yet kicked off
+            r_ = rposmap[rid]
+            resv = set(r_.get("reserve") or [])
+            cand = sorted(((lpoints(proj[cur_week].get(p) or {}), players[p]["position"])
+                           for p in (r_["players"] or [])
+                           if p not in resv and p not in locked_pids
+                           and (players.get(p) or {}).get("position") in SKILL
+                           and (players.get(p) or {}).get("team") not in started_nfl), reverse=True)
+            pools = {pos: [c for c in cand if c[1] == pos] for pos in SKILL}
+            open_proj, flex_n = 0.0, 0
+            vals = []
+            for slot, pid in open_slots:
+                if slot in SKILL:
+                    vals.append((pools[slot].pop(0)[0] if pools[slot] else 0.0, slot))
+                elif slot == "FLEX":
+                    flex_n += 1
+                else:   # K, DEF etc: keep the current occupant, no mid-week streaming
+                    open_proj += lpoints(proj[cur_week].get(pid) or {})
+            flexpool = sorted(pools["RB"] + pools["WR"] + pools["TE"], reverse=True)
+            for i in range(flex_n):
+                vals.append((flexpool[i][0] if i < len(flexpool) else 0.0, "FLEX"))
+            for v, sl in vals:
+                if v < 0.5:
+                    v = max(repl[cur_week].get(p, 0) for p in ("RB", "WR", "TE")) if sl == "FLEX" else repl[cur_week].get(sl, 0)
+                open_proj += v
+            WP[rid][cur_week] = locked_sum + open_proj
+            WSD[rid][cur_week] = sdv[rid] * ((len(open_slots) + inplay) / max(1, len(slots_all))) ** 0.5
+        blended = True
+        print(f"current-week blend: {len(finished_nfl)} NFL teams final, "
+              f"{len(started_nfl) - len(finished_nfl)} in progress; "
+              f"week {cur_week} mixes banked points with projections for the rest")
 status = {}   # owner clinch/elimination status, filled by the solver or by the settled field
 N_TITLE = 100000
 title_counts = {k: {t: 0 for t in TEAMS} for k in ("made", "bye", "finals", "champs")}
@@ -168,7 +261,7 @@ if weeks_left:
         h2h = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
         losers = []
         for w, a, b in sched:
-            pa = gauss(WP[a][w], sdv[a]); pb = gauss(WP[b][w], sdv[b])
+            pa = gauss(WP[a][w], WSD[a][w]); pb = gauss(WP[b][w], WSD[b][w])
             if pa > pb:
                 wins[a] += 1; h2h[a][b][1] += 1; h2h[b][a][1] += 1; h2h[a][b][0] += 1
                 lo = b
@@ -191,7 +284,7 @@ if weeks_left:
             title_counts["made"][t] += 1
         title_counts["bye"][s1] += 1; title_counts["bye"][s2] += 1
         def game(x, y, w):
-            return x if gauss(WP[x][w], sdv[x]) >= gauss(WP[y][w], sdv[y]) else y
+            return x if gauss(WP[x][w], WSD[x][w]) >= gauss(WP[y][w], WSD[y][w]) else y
         q1 = game(s3, s6, PLAYOFF_WEEKS[0]); q2 = game(s4, s5, PLAYOFF_WEEKS[0])
         f1 = game(s1, q2, PLAYOFF_WEEKS[1]); f2 = game(s2, q1, PLAYOFF_WEEKS[1])
         title_counts["finals"][f1] += 1; title_counts["finals"][f2] += 1
@@ -631,6 +724,7 @@ if weeks_left:
         pweeks=PLAYOFF_WEEKS,
         proj={OWNER[t]: {str(w): round(WP[t][w], 1) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS},
         sd={OWNER[t]: round(sdv[t], 1) for t in TEAMS},
+        sdw=({OWNER[t]: round(WSD[t][cur_week], 1) for t in TEAMS} if blended else None),
         wins={OWNER[t]: wins0[t] for t in TEAMS},
         pf={OWNER[t]: round(pf0[t], 2) for t in TEAMS},
         h2hw={OWNER[t]: {OWNER[u]: h2h0[t][u][0] for u in TEAMS if u != t} for t in TEAMS},
@@ -648,7 +742,10 @@ now = dict(
                 key=lambda o: -o["pct"]),
     oddsnote="100,000 full-season simulations (regular season + playoff bracket). Weekly player "
              "projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver "
-             "add (top-5 free agent average). League tiebreakers applied.",
+             "add (top-5 free agent average). League tiebreakers applied."
+             + (" This week's finished games are locked in: those starters count at their actual "
+                "points in their actual slots, and only players who haven't kicked off are projected."
+                if blended else ""),
     week=cur_week,
     matchups=matchup_cards,
     elim=elim_cards,

@@ -4,87 +4,87 @@
  "odds": [
   {
    "owner": "Bob",
-   "playoffs": 96.43,
-   "bye": 47.87,
-   "final": 37.75,
-   "champ": 18.727
+   "playoffs": 98.69,
+   "bye": 65.06,
+   "final": 41.47,
+   "champ": 20.647
   },
   {
    "owner": "Lerch",
-   "playoffs": 92.65,
-   "bye": 40.52,
-   "final": 36.6,
-   "champ": 18.176
+   "playoffs": 97.55,
+   "bye": 54.44,
+   "final": 41.4,
+   "champ": 20.605
   },
   {
    "owner": "Austin",
-   "playoffs": 95.84,
-   "bye": 41.22,
-   "final": 32.57,
-   "champ": 16.49
-  },
-  {
-   "owner": "Cliff",
-   "playoffs": 84.21,
-   "bye": 34.11,
-   "final": 24.77,
-   "champ": 12.411
-  },
-  {
-   "owner": "Steve",
-   "playoffs": 79.55,
-   "bye": 15.83,
-   "final": 22.87,
-   "champ": 11.236
+   "playoffs": 92.53,
+   "bye": 26.26,
+   "final": 28.12,
+   "champ": 14.12
   },
   {
    "owner": "Mark",
-   "playoffs": 53.54,
-   "bye": 9.44,
-   "final": 19.82,
-   "champ": 10.47
+   "playoffs": 59.78,
+   "bye": 9.92,
+   "final": 21.89,
+   "champ": 11.632
+  },
+  {
+   "owner": "Cliff",
+   "playoffs": 81.43,
+   "bye": 29.16,
+   "final": 22.86,
+   "champ": 11.459
   },
   {
    "owner": "Martin",
-   "playoffs": 71.93,
-   "bye": 10.68,
-   "final": 20.32,
-   "champ": 10.24
+   "playoffs": 70.24,
+   "bye": 8.12,
+   "final": 19.17,
+   "champ": 9.777
+  },
+  {
+   "owner": "Steve",
+   "playoffs": 68.59,
+   "bye": 6.49,
+   "final": 17.62,
+   "champ": 8.613
   },
   {
    "owner": "Clancy",
-   "playoffs": 18.85,
-   "bye": 0.23,
-   "final": 4.56,
-   "champ": 1.956
+   "playoffs": 30.35,
+   "bye": 0.55,
+   "final": 7.38,
+   "champ": 3.106
   },
   {
    "owner": "Luke",
-   "playoffs": 6.73,
-   "bye": 0.1,
-   "final": 0.68,
-   "champ": 0.274
+   "playoffs": 0.69,
+   "bye": 0.0,
+   "final": 0.06,
+   "champ": 0.026
   },
   {
    "owner": "Sam",
-   "playoffs": 0.15,
+   "playoffs": 0.14,
    "bye": 0.0,
    "final": 0.03,
-   "champ": 0.011
+   "champ": 0.015
   },
   {
    "owner": "Will",
-   "playoffs": 0.11,
+   "playoffs": 0.0,
    "bye": 0.0,
-   "final": 0.03,
-   "champ": 0.008
+   "final": 0.0,
+   "champ": 0.0
   },
   {
    "owner": "Timmy",
-   "playoffs": 0.01,
+   "playoffs": 0.0,
    "bye": 0.0,
    "final": 0.0,
-   "champ": 0.001
+   "champ": 0.0
   }
  ]
 }

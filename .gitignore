@@ -1,6 +1,7 @@
 espn.txt
 data/raw/players.json
 data/raw/proj_cache_*.json
+data/raw/nfl_games.csv
 data/simout_*.json
 site/
 __pycache__/

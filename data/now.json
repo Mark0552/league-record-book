@@ -103,91 +103,91 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 96.4
-  },
-  {
-   "owner": "Austin",
-   "pct": 95.8
+   "pct": 98.7
   },
   {
    "owner": "Lerch",
-   "pct": 92.6
+   "pct": 97.6
+  },
+  {
+   "owner": "Austin",
+   "pct": 92.5
   },
   {
    "owner": "Cliff",
-   "pct": 84.2
-  },
-  {
-   "owner": "Steve",
-   "pct": 79.6
+   "pct": 81.4
   },
   {
    "owner": "Martin",
-   "pct": 71.9
+   "pct": 70.2
+  },
+  {
+   "owner": "Steve",
+   "pct": 68.6
   },
   {
    "owner": "Mark",
-   "pct": 53.5
+   "pct": 59.8
   },
   {
    "owner": "Clancy",
-   "pct": 18.8
+   "pct": 30.4
   },
   {
    "owner": "Luke",
-   "pct": 6.7
-  },
-  {
-   "owner": "Will",
-   "pct": 0.1
+   "pct": 0.7
   },
   {
    "owner": "Sam",
    "pct": 0.1
   },
   {
+   "owner": "Will",
+   "pct": 0.0
+  },
+  {
    "owner": "Timmy",
    "pct": 0.0
   }
  ],
- "oddsnote": "100,000 full-season simulations (regular season + playoff bracket). Weekly player projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free agent average). League tiebreakers applied.",
+ "oddsnote": "100,000 full-season simulations (regular season + playoff bracket). Weekly player projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free agent average). League tiebreakers applied. This week's finished games are locked in: those starters count at their actual points in their actual slots, and only players who haven't kicked off are projected.",
  "week": 9,
  "matchups": [
   {
    "a": "Sam",
-   "pa": 88.2,
+   "pa": 115.7,
    "b": "Steve",
-   "pb": 92.9
+   "pb": 106.4
   },
   {
    "a": "Mark",
-   "pa": 110.1,
+   "pa": 133.1,
    "b": "Timmy",
-   "pb": 84.3
+   "pb": 79.0
   },
   {
    "a": "Will",
-   "pa": 99.9,
+   "pa": 89.6,
    "b": "Bob",
-   "pb": 101.2
+   "pb": 116.8
   },
   {
    "a": "Lerch",
-   "pa": 94.0,
+   "pa": 136.4,
    "b": "Austin",
-   "pb": 95.7
+   "pb": 113.7
   },
   {
    "a": "Clancy",
-   "pa": 88.0,
+   "pa": 104.8,
    "b": "Luke",
-   "pb": 96.5
+   "pb": 74.9
   },
   {
    "a": "Martin",
-   "pa": 90.9,
+   "pa": 115.8,
    "b": "Cliff",
-   "pb": 92.4
+   "pb": 115.6
   }
  ],
  "elim": [],
@@ -545,7 +545,7 @@
   ],
   "proj": {
    "Mark": {
-    "9": 110.1,
+    "9": 133.1,
     "10": 104.1,
     "11": 84.2,
     "12": 107.3,
@@ -556,7 +556,7 @@
     "17": 107.2
    },
    "Clancy": {
-    "9": 88.0,
+    "9": 104.8,
     "10": 96.3,
     "11": 90.6,
     "12": 98.9,
@@ -567,7 +567,7 @@
     "17": 98.4
    },
    "Will": {
-    "9": 99.9,
+    "9": 89.6,
     "10": 92.6,
     "11": 75.2,
     "12": 93.3,
@@ -578,7 +578,7 @@
     "17": 99.1
    },
    "Sam": {
-    "9": 88.2,
+    "9": 115.7,
     "10": 89.7,
     "11": 89.6,
     "12": 90.8,
@@ -589,7 +589,7 @@
     "17": 88.3
    },
    "Steve": {
-    "9": 92.9,
+    "9": 106.4,
     "10": 100.5,
     "11": 107.8,
     "12": 101.5,
@@ -600,7 +600,7 @@
     "17": 102.7
    },
    "Timmy": {
-    "9": 84.3,
+    "9": 79.0,
     "10": 72.1,
     "11": 87.8,
     "12": 85.2,
@@ -611,7 +611,7 @@
     "17": 87.7
    },
    "Bob": {
-    "9": 101.2,
+    "9": 116.8,
     "10": 102.0,
     "11": 84.5,
     "12": 107.1,
@@ -622,7 +622,7 @@
     "17": 102.8
    },
    "Lerch": {
-    "9": 94.0,
+    "9": 136.4,
     "10": 97.7,
     "11": 95.2,
     "12": 106.2,
@@ -633,7 +633,7 @@
     "17": 103.3
    },
    "Martin": {
-    "9": 90.9,
+    "9": 115.8,
     "10": 98.6,
     "11": 95.8,
     "12": 99.0,
@@ -644,7 +644,7 @@
     "17": 103.9
    },
    "Luke": {
-    "9": 96.5,
+    "9": 74.9,
     "10": 76.3,
     "11": 94.1,
     "12": 97.1,
@@ -655,7 +655,7 @@
     "17": 95.7
    },
    "Austin": {
-    "9": 95.7,
+    "9": 113.7,
     "10": 100.0,
     "11": 102.5,
     "12": 96.1,
@@ -666,7 +666,7 @@
     "17": 103.5
    },
    "Cliff": {
-    "9": 92.4,
+    "9": 115.6,
     "10": 83.5,
     "11": 99.2,
     "12": 100.7,
@@ -690,6 +690,20 @@
    "Luke": 12.0,
    "Austin": 19.1,
    "Cliff": 21.0
+  },
+  "sdw": {
+   "Mark": 0.0,
+   "Clancy": 4.0,
+   "Will": 0.0,
+   "Sam": 10.4,
+   "Steve": 4.5,
+   "Timmy": 12.9,
+   "Bob": 0.0,
+   "Lerch": 0.0,
+   "Martin": 9.5,
+   "Luke": 0.0,
+   "Austin": 6.4,
+   "Cliff": 7.0
   },
   "wins": {
    "Mark": 4,

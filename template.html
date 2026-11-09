@@ -420,9 +420,12 @@ if(now.standings){
   const pavg = {}; T.forEach(t=>{ const v=Object.values(M.proj[t]); pavg[t]=v.reduce((s,x)=>s+x,0)/v.length; });
   const mproj = (t,w)=>{ const v=M.proj[t][String(w)]; return v!=null?v:pavg[t]; };
   const wkList = Object.keys(M.weeks).map(Number).sort((a,b)=>a-b);
+  // current week may be partially played: its means are blended (banked points +
+  // projections) and its sd is shrunk to the unplayed share of the lineup
+  const sdFor = (t,w)=> (M.sdw && w===wkList[0] && M.sdw[t]!=null) ? M.sdw[t] : M.sd[t];
   const sched = [];
   for(const w of wkList) for(const [a,b] of M.weeks[String(w)])
-    sched.push({w, a:idx[a], b:idx[b], an:a, bn:b, key:w+'|'+a+'|'+b, ma:mproj(a,w), mb:mproj(b,w)});
+    sched.push({w, a:idx[a], b:idx[b], an:a, bn:b, key:w+'|'+a+'|'+b, ma:mproj(a,w), mb:mproj(b,w), da:sdFor(a,w), db:sdFor(b,w)});
   const PW = M.pweeks;
   const pwMean = PW.map(w => T.map(t => mproj(t,w)));   // pwMean[round][teamIdx]
   const picks = {};   // key -> owner name
@@ -500,7 +503,7 @@ if(now.standings){
       const wins = winsBase.slice(), pf = pfBase.slice(), h2h = h2hBase.slice();
       for(let i=0;i<sched.length;i++){
         const g = sched[i];
-        let pa = gauss(g.ma, sdA[g.a]), pb = gauss(g.mb, sdA[g.b]);
+        let pa = gauss(g.ma, g.da), pb = gauss(g.mb, g.db);
         const pc = pickCode[i];
         if((pc===1 && pa<=pb) || (pc===2 && pb<=pa)){ const t=pa; pa=pb; pb=t; }
         if(pa>pb){ wins[g.a]++; h2h[g.a*n+g.b]++; } else { wins[g.b]++; h2h[g.b*n+g.a]++; }
