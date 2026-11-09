@@ -2,14 +2,15 @@ name: Daily update
 on:
   schedule:
     # odd minutes on purpose: GitHub's scheduler is most congested at :00
-    - cron: '23 10 * * *'          # daily full update, ~5:23 AM ET (GitHub may run it late)
-    # live odds during NFL game windows (UTC, padded an hour for DST):
-    - cron: '7,27,47 17-23 * * 0'  # Sunday afternoon slates
-    - cron: '7,27,47 0-4 * * 1'    # Sunday night football
-    - cron: '7,27,47 1-4 * * 2'    # Monday night football
-    - cron: '7,27,47 1-4 * * 5'    # Thursday night football
-    - cron: '7,27,47 18-23 * * 6'  # Saturday slates (late season)
-    - cron: '7,27,47 0-3 * * 0'    # Saturday night games (late season)
+    - cron: '23 10 * * *'                   # daily full update, ~5:23 AM ET
+    - cron: '23 0,4,8,12,16,20 * * *'       # every 4 hours; commits only when something changed
+    # live odds every 10 min during NFL game windows (UTC, padded an hour for DST):
+    - cron: '3,13,23,33,43,53 17-23 * * 0'  # Sunday afternoon slates
+    - cron: '3,13,23,33,43,53 0-4 * * 1'    # Sunday night football
+    - cron: '3,13,23,33,43,53 1-4 * * 2'    # Monday night football
+    - cron: '3,13,23,33,43,53 1-4 * * 5'    # Thursday night football
+    - cron: '3,13,23,33,43,53 18-23 * * 6'  # Saturday slates (late season)
+    - cron: '3,13,23,33,43,53 0-3 * * 0'    # Saturday night games (late season)
   workflow_dispatch:
 permissions:
   contents: write
@@ -45,7 +46,11 @@ jobs:
                 echo "only the build timestamp changed - skipping commit"; exit 0
               fi
             fi
-            MSG="Live odds update $(date -u +%FT%H:%MZ)"
+            if [ "${{ github.event.schedule }}" = "23 0,4,8,12,16,20 * * *" ]; then
+              MSG="Interim update $(date -u +%FT%H:%MZ)"
+            else
+              MSG="Live odds update $(date -u +%FT%H:%MZ)"
+            fi
           else
             MSG="Daily auto-update $(date -u +%F)"
           fi
