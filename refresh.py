@@ -383,8 +383,15 @@ if weeks_left:
                     x_, y_ = (a, b) if p > q else (b, a)
                     wi[x_] += 1; h2i[x_][y_][0] += 1
                 h2i[a][b][1] += 1; h2i[b][a][1] += 1
-        mean = {t: (sum(sci[t]) / len(sci[t]) if sci[t] else 110.0) for t in TEAMS}
-        sd_ = {t: max(12.0, statistics.stdev(sci[t])) if len(sci[t]) > 1 else 22.0 for t in TEAMS}
+        # regress scores-to-date toward the league average (a ~5-game prior):
+        # one hot or cold week is mostly noise, not true talent
+        allsc = [s for t in TEAMS for s in sci[t]]
+        lg_avg = sum(allsc) / len(allsc) if allsc else 110.0
+        lg_sd = statistics.stdev(allsc) if len(allsc) > 1 else 22.0
+        K = 5.0
+        mean = {t: (sum(sci[t]) + K * lg_avg) / (len(sci[t]) + K) for t in TEAMS}
+        sd_ = {t: (max(12.0, statistics.stdev(sci[t])) if len(sci[t]) > 3 else max(12.0, lg_sd))
+               for t in TEAMS}
         schedR = [(a, b) for ww in range(w, PSTART) for a, b, *_ in games[ww]]
         made_ = {t: 0 for t in TEAMS}; champ_ = {t: 0 for t in TEAMS}
         random.seed(5)
