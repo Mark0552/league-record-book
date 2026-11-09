@@ -149,6 +149,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note" id="oddsnote"></div></div>
     <div class="card" id="clinchcard" style="display:none"><h2>Clinch watch</h2><div id="clinches"></div><div class="note" id="clinchnote"></div></div>
     <div class="card" id="elimcard"><h2>Elimination watch</h2><div id="elims"></div><div class="note" id="elimnote"></div></div>
+    <div class="card" id="pathcard" style="display:none"><h2>Longshot survival paths</h2><div id="paths"></div><div class="note" id="pathnote"></div></div>
     <div class="card" id="bwbcard" style="display:none"><h2 id="bwbhdr">🏆 Buck Wong Bowl bracket</h2><div id="bwb"></div>
       <div class="note" id="bwbnote">Seeds 1-2 (division winners) have byes into the semifinals.</div></div>
     <div class="card" id="lccard" style="display:none"><h2 id="lchdr">🥄 Lerch Cup bracket</h2><div id="lc"></div>
@@ -368,6 +369,12 @@ if(now.standings){
     $('elimnote').textContent = [(now.elim||[]).length ? now.elimnote : '', now.brinknote || ''].filter(Boolean).join(' ');
   } else {
     $('elimcard').style.display = 'none';
+  }
+  if((now.paths||[]).length){
+    $('pathcard').style.display = '';
+    $('paths').innerHTML = now.paths.map(p=>
+      `<div class="elim" style="border-left-color:var(--gold)"><b>${esc(p.owner)} (${esc(p.rec)})</b><div style="margin-top:4px;font-size:13px;color:var(--ink2);line-height:1.45">${esc(p.text)}</div></div>`).join('');
+    $('pathnote').textContent = now.pathnote || '';
   }
   if((now.clinch||[]).length){
     $('clinchcard').style.display = '';

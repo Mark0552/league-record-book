@@ -618,6 +618,96 @@ if weeks_left:
                 clinch_cards.append(dict(owner=OWNER[x], kind="spot",
                                          needs=factor_conditions(spot_combos, week_games)))
 
+# ---------------- 4a2. longshot survival paths ----------------
+# For every team still mathematically alive but under 2% simulated odds, search
+# the remaining schedule for its easiest surviving world and write it up: the
+# win-out requirement, who has to collapse and how far, the final tie shape,
+# and the points-for hill inside that tie.
+paths_cards = []
+if weeks_left and not FAST:
+    print("writing longshot survival paths ...")
+    REGW = PSTART - 1
+    # current-week games already decided on the field (both lineups final)
+    pre_wins = dict(wins0)
+    decided_pairs = set()
+    if blended:
+        for a, b in future.get(cur_week, []):
+            if WSD[a][cur_week] == 0 and WSD[b][cur_week] == 0 and WP[a][cur_week] != WP[b][cur_week]:
+                pre_wins[a if WP[a][cur_week] > WP[b][cur_week] else b] += 1
+                decided_pairs.add(frozenset((a, b)))
+    sched_open = [(w, a, b) for w in sorted(future) for a, b in future[w]
+                  if not (w == cur_week and frozenset((a, b)) in decided_pairs)]
+    left = {t: sum(1 for _, a, b in sched_open if t in (a, b)) for t in TEAMS}
+
+    def final_alive(x, fw):
+        """Tie-agnostic qualification on a FINAL wins table."""
+        others = [t for t in TEAMS if t != x]
+        M = fw[x]
+        forced = [t for t in others if fw[t] > M]
+        if len(forced) > 5:
+            return False
+        otherdiv = frozenset(t for t in others if division[t] != division[x])
+        cands = ([otherdiv] if all(f in otherdiv for f in forced) else [])
+        for S in itertools.combinations(others, 5):
+            if {division[t] for t in S} == {1, 2} and all(f in S for f in forced):
+                cands.append(frozenset(S))
+        return any(all(fw[y] <= M for y in others if y not in S) for S in cands)
+
+    for x in TEAMS:
+        pct = 100 * made[x] / N
+        if status.get(x) == "out" or pct >= 2.0:
+            continue
+        maxw = pre_wins[x] + left[x]
+        random.seed(11)
+        best = None
+        for _ in range(150000):
+            fw = dict(pre_wins)
+            fw[x] = maxw
+            for w, a, b in sched_open:
+                if x in (a, b):
+                    continue
+                lo_, hi_ = (a, b) if pre_wins[a] <= pre_wins[b] else (b, a)
+                fw[lo_ if random.random() < 0.65 else hi_] += 1   # collapse-friendly worlds
+            if final_alive(x, fw):
+                above = sum(1 for t in TEAMS if t != x and fw[t] > fw[x])
+                if best is None or above < best[0]:
+                    best = (above, dict(fw))
+        if not best:
+            continue
+        above, fw = best
+        spots = 6 - above
+        group = [t for t in TEAMS if t != x and fw[t] == fw[x]]
+        rec = f"{maxw}-{REGW - maxw}"
+        prec = lambda t: f"{pre_wins[t]}-{REGW - left[t] - pre_wins[t]}"
+        collapse = []
+        for t in sorted(group, key=lambda t: -pre_wins[t]):
+            allow = maxw - pre_wins[t]
+            collapse.append(f"{OWNER[t]} ({prec(t)}) can't win again" if allow <= 0
+                            else f"{OWNER[t]} ({prec(t)}) can win at most {allow} more")
+        text = f"Even winning out only gets {OWNER[x]} to {rec} — and the path needs the middle to collapse: " \
+               + "; ".join(collapse) + ". "
+        r_needed = len(group) - (spots - 1)
+        if not group or r_needed <= 0:
+            text += (f"That leaves a {len(group) + 1}-way tie at {rec} with room for everyone inside the field — "
+                     "win out and the spot is there." if group else
+                     f"In that world {OWNER[x]} slots straight into the field at {rec}.")
+        else:
+            text += (f"That leaves a {len(group) + 1}-way tie at {rec} for the last "
+                     + (f"{spots} spots" if spots > 1 else "spot") + ". ")
+            mixed = len({division[t] for t in group + [x]}) > 1
+            rivals_pf = sorted((pf0[t], OWNER[t]) for t in group)
+            binding_pf, binding_name = rivals_pf[r_needed - 1]
+            gap = binding_pf - pf0[x]
+            tiebk = ("The tie crosses divisions, so it falls to season points-for: "
+                     if mixed else "The tie falls to the league tiebreakers: ")
+            if gap > 0:
+                text += (tiebk + f"{OWNER[x]} ({pf0[x]:.1f}) must out-score {r_needed} of the {len(group)} — "
+                         f"at minimum overtaking {binding_name}, currently {gap:.1f} points ahead.")
+            else:
+                text += tiebk + f"{OWNER[x]} ({pf0[x]:.1f}) already leads the group's points race."
+        text += f" Simulated odds: {pct:.1f}%."
+        paths_cards.append(dict(owner=OWNER[x], rec=prec(x), text=text))
+
 # ---------------- 4b. playoff brackets (appear automatically once seeded) ----------------
 def bracket_view(bracket, final_label):
     if not bracket:
@@ -752,6 +842,8 @@ now = dict(
     elimnote=elimnote,
     brink=brink_cards,
     brinknote="On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out." if brink_cards else "",
+    paths=paths_cards,
+    pathnote="The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week." if paths_cards else "",
     clinch=clinch_cards,
     clinchnote="Lock up a playoff spot no matter what happens the rest of the season." if clinch_cards else "",
     brackets=brackets,
