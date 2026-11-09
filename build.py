@@ -1227,7 +1227,8 @@ if Path("data/title_odds.json").exists():
 
 # ---------------- payload ----------------
 payload = dict(
-    updated="through week 8, 2026",
+    updated=(lambda cw: f"through week {max(cw)}, {CUR_SEASON}" if cw else f"preseason {CUR_SEASON}")(
+        [g["week"] for g in games if g["year"] == CUR_SEASON]),
     owners=OWNERS,
     active=list(ROSTER_OWNER_2026.values()),
     games=[[g["year"], g["week"], g["type"][0], g["a"], g["sa"], g["b"], g["sb"]] for g in games],
