@@ -411,7 +411,7 @@ if weeks_left:
         return dict(playoffs={OWNER[t]: round(100 * made_[t] / nsims, 1) for t in TEAMS},
                     champ={OWNER[t]: round(100 * champ_[t] / nsims, 2) for t in TEAMS})
     _oh_changed = False
-    for w in range(2, cur_week):
+    for w in range(1, cur_week):   # week 1 = the post-draft, everyone-even baseline
         if w not in odds_hist:
             print(f"backfilling odds history for week {w} ...")
             odds_hist[w] = retro_odds(w)

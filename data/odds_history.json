@@ -1,6 +1,36 @@
 {
  "season": "2026",
  "weeks": {
+  "1": {
+   "playoffs": {
+    "Mark": 50.3,
+    "Clancy": 49.5,
+    "Will": 50.0,
+    "Sam": 50.1,
+    "Steve": 49.3,
+    "Timmy": 49.7,
+    "Bob": 49.9,
+    "Lerch": 50.8,
+    "Martin": 49.9,
+    "Luke": 50.1,
+    "Austin": 50.6,
+    "Cliff": 49.9
+   },
+   "champ": {
+    "Mark": 8.34,
+    "Clancy": 7.96,
+    "Will": 8.7,
+    "Sam": 8.68,
+    "Steve": 8.0,
+    "Timmy": 7.91,
+    "Bob": 8.35,
+    "Lerch": 8.5,
+    "Martin": 8.46,
+    "Luke": 8.23,
+    "Austin": 8.56,
+    "Cliff": 8.32
+   }
+  },
   "2": {
    "playoffs": {
     "Mark": 1.7,
