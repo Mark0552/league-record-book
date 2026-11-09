@@ -27,23 +27,6 @@ def api(path):
     with urllib.request.urlopen(f"https://api.sleeper.app/v1/{path}", timeout=60) as r:
         return json.load(r)
 
-# ---------------- 1. refresh live data ----------------
-print("fetching league data ...")
-lg = api(f"league/{LEAGUE_ID}")
-season = lg["season"]
-yr_dir = RAW / "sleeper" / season
-get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}", yr_dir / "league.json")
-for name in ("users", "rosters", "winners_bracket", "losers_bracket"):
-    get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/{name}", yr_dir / f"{name}.json")
-for w in range(1, 19):
-    get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/matchups/{w}", yr_dir / f"matchups_{w}.json")
-    get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/transactions/{w}", yr_dir / f"transactions_{w}.json")
-print("fetching players + sheet ...")
-get("https://api.sleeper.app/v1/players/nfl", RAW / "players.json")
-for name, gid in SHEET_TABS.items():
-    get(f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={gid}",
-        RAW / "sheet" / f"{name}.csv")
-
 # ---------------- 1b. publications: news feeds for the Publications tab ----------------
 # Fetched here because a static page can't read RSS cross-origin; a failed
 # fetch keeps the feed's last good copy from data/feeds.json.
@@ -104,6 +87,31 @@ def refresh_feeds():
     print(f"publications: {len(out)} feeds, {sum(len(f['items']) for f in out)} headlines")
 print("fetching news feeds ...")
 refresh_feeds()
+
+if '--news-only' in sys.argv:
+    # headlines-only run: fetch the player map the builder needs, rebuild, done
+    get('https://api.sleeper.app/v1/players/nfl', RAW / 'players.json')
+    import subprocess
+    subprocess.run([sys.executable, '-I', 'build.py', 'data/raw'], check=True)
+    print('news-only refresh complete')
+    sys.exit(0)
+
+# ---------------- 1. refresh live data ----------------
+print("fetching league data ...")
+lg = api(f"league/{LEAGUE_ID}")
+season = lg["season"]
+yr_dir = RAW / "sleeper" / season
+get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}", yr_dir / "league.json")
+for name in ("users", "rosters", "winners_bracket", "losers_bracket"):
+    get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/{name}", yr_dir / f"{name}.json")
+for w in range(1, 19):
+    get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/matchups/{w}", yr_dir / f"matchups_{w}.json")
+    get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/transactions/{w}", yr_dir / f"transactions_{w}.json")
+print("fetching players + sheet ...")
+get("https://api.sleeper.app/v1/players/nfl", RAW / "players.json")
+for name, gid in SHEET_TABS.items():
+    get(f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={gid}",
+        RAW / "sheet" / f"{name}.csv")
 
 def refresh_trade_values(ros_vor, es_vor):
     """Trade-calculator value tables: FantasyCalc (league-matched settings),
@@ -198,6 +206,34 @@ print(f"season {season}: {last_scored} weeks scored, current week {cur_week}")
 
 rosters = json.load(open(yr_dir / "rosters.json"))
 players = json.load(open(RAW / "players.json", encoding="utf-8"))
+
+# ---------------- 1c. injury snapshot (lets the live gate spot changes) ----------------
+def write_injury_snapshot():
+    try:
+        rostered = set()
+        for r in rosters:
+            rostered.update(r.get("players") or [])
+        names = {"".join(ch for ch in (players.get(p, {}).get("full_name") or "").lower() if ch.isalpha())
+                 for p in rostered}
+        names.discard("")
+        req = urllib.request.Request(
+            "https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries",
+            headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            inj = json.load(r)
+        statuses = {}
+        for t in inj.get("injuries", []):
+            for i in t.get("injuries", []):
+                nm = "".join(ch for ch in ((i.get("athlete") or {}).get("displayName") or "").lower()
+                             if ch.isalpha())
+                if nm in names:
+                    statuses[nm] = i.get("status") or ""
+        json.dump(dict(names=sorted(names), statuses=dict(sorted(statuses.items()))),
+                  open("data/injury_snapshot.json", "w", encoding="utf-8"))
+        print(f"injury snapshot: {len(statuses)} rostered players on the report")
+    except Exception as e:
+        print(f"  injury snapshot failed: {e}")
+write_injury_snapshot()
 division = {r["roster_id"]: r["settings"].get("division") for r in rosters}
 TEAMS = sorted(OWNER)
 D = {1: [t for t in TEAMS if division[t] == 1], 2: [t for t in TEAMS if division[t] == 2]}

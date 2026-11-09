@@ -4,14 +4,15 @@ on:
     # odd minutes on purpose: GitHub's scheduler is most congested at :00
     - cron: '23 10 * * *'              # daily full update, ~5:23 AM ET
     - cron: '23 0,4,8,12,16,20 * * *'  # every 4 hours; commits only when something changed
-    # live-odds gate: fires every 10 min through the NFL's possible game hours
-    # (every day â€” holiday games float), then checks the real schedule and
-    # exits in seconds unless a game is actually live right now
-    - cron: '3,13,23,33,43,53 0-5,13-23 * * *'
+    # live-odds gate: fires every 5 min through the NFL's possible game hours
+    # (every day — holiday games float), then checks the real schedule and
+    # exits in seconds unless a game is live, a rostered player's injury
+    # status changed, or it's a half-hourly news tick
+    - cron: '3,8,13,18,23,28,33,38,43,48,53,58 0-5,13-23 * * *'
   workflow_dispatch:
     inputs:
       mode:
-        description: 'manual = always run and publish; live = run only when an NFL game is on'
+        description: 'manual = always run and publish; live = run only when the gate says so'
         required: false
         default: 'manual'
 permissions:
@@ -20,19 +21,20 @@ concurrency:
   group: update
   cancel-in-progress: false
 env:
-  GATE_CRON: '3,13,23,33,43,53 0-5,13-23 * * *'
+  GATE_CRON: '3,8,13,18,23,28,33,38,43,48,53,58 0-5,13-23 * * *'
   INTERIM_CRON: '23 0,4,8,12,16,20 * * *'
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Is an NFL game live right now?
+      - uses: actions/checkout@v4
+      - name: Gate - live game, injury change, or news tick?
         id: live
         if: (github.event_name == 'schedule' && github.event.schedule == env.GATE_CRON) || (github.event_name == 'workflow_dispatch' && inputs.mode == 'live')
         run: |
           curl -sL https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv -o /tmp/games.csv
           python3 - <<'EOF' >> "$GITHUB_OUTPUT"
-          import csv
+          import csv, json, urllib.request
           from datetime import datetime, timedelta
           from zoneinfo import ZoneInfo
           now = datetime.now(ZoneInfo("America/New_York")).replace(tzinfo=None)
@@ -49,21 +51,49 @@ jobs:
                   if ko - timedelta(minutes=10) <= now <= ko + timedelta(hours=4, minutes=30):
                       live = True
                       break
+          # no game on: refresh just the news tab on the half-hour ticks
+          news = (not live) and now.minute % 30 < 5
+          # did a rostered player's injury status change since the last full run?
+          inj_changed = False
+          if not live:
+              try:
+                  snap = json.load(open("data/injury_snapshot.json", encoding="utf-8"))
+                  req = urllib.request.Request(
+                      "https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries",
+                      headers={"User-Agent": "Mozilla/5.0"})
+                  with urllib.request.urlopen(req, timeout=20) as r:
+                      d = json.load(r)
+                  names = set(snap.get("names", []))
+                  cur = {}
+                  for t in d.get("injuries", []):
+                      for i in t.get("injuries", []):
+                          nm = "".join(ch for ch in ((i.get("athlete") or {}).get("displayName") or "").lower()
+                                       if ch.isalpha())
+                          if nm in names:
+                              cur[nm] = i.get("status") or ""
+                  inj_changed = cur != snap.get("statuses", {})
+              except Exception as e:
+                  print("injury check skipped:", e)
           print(f"live={'true' if live else 'false'}")
+          print(f"news={'true' if news else 'false'}")
+          print(f"injuries={'true' if inj_changed else 'false'}")
           EOF
-      - uses: actions/checkout@v4
-        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true'
       - uses: actions/setup-python@v5
-        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true'
+        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true' || steps.live.outputs.news == 'true' || steps.live.outputs.injuries == 'true'
         with:
           python-version: '3.12'
       - name: Refresh data, run simulations, rebuild site
-        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true'
+        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true' || steps.live.outputs.injuries == 'true'
         run: |
           python refresh.py
           cp site/index.html index.html
+      - name: Refresh headlines only
+        if: steps.live.outputs.news == 'true' && steps.live.outputs.injuries != 'true'
+        run: |
+          python refresh.py --news-only
+          cp site/index.html index.html
       - name: Commit and publish
-        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true'
+        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true' || steps.live.outputs.news == 'true' || steps.live.outputs.injuries == 'true'
         run: |
           git config user.name "record-book-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -81,6 +111,10 @@ jobs:
             fi
             if [ "${{ github.event.schedule }}" = "${{ env.INTERIM_CRON }}" ]; then
               MSG="Interim update $(date -u +%FT%H:%MZ)"
+            elif [ "${{ steps.live.outputs.injuries }}" = "true" ]; then
+              MSG="Injury update $(date -u +%FT%H:%MZ)"
+            elif [ "${{ steps.live.outputs.news }}" = "true" ]; then
+              MSG="News update $(date -u +%FT%H:%MZ)"
             else
               MSG="Live odds update $(date -u +%FT%H:%MZ)"
             fi
