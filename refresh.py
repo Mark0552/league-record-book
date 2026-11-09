@@ -52,6 +52,9 @@ FEEDS = [
     ("Yahoo Fantasy", "https://sports.yahoo.com/fantasy/rss.xml"),
     ("CBS NFL", "https://www.cbssports.com/rss/headlines/nfl"),
     ("RotoWire", "https://www.rotowire.com/rss/news.php?sport=NFL"),
+    ("RotoBaller News", "https://www.rotoballer.com/player-news/feed"),
+    ("RotoBaller NFL", "https://www.rotoballer.com/category/nfl/feed"),
+    ("PFF", "https://www.pff.com/feed"),
     ("PFT Rumors", "https://www.profootballrumors.com/feed"),
 ]
 def refresh_feeds():
@@ -85,7 +88,7 @@ def refresh_feeds():
                 d = _refx.sub(r"\s+", " ", _refx.sub(r"<[^>]+>", " ",
                               _html.unescape(it.findtext("description") or ""))).strip()
                 items.append(dict(t=t, u=u, ts=ts, d=(d[:177] + "…") if len(d) > 180 else d))
-                if len(items) >= 15:
+                if len(items) >= 25:
                     break
             if items:
                 out.append(dict(name=name, items=items))
