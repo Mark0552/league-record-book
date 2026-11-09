@@ -1,14 +1,15 @@
 name: Daily update
 on:
   schedule:
-    - cron: '0 10 * * *'        # daily full update, ~5:00 AM ET (GitHub may run it late)
+    # odd minutes on purpose: GitHub's scheduler is most congested at :00
+    - cron: '23 10 * * *'          # daily full update, ~5:23 AM ET (GitHub may run it late)
     # live odds during NFL game windows (UTC, padded an hour for DST):
-    - cron: '*/20 17-23 * * 0'  # Sunday afternoon slates
-    - cron: '*/20 0-4 * * 1'    # Sunday night football
-    - cron: '*/20 1-4 * * 2'    # Monday night football
-    - cron: '*/20 1-4 * * 5'    # Thursday night football
-    - cron: '*/20 18-23 * * 6'  # Saturday slates (late season)
-    - cron: '*/20 0-3 * * 0'    # Saturday night games (late season)
+    - cron: '7,27,47 17-23 * * 0'  # Sunday afternoon slates
+    - cron: '7,27,47 0-4 * * 1'    # Sunday night football
+    - cron: '7,27,47 1-4 * * 2'    # Monday night football
+    - cron: '7,27,47 1-4 * * 5'    # Thursday night football
+    - cron: '7,27,47 18-23 * * 6'  # Saturday slates (late season)
+    - cron: '7,27,47 0-3 * * 0'    # Saturday night games (late season)
   workflow_dispatch:
 permissions:
   contents: write
@@ -37,7 +38,7 @@ jobs:
           fi
           # In-game runs: skip the commit when only the build timestamp moved
           # (no scores, odds or data actually changed), so quiet windows stay quiet.
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" != "0 10 * * *" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" != "23 10 * * *" ]; then
             if [ "$(git diff --cached --name-only)" = "index.html" ]; then
               strip_ts() { sed -E 's/"built_ts": "[^"]*"/TS/; s/"built": "[^"]*"/B/'; }
               if diff <(git show HEAD:index.html | strip_ts) <(strip_ts < index.html) > /dev/null; then
