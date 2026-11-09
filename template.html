@@ -257,6 +257,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Bold = won that week. Gold = league's top score of the week. (n) and the cell color = where the score ranked league-wide that week: green = best, red = worst.</div></div>
     <div class="card"><h2>Scoring distribution</h2><div id="ss_dist"></div>
       <div class="note">Each team's weekly scores: whisker = min to max, box = middle half (Q1&ndash;Q3), bright tick = median. Sorted by median.</div></div>
+    <div class="card"><h2 id="ss_rec_h">Season records</h2><div id="ss_records"></div>
+      <div class="note">That season only &mdash; every game counts, playoffs and consolation included; streaks are regular-season. Tap a game for both lineups.</div></div>
     <div class="card swcard" data-sw="0"><h2>Brackets</h2>
       <div class="swtabs"><button class="swtab on">🏆 Playoffs</button><button class="swtab">🥄 Consolation</button></div>
       <div class="swpane on"><div id="ss_playoffs"></div></div>
@@ -906,6 +908,47 @@ function renderSeason(){
       rws.map((r,i)=>`<tr><td><b>${esc(r.o)}</b>${i===0?` <span class="badge div">${tag}</span>`:''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td></tr>`).join('') +
       '</table></div>';
   }).join('') : '<div class="note">No division data recorded for this season.</div>';
+  // season records: this year's bests and worsts, from the game log
+  (function(){
+    $('ss_rec_h').textContent = year + ' records';
+    const yg = G.filter(g=>g[0]===year);
+    const ex = [];
+    for(const g of yg){
+      ex.push({pts:g[4], o:g[3], opp:g[5], op:g[6], g});
+      ex.push({pts:g[6], o:g[5], opp:g[3], op:g[4], g});
+    }
+    const att = g => `class="lurow" style="cursor:pointer" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"`;
+    const li = (v, g, body) => `<li ${att(g)}><span class="v">${v}</span><span>${body}</span></li>`;
+    const sub = t => `<div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink2);margin:10px 0 2px">${t}</div>`;
+    const srt = ex.slice().sort((a,b)=>b.pts-a.pts);
+    const scoreRow = e => li(f2(e.pts), e.g, `<b>${esc(e.o)}</b> <span class="d">vs ${esc(e.opp)} · wk${e.g[1]}</span>`);
+    const margins = yg.map(g=>({m:Math.abs(g[4]-g[6]), g})).filter(x=>x.m>0).sort((a,b)=>b.m-a.m);
+    const mRow = (x, verb) => { const g=x.g, w=g[4]>g[6]?g[3]:g[5], l=g[4]>g[6]?g[5]:g[3];
+      return li(f2(x.m), g, `<b>${esc(w)}</b> <span class="d">${verb} ${esc(l)} (${f1(Math.max(g[4],g[6]))}–${f1(Math.min(g[4],g[6]))}) · wk${g[1]}</span>`); };
+    const shoot = yg.map(g=>({t:g[4]+g[6], g})).sort((a,b)=>b.t-a.t)[0];
+    const hb = ex.filter(e=>e.pts<e.op).sort((a,b)=>b.pts-a.pts)[0];
+    const rob = ex.filter(e=>e.pts>e.op).sort((a,b)=>a.pts-b.pts)[0];
+    const seq = {};
+    for(const g of G.filter(g=>g[0]===year&&g[2]==='R').sort((a,b)=>a[1]-b[1])){
+      if(g[4]===g[6]) continue;
+      (seq[g[3]]=seq[g[3]]||[]).push(g[4]>g[6]?'W':'L');
+      (seq[g[5]]=seq[g[5]]||[]).push(g[6]>g[4]?'W':'L');
+    }
+    const run = (s,ch)=>{ let b=0,c=0; for(const r of s){ c = r===ch?c+1:0; b=Math.max(b,c); } return b; };
+    let bw={n:0,o:''}, bl={n:0,o:''};
+    for(const o in seq){
+      const w=run(seq[o],'W'), l=run(seq[o],'L');
+      if(w>bw.n) bw={n:w,o};
+      if(l>bl.n) bl={n:l,o};
+    }
+    $('ss_records').innerHTML =
+      sub('Top scores') + `<ol class="rec">${srt.slice(0,3).map(scoreRow).join('')}</ol>` +
+      sub('Lowest scores') + `<ol class="rec">${srt.slice(-3).reverse().map(scoreRow).join('')}</ol>` +
+      sub('Margins') + `<ol class="rec">${margins.length?mRow(margins[0],'blew out')+mRow(margins[margins.length-1],'edged'):''}</ol>` +
+      sub('Highest-scoring matchup') + `<ol class="rec">${shoot?li(f1(shoot.t), shoot.g, `<b>${esc(shoot.g[3])} ${f1(shoot.g[4])}</b> <span class="d">vs</span> <b>${f1(shoot.g[6])} ${esc(shoot.g[5])}</b> <span class="d">· wk${shoot.g[1]}</span>`):''}</ol>` +
+      sub('Cruel games') + `<ol class="rec">${hb?li(f2(hb.pts), hb.g, `<b>${esc(hb.o)}</b> <span class="d">lost to ${esc(hb.opp)}'s ${f2(hb.op)} · wk${hb.g[1]} (heartbreaker)</span>`):''}${rob?li(f2(rob.pts), rob.g, `<b>${esc(rob.o)}</b> <span class="d">beat ${esc(rob.opp)}'s ${f2(rob.op)} · wk${rob.g[1]} (daylight robbery)</span>`):''}</ol>` +
+      sub('Streaks') + `<ol class="rec">${bw.n?`<li><span class="v">W${bw.n}</span><span><b>${esc(bw.o)}</b> <span class="d">longest win streak</span></span></li>`:''}${bl.n?`<li><span class="v" style="color:var(--red)">L${bl.n}</span><span><b>${esc(bl.o)}</b> <span class="d">longest skid</span></span></li>`:''}</ol>`;
+  })();
   // weekly matrix (regular season)
   const weeks = [...new Set(G.filter(g=>g[0]===year&&g[2]==='R').map(g=>g[1]))].sort((a,b)=>a-b);
   const owners = rows.map(r=>r.o);
