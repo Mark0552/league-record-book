@@ -425,6 +425,14 @@ if weeks_left:
         json.dump(dict(season=season, weeks={str(k): v for k, v in sorted(odds_hist.items())}),
                   open(ODDS_HIST, "w", encoding="utf-8"), indent=1)
         print(f"odds history: {len(odds_hist)} weeks on file")
+else:
+    # regular season over: pin the settled after-week-14 point once
+    if odds_hist and PSTART not in odds_hist and "title_odds" in globals():
+        odds_hist[PSTART] = dict(playoffs={OWNER[t]: round(100.0 * made[t] / N, 1) for t in TEAMS},
+                                 champ={o["owner"]: o["champ"] for o in title_odds})
+        json.dump(dict(season=season, weeks={str(k): v for k, v in sorted(odds_hist.items())}),
+                  open(ODDS_HIST, "w", encoding="utf-8"), indent=1)
+        print("odds history: final settled point recorded")
 
 # ---------------- 4. elimination solver (house rule, witness-verified) ----------------
 def maxflow_feasible(glist, budget):
