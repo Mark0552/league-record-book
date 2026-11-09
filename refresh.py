@@ -186,25 +186,27 @@ def refresh_trade_values(ros_vor, es_vor):
         print(f"  trade values failed (ROS consensus): {ex}")
     nrm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
     try:
-        import csv as _csv
-        import io as _io
-        req = urllib.request.Request(
-            "https://raw.githubusercontent.com/dynastyprocess/data/master/files/db_fpecr_latest.csv",
-            headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=20) as r:
-            rows = list(_csv.DictReader(_io.StringIO(r.read().decode("utf-8"))))
+        # FantasyPros' own HALF-PPR rest-of-season boards (QB page is scoring-free)
         byname = {(nrm(e["n"]), e["p"]): e for e in players_v.values()}
         n = 0
-        for row in rows:
-            if row.get("ecr_type") != "rp" or row.get("pos") not in ("QB", "RB", "WR", "TE"):
-                continue   # rp = FantasyPros REDRAFT positional ECR
-            e = byname.get((nrm(row["player"]), row["pos"]))
-            v = curve_val(row["pos"], row.get("ecr"))
-            if e is not None and v:
-                e["fp"] = v; n += 1
-        print(f"trade values: FantasyPros redraft ECR for {n} players")
+        for pos, page in (("QB", "ros-qb"), ("RB", "ros-half-point-ppr-rb"),
+                          ("WR", "ros-half-point-ppr-wr"), ("TE", "ros-half-point-ppr-te")):
+            req = urllib.request.Request(f"https://www.fantasypros.com/nfl/rankings/{page}.php",
+                                         headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                h = r.read().decode("utf-8", "ignore")
+            k = h.find("var ecrData")
+            if k < 0:
+                continue
+            d2, _ = json.JSONDecoder().raw_decode(h, h.index("{", k))
+            for p in d2.get("players", []):
+                e = byname.get((nrm(p.get("player_name") or ""), pos))
+                v = curve_val(pos, p.get("rank_ecr"))
+                if e is not None and v:
+                    e["fp"] = v; n += 1
+        print(f"trade values: FantasyPros half-PPR ROS ECR for {n} players")
     except Exception as ex:
-        print(f"  trade values failed (FantasyPros ECR): {ex}")
+        print(f"  trade values failed (FantasyPros): {ex}")
     for e in players_v.values():
         v = ros_vor.get(e["id"], 0.0)
         if v > 1:
