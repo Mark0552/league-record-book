@@ -104,10 +104,11 @@ def refresh_feeds():
 print("fetching news feeds ...")
 refresh_feeds()
 
-def refresh_trade_values(ros_pts):
+def refresh_trade_values(ros_vor, es_vor):
     """Trade-calculator value tables: FantasyCalc (league-matched settings),
-    Dynasty Daddy, DynastyProcess open data, and our own rest-of-season Sleeper
-    projections, keyed by Sleeper id. A failed fetch keeps the last copy."""
+    Dynasty Daddy, DynastyProcess open data, plus Sleeper and ESPN rest-of-season
+    projections as value-over-replacement, keyed by Sleeper id. A failed fetch
+    keeps the last copy."""
     fp = Path("data/values.json")
     old = {}
     if fp.exists():
@@ -171,12 +172,18 @@ def refresh_trade_values(ros_pts):
         print(f"trade values: DynastyProcess matched {hits} players")
     except Exception as ex:
         print(f"  trade values failed (DynastyProcess): {ex}")
+    nrm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
     for e in players_v.values():
-        rs = ros_pts.get(e["id"], 0.0)
-        if rs > 1:
-            e["rs"] = round(rs, 1)
+        v = ros_vor.get(e["id"], 0.0)
+        if v > 1:
+            e["rs"] = round(v, 1)
         else:
             e.pop("rs", None)
+        v = es_vor.get((nrm(e["n"]), e["p"]), 0.0)
+        if v > 1:
+            e["es"] = round(v, 1)
+        else:
+            e.pop("es", None)
     json.dump(dict(at=int(__import__("time").time()),
                    players=sorted(players_v.values(), key=lambda e: -(e.get("fc", 0) + e.get("dd", 0)))),
               open(fp, "w", encoding="utf-8"))
@@ -287,15 +294,67 @@ def wproj(rid, w):
     return out
 WP = {t: {w: wproj(t, w) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS}
 
-# rest-of-season projection per player (for the trade calculator's house column)
+# rest-of-season projection per player (for the trade calculator's projection columns)
 ros_pts = defaultdict(float)
 for w in weeks_left + PLAYOFF_WEEKS:
     for pid, st in proj[w].items():
         v = lpoints(st)
         if v:
             ros_pts[pid] += v
+
+def espn_ros_half():
+    """ESPN rest-of-season projections at 0.5 PPR: the mean of their standard
+    and full-PPR league defaults, which differ only in reception points."""
+    flt = json.dumps({"players": {"limit": 350,
+                                  "sortPercOwned": {"sortAsc": False, "sortPriority": 1},
+                                  "filterStatsForSourceIds": {"value": [1]}}})
+    out = defaultdict(float)
+    meta = {}
+    posmap = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DEF"}
+    for dflt in (1, 3):
+        url = (f"https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}"
+               f"/segments/0/leaguedefaults/{dflt}?view=kona_player_info")
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0",
+                                                   "X-Fantasy-Filter": flt})
+        with urllib.request.urlopen(req, timeout=40) as r:
+            d = json.loads(r.read())
+        for p in d.get("players", []):
+            pl = p.get("player") or {}
+            tot = sum((st.get("appliedTotal") or 0) for st in (pl.get("stats") or [])
+                      if st.get("statSourceId") == 1 and st.get("statSplitTypeId") == 1
+                      and cur_week <= (st.get("scoringPeriodId") or 0) <= 17)
+            out[pl.get("id")] += tot / 2.0
+            meta[pl.get("id")] = (pl.get("fullName", ""), posmap.get(pl.get("defaultPositionId"), "?"))
+    return {meta[k]: v for k, v in out.items() if meta.get(k, ("", "?"))[1] != "?"}
+
+# positional scarcity: projections become value over a replacement-level
+# starter (12-team, 1QB/2RB/2WR/TE/flex lineups)
+REPL_RANK = {"QB": 13, "RB": 29, "WR": 31, "TE": 14, "K": 13, "DEF": 13}
+def vor_by_pos(items):
+    """items: (key, pos, value) -> {key: value over replacement, positives only}"""
+    by_pos = defaultdict(list)
+    for _, pos, v in items:
+        if pos in REPL_RANK:
+            by_pos[pos].append(v)
+    repl = {pos: sorted(vs, reverse=True)[min(REPL_RANK[pos], len(vs)) - 1]
+            for pos, vs in by_pos.items()}
+    return {k: v - repl[pos] for k, pos, v in items
+            if pos in repl and v - repl[pos] > 0}
+
+ESPN_POSMAP = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DEF"}
+_nrm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
+es_vor = {}
+try:
+    es_raw = espn_ros_half()   # espn id -> (summed halves); meta captured below
+    es_vor = vor_by_pos([((_nrm(nm), pos), pos, v) for (nm, pos), v in es_raw.items()])
+    print(f"trade values: ESPN ROS projections for {len(es_raw)} players")
+except Exception as ex:
+    print(f"  trade values failed (ESPN ROS): {ex}")
+
+ros_vor = vor_by_pos([(pid, (players.get(pid) or {}).get("position"), v)
+                      for pid, v in ros_pts.items()])
 print("fetching trade values ...")
-refresh_trade_values(dict(ros_pts))
+refresh_trade_values(ros_vor, es_vor)
 
 # ---------------- 3. one simulation to rule them all: 100k full seasons incl. bracket ----------------
 sdv = {t: max(12.0, statistics.stdev(sc[t])) if len(sc[t]) > 1 else 20.0 for t in TEAMS}
