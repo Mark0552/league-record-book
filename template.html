@@ -71,6 +71,25 @@ input.flt{width:100%;padding:9px 10px;border-radius:10px;background:var(--surfac
 td{padding:7px 6px;border-top:1px solid var(--line);white-space:nowrap}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* wide tables keep their identifying first column pinned while scrolling */
+#master th:first-child, #master td:first-child,
+#d_grades th:first-child, #d_grades td:first-child,
+#ss_matrix th:first-child, #ss_matrix td:first-child,
+#schedMatrix th:first-child, #schedMatrix td:first-child,
+#pmSeeds th:first-child, #pmSeeds td:first-child,
+#pmOdds th:first-child, #pmOdds td:first-child,
+#m_pay th:first-child, #m_pay td:first-child,
+#l_season th:first-child, #l_season td:first-child,
+#l_career th:first-child, #l_career td:first-child{
+  position:sticky;left:0;background:var(--surface);z-index:2}
+/* standings pin seed + owner together */
+#standings th:nth-child(-n+2), #standings td:nth-child(-n+2),
+#ss_stand th:nth-child(-n+2), #ss_stand td:nth-child(-n+2){
+  position:sticky;background:var(--surface);z-index:2}
+#standings th:first-child, #standings td:first-child,
+#ss_stand th:first-child, #ss_stand td:first-child{left:0;width:32px;min-width:32px}
+#standings th:nth-child(2), #standings td:nth-child(2),
+#ss_stand th:nth-child(2), #ss_stand td:nth-child(2){left:32px}
 .badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;padding:2px 6px;border-radius:5px;
   background:var(--surface2);color:var(--ink2);vertical-align:1px}
 .badge.div{background:rgba(45,212,191,.16);color:var(--accent)}
@@ -418,14 +437,18 @@ document.addEventListener('click', e=>{
   const card = t.closest('.swcard');
   swSet(card, [...card.querySelectorAll('.swtabs .swtab')].indexOf(t));
 });
-let _swX=null, _swY=null, _swC=null;
+let _swX=null, _swY=null, _swC=null, _swT=null, _swTL=0;
 document.addEventListener('touchstart', e=>{
   const c = e.target.closest('.swcard');
-  if(!c || e.target.closest('.tscroll')) return;
+  if(!c) return;
   _swC=c; _swX=e.touches[0].clientX; _swY=e.touches[0].clientY;
+  // a swipe that starts on a scrollable table only switches panes if the
+  // table itself didn't scroll (i.e. it was already at its edge)
+  _swT = e.target.closest('.tscroll'); _swTL = _swT ? _swT.scrollLeft : 0;
 }, {passive:true});
 document.addEventListener('touchend', e=>{
   if(!_swC) return;
+  if(_swT && Math.abs(_swT.scrollLeft - _swTL) > 2){ _swC=null; return; }
   const dx = e.changedTouches[0].clientX-_swX, dy = e.changedTouches[0].clientY-_swY;
   if(Math.abs(dx)>55 && Math.abs(dx)>2*Math.abs(dy)){
     const cur = +_swC.dataset.sw||0, dir = dx<0?1:-1;
