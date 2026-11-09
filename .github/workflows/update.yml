@@ -2,34 +2,63 @@ name: Daily update
 on:
   schedule:
     # odd minutes on purpose: GitHub's scheduler is most congested at :00
-    - cron: '23 10 * * *'                   # daily full update, ~5:23 AM ET
-    - cron: '23 0,4,8,12,16,20 * * *'       # every 4 hours; commits only when something changed
-    # live odds every 10 min during NFL game windows (UTC, padded an hour for DST):
-    - cron: '3,13,23,33,43,53 17-23 * * 0'  # Sunday afternoon slates
-    - cron: '3,13,23,33,43,53 0-4 * * 1'    # Sunday night football
-    - cron: '3,13,23,33,43,53 1-4 * * 2'    # Monday night football
-    - cron: '3,13,23,33,43,53 1-4 * * 5'    # Thursday night football
-    - cron: '3,13,23,33,43,53 18-23 * * 6'  # Saturday slates (late season)
-    - cron: '3,13,23,33,43,53 0-3 * * 0'    # Saturday night games (late season)
+    - cron: '23 10 * * *'              # daily full update, ~5:23 AM ET
+    - cron: '23 0,4,8,12,16,20 * * *'  # every 4 hours; commits only when something changed
+    # live-odds gate: fires every 10 min through the NFL's possible game hours
+    # (every day — holiday games float), then checks the real schedule and
+    # exits in seconds unless a game is actually live right now
+    - cron: '3,13,23,33,43,53 0-5,13-23 * * *'
   workflow_dispatch:
 permissions:
   contents: write
 concurrency:
   group: update
   cancel-in-progress: false
+env:
+  GATE_CRON: '3,13,23,33,43,53 0-5,13-23 * * *'
+  INTERIM_CRON: '23 0,4,8,12,16,20 * * *'
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      - name: Is an NFL game live right now?
+        id: live
+        if: github.event_name == 'schedule' && github.event.schedule == env.GATE_CRON
+        run: |
+          curl -sL https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv -o /tmp/games.csv
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import csv
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
+          now = datetime.now(ZoneInfo("America/New_York")).replace(tzinfo=None)
+          season = now.year if now.month >= 8 else now.year - 1
+          live = False
+          with open("/tmp/games.csv", encoding="utf-8") as f:
+              for r in csv.DictReader(f):
+                  if r["season"] != str(season) or not r.get("gameday"):
+                      continue
+                  try:
+                      ko = datetime.strptime(r["gameday"] + " " + (r.get("gametime") or "13:00"), "%Y-%m-%d %H:%M")
+                  except ValueError:
+                      continue
+                  if ko - timedelta(minutes=10) <= now <= ko + timedelta(hours=4, minutes=30):
+                      live = True
+                      break
+          print(f"live={'true' if live else 'false'}")
+          EOF
       - uses: actions/checkout@v4
+        if: github.event.schedule != env.GATE_CRON || steps.live.outputs.live == 'true'
       - uses: actions/setup-python@v5
+        if: github.event.schedule != env.GATE_CRON || steps.live.outputs.live == 'true'
         with:
           python-version: '3.12'
       - name: Refresh data, run simulations, rebuild site
+        if: github.event.schedule != env.GATE_CRON || steps.live.outputs.live == 'true'
         run: |
           python refresh.py
           cp site/index.html index.html
       - name: Commit and publish
+        if: github.event.schedule != env.GATE_CRON || steps.live.outputs.live == 'true'
         run: |
           git config user.name "record-book-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -37,8 +66,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "nothing changed"; exit 0
           fi
-          # In-game runs: skip the commit when only the build timestamp moved
-          # (no scores, odds or data actually changed), so quiet windows stay quiet.
+          # Non-daily runs: skip the commit when only the build timestamp moved.
           if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" != "23 10 * * *" ]; then
             if [ "$(git diff --cached --name-only)" = "index.html" ]; then
               strip_ts() { sed -E 's/"built_ts": "[^"]*"/TS/; s/"built": "[^"]*"/B/'; }
@@ -46,7 +74,7 @@ jobs:
                 echo "only the build timestamp changed - skipping commit"; exit 0
               fi
             fi
-            if [ "${{ github.event.schedule }}" = "23 0,4,8,12,16,20 * * *" ]; then
+            if [ "${{ github.event.schedule }}" = "${{ env.INTERIM_CRON }}" ]; then
               MSG="Interim update $(date -u +%FT%H:%MZ)"
             else
               MSG="Live odds update $(date -u +%FT%H:%MZ)"
