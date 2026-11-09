@@ -1233,6 +1233,7 @@ payload = dict(
     updated=(lambda cw: f"through week {max(cw)}, {CUR_SEASON}" if cw else f"preseason {CUR_SEASON}")(
         [g["week"] for g in games if g["year"] == CUR_SEASON]),
     built=f"{BUILT_ET.strftime('%B')} {BUILT_ET.day}, {BUILT_ET.year}",
+    built_ts=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     owners=OWNERS,
     active=list(ROSTER_OWNER_2026.values()),
     games=[[g["year"], g["week"], g["type"][0], g["a"], g["sa"], g["b"], g["sb"]] for g in games],

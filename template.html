@@ -320,7 +320,9 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const G = DATA.games; // [year, week, type(R/P/C), a, sa, b, sb]
 const YEARS = [...new Set(G.map(g=>g[0]))].sort((a,b)=>b-a);
-$('sub').textContent = 'League record book · last updated ' + (DATA.built || DATA.updated);
+$('sub').textContent = 'League record book · last updated ' + (DATA.built_ts
+  ? new Date(DATA.built_ts).toLocaleString(undefined, {month:'long', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'})
+  : (DATA.built || DATA.updated));
 $('foot').textContent = 'Built from the Sleeper API, ESPN league history & the league record sheet · auto-updates every morning · ' + DATA.updated;
 
 function show(){
