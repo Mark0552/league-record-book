@@ -318,7 +318,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="money">
     <div class="card"><h2>Career money</h2><div class="tscroll"><table id="m_pay"></table></div>
-      <div class="note">Recomputed from the payout ledger's yearly columns, 2014&ndash;2026 buy-ins included (the sheet's own Total column stopped updating after 2023). Championship and runner-up money = season payouts by finish; weekly = top-score money at that year's rate; other = 2014 payouts with no recorded category. Shared-seat money is split by year to whoever held the seat (Austin: seat-A 2014&ndash;15 + seat-B 2024+; Alex: 2016; Luke: 2017+; Neville: 2014&ndash;23). 2026 winnings land after the season.</div></div>
+      <div class="note">Recomputed from the payout ledger's yearly columns, 2014&ndash;2026 buy-ins included (the sheet's own Total column stopped updating after 2023). Championship and runner-up money = season payouts by finish (2014's final, Mark over Cliff, credited per the commissioner); weekly = top-score money at that year's rate ($20 through 2025, $40 since). Shared-seat money is split by year to whoever held the seat (Austin: seat-A 2014&ndash;15 + seat-B 2024+; Alex: 2016; Luke: 2017+; Neville: 2014&ndash;23). 2026 winnings land after the season.</div></div>
     <div class="card"><h2 id="m_hdr">Weekly high scores</h2><div id="m_weekly"></div>
       <div class="note">$40 to the top score each week. (n) = that owner's nth weekly win this season.</div></div>
     <div class="card"><h2>Career weekly highs</h2><ol class="rec" id="m_counts"></ol>
@@ -1328,9 +1328,9 @@ $('m_counts').addEventListener('click', e=>{
 });
 const moneyN = v => parseFloat(String(v).replace(/[$,]/g, ''));
 const moneyCell = v => `<td class="num"${moneyN(v)===0?' style="color:var(--ink3)"':''}>${esc(v)}</td>`;
-$('m_pay').innerHTML = '<tr><th>Owner</th><th class="num">Paid in</th><th class="num">🏆 Champs</th><th class="num">🥈 2nd</th><th class="num">Weekly</th><th class="num">Other</th><th class="num">Net</th></tr>' +
+$('m_pay').innerHTML = '<tr><th>Owner</th><th class="num">Paid in</th><th class="num">🏆 Champs</th><th class="num">🥈 2nd</th><th class="num">Weekly</th><th class="num">Net</th></tr>' +
   M.payouts.slice().sort((a,b)=>moneyN(b.net)-moneyN(a.net)).map(p=>
-  `<tr><td><b>${esc(p.owner)}</b></td><td class="num">${esc(p.paid)}</td>${moneyCell(p.champ||'$0.00')}${moneyCell(p.second||'$0.00')}${moneyCell(p.weekly||'$0.00')}${moneyCell(p.other||'$0.00')}<td class="num"><b>${esc(p.net)}</b></td></tr>`).join('');
+  `<tr><td><b>${esc(p.owner)}</b></td><td class="num">${esc(p.paid)}</td>${moneyCell(p.champ||'$0.00')}${moneyCell(p.second||'$0.00')}${moneyCell(p.weekly||'$0.00')}<td class="num"><b>${esc(p.net)}</b></td></tr>`).join('');
 
 /* ---------------- LUCK ---------------- */
 const L = DATA.luck;

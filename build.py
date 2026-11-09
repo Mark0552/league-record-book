@@ -429,8 +429,10 @@ wk_rate = {yr: v.most_common(1)[0][0] for yr, v in rate_votes.items()}
 champ2014 = next((c["owner"] for c in champs if c["year"] == 2014), None)
 for (p, yr), d in pay_cells.items():
     out = d["out"]
-    if yr == 2014:   # 2014 has no weekly/finish columns in the ledger
-        person_money[p]["champ" if p == champ2014 else "other"] += out
+    if yr == 2014:   # no weekly/finish columns in the ledger; finishes per the
+        # commissioner: Mark beat Cliff in the 2014 final
+        person_money[p]["champ" if p == champ2014 else
+                        ("second" if p == "Cliff" else "other")] += out
         continue
     wk = min(out, wk_rate.get(yr, 20) * d["wins"])
     if d["code"] in (1, 2):
