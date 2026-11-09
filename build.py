@@ -395,26 +395,59 @@ for i, h in enumerate(pay_hdr):
     h = h.strip()
     if h[:4].isdigit():
         year_cols[i] = (int(h[:4]), "out" if "Out" in h else "in")
-person_money = defaultdict(lambda: {"in": 0.0, "out": 0.0})
+person_money = defaultdict(lambda: {"in": 0.0, "out": 0.0,
+                                    "champ": 0.0, "second": 0.0, "weekly": 0.0, "other": 0.0})
+# per (person, year): paid out, weekly-win count, finish code (1=champ, 2=runner-up, 3=neither);
+# each year block in the sheet is [Y Paid Out][Y Paid In][Weekly Wins][Win?]
+pay_cells = {}
 for r in pay_rows_raw[1:]:
     raw_o = (r[0] or "").strip()
-    if raw_o in SEAT_YEARS:
-        for i, (yr, kind) in year_cols.items():
-            if i < len(r):
-                p = SEAT_YEARS[raw_o].get(yr)
-                if p:
-                    person_money[p][kind] += money_f(r[i])
+    for i, (yr, kind) in year_cols.items():
+        if i >= len(r):
+            continue
+        p = SEAT_YEARS[raw_o].get(yr) if raw_o in SEAT_YEARS else canon(raw_o)
+        if not p or (raw_o not in SEAT_YEARS and p not in alltime):
+            continue
+        person_money[p][kind] += money_f(r[i])
+        if kind == "out":
+            wins = code = 0
+            if i + 3 < len(pay_hdr) and pay_hdr[i + 2].strip() == "Weekly Wins":
+                try:
+                    wins = int(r[i + 2] or 0); code = int(r[i + 3] or 3)
+                except (ValueError, IndexError):
+                    wins, code = 0, 3
+            pay_cells[(p, yr)] = dict(out=money_f(r[i]), wins=wins, code=code)
+# the weekly rate changed over the years: infer it per year from people who
+# earned weekly money but no finish money (out / wins, mode across owners)
+rate_votes = defaultdict(Counter)
+for (p, yr), d in pay_cells.items():
+    if d["code"] == 3 and d["wins"] > 0 and d["out"] > 0:
+        rv = d["out"] / d["wins"]
+        if abs(rv - round(rv)) < 0.01:
+            rate_votes[yr][round(rv)] += 1
+wk_rate = {yr: v.most_common(1)[0][0] for yr, v in rate_votes.items()}
+champ2014 = next((c["owner"] for c in champs if c["year"] == 2014), None)
+for (p, yr), d in pay_cells.items():
+    out = d["out"]
+    if yr == 2014:   # 2014 has no weekly/finish columns in the ledger
+        person_money[p]["champ" if p == champ2014 else "other"] += out
+        continue
+    wk = min(out, wk_rate.get(yr, 20) * d["wins"])
+    if d["code"] in (1, 2):
+        person_money[p]["weekly"] += wk
+        person_money[p]["champ" if d["code"] == 1 else "second"] += max(0.0, out - wk)
     else:
-        # recompute from the yearly ledger for everyone: the sheet's own Total
-        # columns are stale (frozen after 2023), the year columns are current
-        o = canon(raw_o)
-        if o in alltime:
-            for i, (yr, kind) in year_cols.items():
-                if i < len(r):
-                    person_money[o][kind] += money_f(r[i])
-payout_rows = [dict(owner=o, paid=money_s(v["in"]), earned=money_s(v["out"]),
+        person_money[p]["weekly"] += out
+print("weekly payout rates by year:", {y: wk_rate[y] for y in sorted(wk_rate)})
+for o, v in person_money.items():
+    drift = v["out"] - (v["champ"] + v["second"] + v["weekly"] + v["other"])
+    if abs(drift) > 0.01:
+        print(f"  !! payout breakdown drift for {o}: {drift:+.2f}")
+payout_rows = [dict(owner=o, paid=money_s(v["in"]), champ=money_s(v["champ"]),
+                    second=money_s(v["second"]), weekly=money_s(v["weekly"]),
+                    other=money_s(v["other"]), earned=money_s(v["out"]),
                     net=money_s(v["out"] - v["in"]))
-               for o, v in person_money.items()]
+               for o, v in sorted(person_money.items(), key=lambda kv: kv[1]["in"] - kv[1]["out"])]
 payouts.update({o: money_s(v["out"] - v["in"]) for o, v in person_money.items()})
 print(f"payouts split: Austin {payouts.get('Austin')}, Alex {payouts.get('Alex')}, "
       f"Luke {payouts.get('Luke')}, Neville {payouts.get('Neville')}")
