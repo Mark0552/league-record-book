@@ -1332,6 +1332,8 @@ payload = dict(
     shame=shame,
     lineups=lineups,
     divisions=divhist,
+    pubs=(json.load(open("data/feeds.json", encoding="utf-8")).get("feeds", [])
+          if Path("data/feeds.json").exists() else []),
     now=now,
 )
 

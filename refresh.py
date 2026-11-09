@@ -44,6 +44,63 @@ for name, gid in SHEET_TABS.items():
     get(f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={gid}",
         RAW / "sheet" / f"{name}.csv")
 
+# ---------------- 1b. publications: news feeds for the Publications tab ----------------
+# Fetched here because a static page can't read RSS cross-origin; a failed
+# fetch keeps the feed's last good copy from data/feeds.json.
+FEEDS = [
+    ("ESPN NFL", "https://www.espn.com/espn/rss/nfl/news"),
+    ("Yahoo Fantasy", "https://sports.yahoo.com/fantasy/rss.xml"),
+    ("CBS NFL", "https://www.cbssports.com/rss/headlines/nfl"),
+    ("RotoWire", "https://www.rotowire.com/rss/news.php?sport=NFL"),
+    ("PFT Rumors", "https://www.profootballrumors.com/feed"),
+]
+def refresh_feeds():
+    import html as _html
+    import re as _refx
+    import xml.etree.ElementTree as _ET
+    from email.utils import parsedate_to_datetime
+    fp = Path("data/feeds.json")
+    old = {}
+    if fp.exists():
+        try:
+            old = {f["name"]: f for f in json.load(open(fp, encoding="utf-8")).get("feeds", [])}
+        except Exception:
+            old = {}
+    out = []
+    for name, url in FEEDS:
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                root = _ET.fromstring(r.read())
+            items = []
+            for it in root.iter("item"):
+                t = (it.findtext("title") or "").strip()
+                u = (it.findtext("link") or "").strip()
+                if not t or not u.startswith("http"):
+                    continue
+                try:
+                    ts = int(parsedate_to_datetime(it.findtext("pubDate").strip()).timestamp())
+                except Exception:
+                    ts = 0
+                d = _refx.sub(r"\s+", " ", _refx.sub(r"<[^>]+>", " ",
+                              _html.unescape(it.findtext("description") or ""))).strip()
+                items.append(dict(t=t, u=u, ts=ts, d=(d[:177] + "…") if len(d) > 180 else d))
+                if len(items) >= 15:
+                    break
+            if items:
+                out.append(dict(name=name, items=items))
+            elif name in old:
+                out.append(old[name])
+        except Exception as e:
+            print(f"  feed failed ({name}): {e}")
+            if name in old:
+                out.append(old[name])
+    json.dump(dict(at=int(__import__("time").time()), feeds=out),
+              open(fp, "w", encoding="utf-8"))
+    print(f"publications: {len(out)} feeds, {sum(len(f['items']) for f in out)} headlines")
+print("fetching news feeds ...")
+refresh_feeds()
+
 scoring = lg["scoring_settings"]
 PSTART = lg["settings"]["playoff_week_start"]       # regular season = weeks 1..PSTART-1
 last_scored = lg["settings"].get("last_scored_leg") or 0
