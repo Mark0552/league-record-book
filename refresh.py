@@ -117,10 +117,13 @@ for name, gid in SHEET_TABS.items():
         RAW / "sheet" / f"{name}.csv")
 
 def refresh_trade_values(ros_vor, es_vor):
-    """Trade-calculator value tables: FantasyCalc (league-matched settings),
-    Dynasty Daddy, DynastyProcess open data, plus Sleeper and ESPN rest-of-season
-    projections as value-over-replacement, keyed by Sleeper id. A failed fetch
-    keeps the last copy."""
+    """Trade-calculator value tables, ALL REDRAFT: FantasyCalc market values
+    computed for this league's settings (which also provide the value curve),
+    rest-of-season consensus ranks (Dynasty Daddy's redraft aggregate of
+    ESPN/FantasyPros/FanDuel) and FantasyPros redraft ECR — both converted to
+    values on the FantasyCalc positional curve — plus Sleeper and ESPN ROS
+    projections as value-over-replacement. Keyed by Sleeper id; a failed
+    fetch keeps the last copy."""
     fp = Path("data/values.json")
     old = {}
     if fp.exists():
@@ -150,41 +153,58 @@ def refresh_trade_values(ros_vor, es_vor):
         print(f"trade values: FantasyCalc {len(fc)} players")
     except Exception as ex:
         print(f"  trade values failed (FantasyCalc): {ex}")
+    # the FantasyCalc positional curve turns a redraft rank into a value
+    curves = defaultdict(list)
+    for e in players_v.values():
+        if e.get("fc"):
+            curves[e["p"]].append(e["fc"])
+    for pos in curves:
+        curves[pos].sort(reverse=True)
+    def curve_val(pos, rank):
+        vs = curves.get(pos)
+        try:
+            r = int(round(float(rank)))
+        except (TypeError, ValueError):
+            return None
+        if not vs or r < 1:
+            return None
+        return vs[r - 1] if r <= len(vs) else max(0, int(vs[-1] * len(vs) / r))
+    for e in players_v.values():
+        for k in ("dd", "dp", "rc", "fp"):   # retired dynasty fields + rebuilt ranks
+            e.pop(k, None)
     try:
         dd = grab("https://dynasty-daddy.com/api/v1/player/all/today")
-        for e in players_v.values():
-            e.pop("dd", None)
+        n = 0
         for p in dd:
             sid = str(p.get("sleeper_id") or "")
-            if not sid or not p.get("trade_value"):
-                continue
-            e = players_v.setdefault(sid, dict(id=sid, n=p.get("full_name", "?"),
-                                               p=p.get("position", "?"), t=p.get("team") or ""))
-            e["dd"] = p["trade_value"]
-        print(f"trade values: Dynasty Daddy {len(dd)} players")
+            e = players_v.get(sid)
+            v = curve_val(p.get("position"), p.get("avg_ros"))
+            if e is not None and v:
+                e["rc"] = v; n += 1
+        print(f"trade values: ROS consensus ranks for {n} players")
     except Exception as ex:
-        print(f"  trade values failed (Dynasty Daddy): {ex}")
+        print(f"  trade values failed (ROS consensus): {ex}")
+    nrm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
     try:
         import csv as _csv
         import io as _io
         req = urllib.request.Request(
-            "https://raw.githubusercontent.com/dynastyprocess/data/master/files/values-players.csv",
+            "https://raw.githubusercontent.com/dynastyprocess/data/master/files/db_fpecr_latest.csv",
             headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=20) as r:
             rows = list(_csv.DictReader(_io.StringIO(r.read().decode("utf-8"))))
-        norm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
-        byname = {(norm(e["n"]), e["p"]): e for e in players_v.values()}
-        for e in players_v.values():
-            e.pop("dp", None)
-        hits = 0
+        byname = {(nrm(e["n"]), e["p"]): e for e in players_v.values()}
+        n = 0
         for row in rows:
-            e = byname.get((norm(row["player"]), row["pos"]))
-            if e and row.get("value_1qb"):
-                e["dp"] = int(row["value_1qb"]); hits += 1
-        print(f"trade values: DynastyProcess matched {hits} players")
+            if row.get("ecr_type") != "rp" or row.get("pos") not in ("QB", "RB", "WR", "TE"):
+                continue   # rp = FantasyPros REDRAFT positional ECR
+            e = byname.get((nrm(row["player"]), row["pos"]))
+            v = curve_val(row["pos"], row.get("ecr"))
+            if e is not None and v:
+                e["fp"] = v; n += 1
+        print(f"trade values: FantasyPros redraft ECR for {n} players")
     except Exception as ex:
-        print(f"  trade values failed (DynastyProcess): {ex}")
-    nrm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
+        print(f"  trade values failed (FantasyPros ECR): {ex}")
     for e in players_v.values():
         v = ros_vor.get(e["id"], 0.0)
         if v > 1:
@@ -196,8 +216,9 @@ def refresh_trade_values(ros_vor, es_vor):
             e["es"] = round(v, 1)
         else:
             e.pop("es", None)
+    keep = [e for e in players_v.values() if any(k in e for k in ("fc", "rc", "fp", "rs", "es"))]
     json.dump(dict(at=int(__import__("time").time()),
-                   players=sorted(players_v.values(), key=lambda e: -(e.get("fc", 0) + e.get("dd", 0)))),
+                   players=sorted(keep, key=lambda e: -(e.get("fc", 0) + e.get("rc", 0)))),
               open(fp, "w", encoding="utf-8"))
 
 scoring = lg["scoring_settings"]
