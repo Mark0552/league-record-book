@@ -433,7 +433,7 @@ if(now.standings){
     if(!H){ elP.innerHTML = elC.innerHTML = '<div class="note">Trends appear once a few weeks are on file.</div>'; return; }
     const wks = Object.keys(H).map(Number).sort((a,b)=>a-b);
     const lastW = String(wks[wks.length-1]);
-    const maxWk = (now.machine && now.machine.pweeks) ? now.machine.pweeks[0] : wks[wks.length-1];
+    const maxWk = wks[wks.length-1];   // axis ends at the latest data point
     const owners = Object.keys(H[lastW].playoffs);
     const PAL = ['#60a5fa','#f87171','#34d399','#fbbf24','#a78bfa','#f472b6','#2dd4bf','#fb923c','#a3e635','#38bdf8','#e879f9','#94a3b8'];
     const colorOf = {}; owners.slice().sort().forEach((o,i)=>colorOf[o]=PAL[i%PAL.length]);
