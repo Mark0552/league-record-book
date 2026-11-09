@@ -194,13 +194,6 @@
  "elimnote": "Shown only when no combination of results and tiebreakers could save the team \u2014 a spot still reachable via a points-for tiebreak counts as alive.",
  "brink": [
   {
-   "owner": "Will",
-   "needs": [
-    "Loses to Bob"
-   ],
-   "odds": 0.0
-  },
-  {
    "owner": "Sam",
    "needs": [
     "Loses to Steve"

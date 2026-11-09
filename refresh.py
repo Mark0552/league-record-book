@@ -473,14 +473,36 @@ def factor_conditions(combos, games_list):
                 needs.append("Plus specific combinations of the other games")
     return needs
 
+# ---------------- 3a. games already decided on the field ----------------
+# When every starter on both sides has a final score, the game's result is a
+# fact even though Sleeper hasn't closed the week: promote it to a real
+# win/loss for the solvers. Official standings and records still wait for the
+# fully scored week.
+decided = {}
+if blended and weeks_left:
+    for a, b in future.get(cur_week, []):
+        if WSD[a][cur_week] == 0 and WSD[b][cur_week] == 0 and WP[a][cur_week] != WP[b][cur_week]:
+            decided[frozenset((a, b))] = a if WP[a][cur_week] > WP[b][cur_week] else b
+wins_eff = dict(wins0)
+h2h_eff = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
+for pair, wnr in decided.items():
+    lsr = next(t for t in pair if t != wnr)
+    wins_eff[wnr] += 1
+    h2h_eff[wnr][lsr][0] += 1
+    h2h_eff[wnr][lsr][1] += 1; h2h_eff[lsr][wnr][1] += 1
+future_eff = {w: [g for g in gs if not (w == cur_week and frozenset(g) in decided)]
+              for w, gs in future.items()}
+if decided:
+    print(f"on-the-field finals: {len(decided)} of this week's games already count for the solvers")
+
 elim_cards = []
 brink_cards = []
 clinch_cards = []
 elimnote = ""
-if not FAST and future.get(cur_week):
+if not FAST and future_eff.get(cur_week):
     print("running elimination solver ...")
-    WEEKG = future[cur_week]
-    FUTA = {w: future[w] for w in future if w > cur_week}
+    WEEKG = future_eff[cur_week]
+    FUTA = {w: future_eff[w] for w in future_eff if w > cur_week}
     for x in TEAMS:
         other = [(a, b) for a, b in WEEKG if x not in (a, b)]
         xg = [(a, b) for a, b in WEEKG if x in (a, b)]
@@ -489,8 +511,8 @@ if not FAST and future.get(cur_week):
         opp = xg[0][0] if xg[0][1] == x else xg[0][1]
         combos, brink_combos = [], []
         for combo in itertools.product(*[[a, b] for a, b in other]):
-            w9 = dict(wins0); w9[opp] += 1
-            hh = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
+            w9 = dict(wins_eff); w9[opp] += 1
+            hh = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h_eff.items()}
             def rec2(wi, lo):
                 hh[wi][lo][1] += 1; hh[lo][wi][1] += 1; hh[wi][lo][0] += 1
             rec2(opp, x)
@@ -583,25 +605,25 @@ def can_lose_division(x, wins_now, h2h_now, future_games):
 if weeks_left:
     print("computing clinch/elimination status ...")
     for x in TEAMS:
-        if not alive(x, wins0, h2h0, future):
+        if not alive(x, wins_eff, h2h_eff, future_eff):
             status[x] = "out"
-        elif not can_lose_division(x, wins0, h2h0, future):
+        elif not can_lose_division(x, wins_eff, h2h_eff, future_eff):
             status[x] = "bye"
-        elif not can_miss(x):
+        elif not can_miss(x, wins_eff, h2h_eff, future_eff):
             status[x] = "clinched"
 
     # clinch scenarios: can any combination of this week's results LOCK a playoff spot?
-    if not FAST and future.get(cur_week):
+    if not FAST and future_eff.get(cur_week):
         print("running clinch-scenario solver ...")
-        week_games = future[cur_week]
-        futa_c = {w: future[w] for w in future if w > cur_week}
+        week_games = future_eff[cur_week]
+        futa_c = {w: future_eff[w] for w in future_eff if w > cur_week}
         for x in TEAMS:
             if status.get(x) in ("bye", "out"):
                 continue
             spot_combos, bye_combos = [], []
             for combo in itertools.product(*[[a, b] for a, b in week_games]):
-                wC = dict(wins0)
-                hh = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h0.items()}
+                wC = dict(wins_eff)
+                hh = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h_eff.items()}
                 for wt, (a, b) in zip(combo, week_games):
                     wC[wt] += 1
                     lt = b if wt == a else a
@@ -627,16 +649,8 @@ paths_cards = []
 if weeks_left and not FAST:
     print("writing longshot survival paths ...")
     REGW = PSTART - 1
-    # current-week games already decided on the field (both lineups final)
-    pre_wins = dict(wins0)
-    decided_pairs = set()
-    if blended:
-        for a, b in future.get(cur_week, []):
-            if WSD[a][cur_week] == 0 and WSD[b][cur_week] == 0 and WP[a][cur_week] != WP[b][cur_week]:
-                pre_wins[a if WP[a][cur_week] > WP[b][cur_week] else b] += 1
-                decided_pairs.add(frozenset((a, b)))
-    sched_open = [(w, a, b) for w in sorted(future) for a, b in future[w]
-                  if not (w == cur_week and frozenset((a, b)) in decided_pairs)]
+    pre_wins = dict(wins_eff)   # on-the-field finals already count
+    sched_open = [(w, a, b) for w in sorted(future_eff) for a, b in future_eff[w]]
     left = {t: sum(1 for _, a, b in sched_open if t in (a, b)) for t in TEAMS}
 
     def final_alive(x, fw):
