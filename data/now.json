@@ -107,11 +107,11 @@
   },
   {
    "owner": "Lerch",
-   "pct": 98.0
+   "pct": 97.7
   },
   {
    "owner": "Austin",
-   "pct": 93.4
+   "pct": 93.2
   },
   {
    "owner": "Cliff",
@@ -119,23 +119,23 @@
   },
   {
    "owner": "Steve",
-   "pct": 72.4
+   "pct": 72.8
   },
   {
    "owner": "Martin",
-   "pct": 70.7
+   "pct": 70.4
   },
   {
    "owner": "Mark",
-   "pct": 50.1
+   "pct": 50.6
   },
   {
    "owner": "Clancy",
-   "pct": 34.2
+   "pct": 34.0
   },
   {
    "owner": "Luke",
-   "pct": 0.8
+   "pct": 0.9
   },
   {
    "owner": "Sam",
@@ -163,7 +163,7 @@
    "a": "Mark",
    "pa": 133.1,
    "b": "Timmy",
-   "pb": 79.4
+   "pb": 79.6
   },
   {
    "a": "Will",
@@ -179,7 +179,7 @@
   },
   {
    "a": "Clancy",
-   "pa": 105.1,
+   "pa": 105.2,
    "b": "Luke",
    "pb": 74.9
   },
@@ -187,7 +187,7 @@
    "a": "Martin",
    "pa": 115.8,
    "b": "Cliff",
-   "pb": 115.9
+   "pb": 115.8
   }
  ],
  "elim": [],
@@ -228,7 +228,7 @@
   {
    "owner": "Luke",
    "rec": "3-5",
-   "text": "Even winning out only gets Luke to 9-5 \u2014 and the path needs the middle to collapse: Austin (6-2) can win at most 3 more; Martin (5-3) can win at most 4 more. That leaves a 3-way tie at 9-5 with room for everyone inside the field \u2014 win out and the spot is there. Simulated odds: 0.8%."
+   "text": "Even winning out only gets Luke to 9-5 \u2014 and the path needs the middle to collapse: Austin (6-2) can win at most 3 more; Martin (5-3) can win at most 4 more. That leaves a 3-way tie at 9-5 with room for everyone inside the field \u2014 win out and the spot is there. Simulated odds: 0.9%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -475,32 +475,32 @@
   },
   "9": {
    "playoffs": {
-    "Mark": 50.1,
-    "Clancy": 34.2,
+    "Mark": 50.6,
+    "Clancy": 34.0,
     "Will": 0.0,
     "Sam": 0.2,
-    "Steve": 72.4,
+    "Steve": 72.8,
     "Timmy": 0.0,
     "Bob": 99.1,
-    "Lerch": 98.0,
-    "Martin": 70.7,
-    "Luke": 0.8,
-    "Austin": 93.4,
+    "Lerch": 97.7,
+    "Martin": 70.4,
+    "Luke": 0.9,
+    "Austin": 93.2,
     "Cliff": 81.1
    },
    "champ": {
-    "Mark": 6.46,
-    "Clancy": 2.85,
+    "Mark": 6.65,
+    "Clancy": 2.92,
     "Will": 0.0,
-    "Sam": 0.01,
-    "Steve": 8.89,
+    "Sam": 0.02,
+    "Steve": 9.28,
     "Timmy": 0.0,
-    "Bob": 20.96,
-    "Lerch": 23.53,
-    "Martin": 10.08,
-    "Luke": 0.04,
-    "Austin": 16.37,
-    "Cliff": 10.81
+    "Bob": 21.39,
+    "Lerch": 21.6,
+    "Martin": 10.24,
+    "Luke": 0.05,
+    "Austin": 16.71,
+    "Cliff": 11.15
    }
   }
  },
@@ -834,18 +834,18 @@
   "proj": {
    "Mark": {
     "9": 133.1,
-    "10": 86.2,
-    "11": 89.0,
+    "10": 86.9,
+    "11": 89.1,
     "12": 99.2,
-    "13": 93.8,
+    "13": 93.9,
     "14": 95.9,
     "15": 98.7,
     "16": 104.3,
     "17": 97.2
    },
    "Clancy": {
-    "9": 105.1,
-    "10": 94.3,
+    "9": 105.2,
+    "10": 94.1,
     "11": 89.0,
     "12": 96.3,
     "13": 84.8,
@@ -856,18 +856,18 @@
    },
    "Will": {
     "9": 89.6,
-    "10": 91.0,
+    "10": 91.3,
     "11": 74.5,
-    "12": 92.5,
+    "12": 92.4,
     "13": 97.2,
     "14": 89.5,
     "15": 95.2,
-    "16": 94.4,
+    "16": 94.5,
     "17": 99.0
    },
    "Sam": {
     "9": 115.7,
-    "10": 91.0,
+    "10": 91.1,
     "11": 89.8,
     "12": 90.6,
     "13": 84.5,
@@ -878,7 +878,7 @@
    },
    "Steve": {
     "9": 106.4,
-    "10": 101.7,
+    "10": 102.2,
     "11": 107.4,
     "12": 100.3,
     "13": 88.4,
@@ -888,41 +888,41 @@
     "17": 102.3
    },
    "Timmy": {
-    "9": 79.4,
-    "10": 70.9,
-    "11": 87.6,
-    "12": 82.3,
-    "13": 81.6,
-    "14": 81.5,
-    "15": 84.6,
-    "16": 85.5,
-    "17": 85.8
+    "9": 79.6,
+    "10": 70.7,
+    "11": 87.7,
+    "12": 82.4,
+    "13": 81.7,
+    "14": 81.6,
+    "15": 84.7,
+    "16": 85.6,
+    "17": 86.1
    },
    "Bob": {
     "9": 116.8,
     "10": 104.0,
     "11": 85.7,
     "12": 106.8,
-    "13": 98.4,
+    "13": 98.3,
     "14": 95.7,
-    "15": 105.6,
-    "16": 100.5,
+    "15": 105.7,
+    "16": 100.6,
     "17": 102.5
    },
    "Lerch": {
     "9": 136.4,
-    "10": 98.0,
-    "11": 93.7,
-    "12": 107.3,
-    "13": 92.4,
+    "10": 97.1,
+    "11": 92.3,
+    "12": 105.8,
+    "13": 91.0,
     "14": 93.2,
-    "15": 103.5,
-    "16": 105.9,
-    "17": 104.1
+    "15": 102.0,
+    "16": 104.4,
+    "17": 102.6
    },
    "Martin": {
     "9": 115.8,
-    "10": 101.0,
+    "10": 100.6,
     "11": 95.3,
     "12": 98.6,
     "13": 101.5,
@@ -944,7 +944,7 @@
    },
    "Austin": {
     "9": 113.7,
-    "10": 100.4,
+    "10": 99.5,
     "11": 104.4,
     "12": 97.4,
     "13": 100.7,
@@ -954,8 +954,8 @@
     "17": 104.2
    },
    "Cliff": {
-    "9": 115.9,
-    "10": 78.2,
+    "9": 115.8,
+    "10": 78.0,
     "11": 100.0,
     "12": 99.9,
     "13": 95.5,
