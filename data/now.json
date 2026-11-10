@@ -103,39 +103,39 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 98.9
+   "pct": 99.0
   },
   {
    "owner": "Lerch",
-   "pct": 97.4
+   "pct": 97.5
   },
   {
    "owner": "Austin",
-   "pct": 92.0
-  },
-  {
-   "owner": "Steve",
-   "pct": 81.0
+   "pct": 92.5
   },
   {
    "owner": "Cliff",
+   "pct": 78.7
+  },
+  {
+   "owner": "Steve",
    "pct": 78.4
   },
   {
    "owner": "Martin",
-   "pct": 70.7
+   "pct": 71.3
   },
   {
    "owner": "Mark",
-   "pct": 49.1
+   "pct": 49.5
   },
   {
    "owner": "Clancy",
-   "pct": 31.4
+   "pct": 32.0
   },
   {
    "owner": "Luke",
-   "pct": 0.8
+   "pct": 0.9
   },
   {
    "owner": "Sam",
@@ -155,15 +155,15 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 115.6,
+   "pa": 115.3,
    "b": "Steve",
-   "pb": 118.4
+   "pb": 115.2
   },
   {
    "a": "Mark",
    "pa": 133.1,
    "b": "Timmy",
-   "pb": 71.9
+   "pb": 72.3
   },
   {
    "a": "Will",
@@ -175,19 +175,19 @@
    "a": "Lerch",
    "pa": 136.4,
    "b": "Austin",
-   "pb": 105.2
+   "pb": 111.1
   },
   {
    "a": "Clancy",
-   "pa": 97.7,
+   "pa": 97.3,
    "b": "Luke",
    "pb": 74.9
   },
   {
    "a": "Martin",
-   "pa": 114.0,
+   "pa": 113.8,
    "b": "Cliff",
-   "pb": 112.7
+   "pb": 112.3
   }
  ],
  "elim": [],
@@ -228,7 +228,7 @@
   {
    "owner": "Luke",
    "rec": "3-5",
-   "text": "Even winning out only gets Luke to 9-5 \u2014 and the path needs the middle to collapse: Austin (6-2) can win at most 3 more; Martin (5-3) can win at most 4 more. That leaves a 3-way tie at 9-5 with room for everyone inside the field \u2014 win out and the spot is there. Simulated odds: 0.8%."
+   "text": "Even winning out only gets Luke to 9-5 \u2014 and the path needs the middle to collapse: Austin (6-2) can win at most 3 more; Martin (5-3) can win at most 4 more. That leaves a 3-way tie at 9-5 with room for everyone inside the field \u2014 win out and the spot is there. Simulated odds: 0.9%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -475,32 +475,32 @@
   },
   "9": {
    "playoffs": {
-    "Mark": 49.1,
-    "Clancy": 31.4,
+    "Mark": 49.5,
+    "Clancy": 32.0,
     "Will": 0.0,
     "Sam": 0.1,
-    "Steve": 81.0,
+    "Steve": 78.4,
     "Timmy": 0.0,
-    "Bob": 98.9,
-    "Lerch": 97.4,
-    "Martin": 70.7,
-    "Luke": 0.8,
-    "Austin": 92.0,
-    "Cliff": 78.4
+    "Bob": 99.0,
+    "Lerch": 97.5,
+    "Martin": 71.3,
+    "Luke": 0.9,
+    "Austin": 92.5,
+    "Cliff": 78.7
    },
    "champ": {
-    "Mark": 6.39,
-    "Clancy": 2.72,
+    "Mark": 6.44,
+    "Clancy": 2.76,
     "Will": 0.0,
     "Sam": 0.01,
-    "Steve": 10.98,
+    "Steve": 10.4,
     "Timmy": 0.0,
-    "Bob": 21.35,
-    "Lerch": 21.47,
-    "Martin": 10.2,
+    "Bob": 21.31,
+    "Lerch": 21.59,
+    "Martin": 10.32,
     "Luke": 0.04,
-    "Austin": 16.41,
-    "Cliff": 10.44
+    "Austin": 16.56,
+    "Cliff": 10.56
    }
   }
  },
@@ -844,7 +844,7 @@
     "17": 97.2
    },
    "Clancy": {
-    "9": 97.7,
+    "9": 97.3,
     "10": 94.1,
     "11": 89.0,
     "12": 96.3,
@@ -866,7 +866,7 @@
     "17": 99.0
    },
    "Sam": {
-    "9": 115.6,
+    "9": 115.3,
     "10": 91.1,
     "11": 89.8,
     "12": 90.6,
@@ -877,7 +877,7 @@
     "17": 87.1
    },
    "Steve": {
-    "9": 118.4,
+    "9": 115.2,
     "10": 102.2,
     "11": 107.4,
     "12": 100.3,
@@ -888,7 +888,7 @@
     "17": 102.3
    },
    "Timmy": {
-    "9": 71.9,
+    "9": 72.3,
     "10": 70.7,
     "11": 87.7,
     "12": 82.4,
@@ -921,7 +921,7 @@
     "17": 102.6
    },
    "Martin": {
-    "9": 114.0,
+    "9": 113.8,
     "10": 100.6,
     "11": 95.3,
     "12": 98.6,
@@ -943,7 +943,7 @@
     "17": 97.2
    },
    "Austin": {
-    "9": 105.2,
+    "9": 111.1,
     "10": 99.5,
     "11": 104.4,
     "12": 97.4,
@@ -954,7 +954,7 @@
     "17": 104.2
    },
    "Cliff": {
-    "9": 112.7,
+    "9": 112.3,
     "10": 78.0,
     "11": 100.0,
     "12": 99.9,
@@ -981,17 +981,17 @@
   },
   "sdw": {
    "Mark": 0.0,
-   "Clancy": 3.0,
+   "Clancy": 2.9,
    "Will": 0.0,
-   "Sam": 7.7,
-   "Steve": 3.3,
-   "Timmy": 10.8,
+   "Sam": 7.5,
+   "Steve": 3.2,
+   "Timmy": 10.6,
    "Bob": 0.0,
    "Lerch": 0.0,
-   "Martin": 7.1,
+   "Martin": 6.9,
    "Luke": 0.0,
-   "Austin": 4.7,
-   "Cliff": 5.2
+   "Austin": 4.6,
+   "Cliff": 5.1
   },
   "wins": {
    "Mark": 4,
