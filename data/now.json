@@ -135,7 +135,7 @@
   },
   {
    "owner": "Luke",
-   "pct": 1.1
+   "pct": 1.0
   },
   {
    "owner": "Sam",
@@ -221,7 +221,7 @@
   {
    "owner": "Luke",
    "rec": "3-6",
-   "text": "Even winning out only gets Luke to 8-6 \u2014 and the path needs the middle to collapse: Bob (7-2) can win at most 1 more; Austin (6-3) can win at most 2 more; Clancy (5-4) can win at most 3 more; Martin (5-4) can win at most 3 more; Mark (4-4) can win at most 4 more. That leaves a 6-way tie at 8-6 with room for everyone inside the field \u2014 win out and the spot is there. Simulated odds: 1.1%."
+   "text": "Even winning out only gets Luke to 8-6 \u2014 and the path needs the middle to collapse: Bob (7-2) can win at most 1 more; Austin (6-3) can win at most 2 more; Clancy (5-4) can win at most 3 more; Martin (5-4) can win at most 3 more; Mark (4-4) can win at most 4 more. That leaves a 6-way tie at 8-6 with room for everyone inside the field \u2014 win out and the spot is there. Simulated odds: 1.0%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -477,22 +477,22 @@
     "Bob": 99.3,
     "Lerch": 98.1,
     "Martin": 60.3,
-    "Luke": 1.1,
+    "Luke": 1.0,
     "Austin": 93.6,
     "Cliff": 92.4
    },
    "champ": {
-    "Mark": 6.68,
+    "Mark": 6.69,
     "Clancy": 2.93,
     "Will": 0.0,
     "Sam": 0.02,
-    "Steve": 8.83,
+    "Steve": 8.82,
     "Timmy": 0.0,
-    "Bob": 21.58,
-    "Lerch": 20.6,
+    "Bob": 21.57,
+    "Lerch": 20.61,
     "Martin": 8.45,
     "Luke": 0.05,
-    "Austin": 17.11,
+    "Austin": 17.12,
     "Cliff": 13.75
    }
   }
@@ -904,7 +904,7 @@
    },
    "Lerch": {
     "9": 136.4,
-    "10": 96.9,
+    "10": 97.0,
     "11": 92.3,
     "12": 105.8,
     "13": 91.0,
@@ -937,7 +937,7 @@
    },
    "Austin": {
     "9": 105.2,
-    "10": 99.2,
+    "10": 99.5,
     "11": 104.4,
     "12": 97.4,
     "13": 100.7,
@@ -948,7 +948,7 @@
    },
    "Cliff": {
     "9": 120.2,
-    "10": 77.9,
+    "10": 78.0,
     "11": 100.0,
     "12": 99.9,
     "13": 95.5,

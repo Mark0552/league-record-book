@@ -252,22 +252,22 @@
     "Bob": 99.3,
     "Lerch": 98.1,
     "Martin": 60.3,
-    "Luke": 1.1,
+    "Luke": 1.0,
     "Austin": 93.6,
     "Cliff": 92.4
    },
    "champ": {
-    "Mark": 6.68,
+    "Mark": 6.69,
     "Clancy": 2.93,
     "Will": 0.0,
     "Sam": 0.02,
-    "Steve": 8.83,
+    "Steve": 8.82,
     "Timmy": 0.0,
-    "Bob": 21.58,
-    "Lerch": 20.6,
+    "Bob": 21.57,
+    "Lerch": 20.61,
     "Martin": 8.45,
     "Luke": 0.05,
-    "Austin": 17.11,
+    "Austin": 17.12,
     "Cliff": 13.75
    }
   }
