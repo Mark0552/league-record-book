@@ -1067,8 +1067,8 @@ function seasonRosterHTML(year, o){
     }
   }
   const rows = Object.entries(agg).sort((x,y)=>y[1].pts-x[1].pts);
-  const gapNote = (year===2015||year===2016)
-    ? '<div class="note" style="margin-top:4px">A few starters from this season are missing — ESPN lost pieces of its 2015–16 boxscore data.</div>' : '';
+  const gapNote = (year>=2014&&year<=2016)
+    ? '<div class="note" style="margin-top:4px">A few starters from this season are missing — ESPN\'s archive no longer lists some since-retired players.</div>' : '';
   return `<b style="font-size:13px">${esc(o)}'s ${year} starters</b>` +
     (rows.length ? rows.map(([nm,a])=>
       `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0">
@@ -1214,11 +1214,16 @@ function renderGames(){
   $('gCount').textContent = `${rows.length} games match` + (rows.length>lim?` (showing ${lim})`:'') + ' · tap a game for starting lineups';
   $('gMore').style.display = rows.length>lim ? 'block':'none';
 }
+const GSCORE = {};   // official team score per game, to expose archive gaps in lineups
+for(const g of G){ if(!g[7]){ GSCORE[`${g[0]}|${g[1]}|${g[3]}`]=g[4]; GSCORE[`${g[0]}|${g[1]}|${g[5]}`]=g[6]; } }
 function lineupSide(y, w, o){
   const lu = (DATA.lineups||{})[`${y}|${w}|${o}`];
   if(!lu) return `<div class="note">No lineup data for ${esc(o)}.</div>`;
+  const off = GSCORE[`${y}|${w}|${o}`];
+  const gap = off!=null ? off - lu.reduce((s,p)=>s+p[2],0) : 0;
   return `<div style="flex:1;min-width:150px"><b style="font-size:13px">${esc(o)}</b>` +
-    lu.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span><span style="color:var(--ink3)">${esc(p[1])}</span> ${esc(p[0])}</span><span style="font-variant-numeric:tabular-nums">${p[2].toFixed(1)}</span></div>`).join('') + '</div>';
+    lu.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span><span style="color:var(--ink3)">${esc(p[1])}</span> ${esc(p[0])}</span><span style="font-variant-numeric:tabular-nums">${p[2].toFixed(1)}</span></div>`).join('') +
+    (gap > 0.5 ? `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0;color:var(--ink3);font-style:italic"><span>unrecorded starter(s) — lost from ESPN's archive</span><span style="font-variant-numeric:tabular-nums">${gap.toFixed(1)}</span></div>` : '') + '</div>';
 }
 const lineupPanel = (y,w,a,b) => `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${lineupSide(y,w,a)}${lineupSide(y,w,b)}</div>`;
 $('gTable').addEventListener('click', e=>{
