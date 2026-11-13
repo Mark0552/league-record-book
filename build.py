@@ -706,6 +706,21 @@ trade_list.sort(key=lambda t: (-t["year"], -t["week"]))
 
 # Sleeper transactions are the authoritative trade record for 2020+ (the sheet runs behind);
 # keep the sheet only for the pre-Sleeper years it alone remembers.
+# a fantasy week ends after Monday night: week N runs Tuesday 6 AM ET (post-MNF)
+# to the next Tuesday 6 AM ET, anchored on each season's kickoff Thursday.
+# Sleeper's own "leg" can't be used — it rolls over mid-Wednesday, so both the
+# Wednesday BEFORE week N's games and the Tuesday AFTER them carry leg N.
+WK1_THURSDAY = {2020: "2020-09-10", 2021: "2021-09-09", 2022: "2022-09-08",
+                2023: "2023-09-07", 2024: "2024-09-05", 2025: "2025-09-04",
+                2026: "2026-09-10"}
+def eff_week(season, ts_ms, leg):
+    if not ts_ms or season not in WK1_THURSDAY:
+        return leg
+    thu = datetime.strptime(WK1_THURSDAY[season], "%Y-%m-%d")
+    start = thu - timedelta(days=2) + timedelta(hours=6)   # Tuesday 6 AM ET before kickoff
+    et = datetime.utcfromtimestamp(ts_ms / 1000) - timedelta(hours=5)
+    return max(1, min(18, (et - start).days // 7 + 1))
+
 sleeper_trades = []
 for season in SLEEPER_SEASONS:
     ro = season_ro.get(season)
@@ -719,7 +734,7 @@ for season in SLEEPER_SEASONS:
             if t.get("type") != "trade" or t.get("status") != "complete":
                 continue
             adds = t.get("adds") or {}
-            week = t.get("leg") or w
+            week = eff_week(season, t.get("status_updated") or t.get("created"), t.get("leg") or w)
             sides = []
             for r in t.get("roster_ids") or []:
                 got, gotd = [], []
@@ -765,18 +780,19 @@ for season in SLEEPER_SEASONS:
         for t in tx:
             if t.get("type") not in ("waiver", "free_agent") or t.get("status") != "complete":
                 continue
+            wtx = eff_week(season, t.get("status_updated") or t.get("created"), t.get("leg") or w)
             for pid, rid in (t.get("adds") or {}).items():
                 key = (season, pid, rid)
                 if key in seen_adds:
                     continue
                 seen_adds.add(key)
                 pts = sum(v for wk2, (v, rid2) in pwk[season].get(pid, {}).items()
-                          if wk2 >= w and rid2 == rid)
+                          if wk2 >= wtx and rid2 == rid)
                 if pts > 50:
                     info = players.get(pid) or {}
                     bid = (t.get("settings") or {}).get("waiver_bid")
                     steals.append(dict(owner=ro.get(rid, "?"), player=info.get("full_name", pid),
-                                       pos=info.get("position", "?"), year=season, week=w,
+                                       pos=info.get("position", "?"), year=season, week=wtx,
                                        pts=round(pts, 1), bid=bid))
 steals.sort(key=lambda s: -s["pts"])
 
