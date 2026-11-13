@@ -1620,7 +1620,7 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
       return `<div class="elim" style="border-left-color:${dp>=-0.05?'var(--accent)':'var(--red)'}"><b>${esc(t)}</b> <span class="d">after this trade</span>` +
         `<div style="font-size:13px;margin-top:3px">Playoffs ${b0[t].p.toFixed(1)}% → ${b1[t].p.toFixed(1)}% ${f(dp)} &nbsp;·&nbsp; Title ${b0[t].c.toFixed(1)}% → ${b1[t].c.toFixed(1)}% ${f(dc)}</div></div>`;
     }).join('') +
-    '<div class="note">20,000 paired simulations with lineups re-optimized for every remaining week (this week excluded — already underway). K/DEF aren\'t modeled, and IR-slotted players don\'t count toward lineups until activated — their trade value shows, their odds impact doesn\'t.</div>';
+    '<div class="note">20,000 paired simulations with lineups re-optimized for every remaining week (this week excluded — already underway), using the same Sleeper + ESPN ensemble projections as the main odds. K/DEF aren\'t modeled, and IR-slotted players don\'t count toward lineups until activated — their trade value shows, their odds impact doesn\'t.</div>';
   }
   function verdict(){
     const owners = partyOwners();

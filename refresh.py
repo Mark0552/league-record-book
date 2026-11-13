@@ -184,7 +184,7 @@ def refresh_trade_values(ros_vor, es_vor):
         print(f"trade values: ROS consensus ranks for {n} players")
     except Exception as ex:
         print(f"  trade values failed (ROS consensus): {ex}")
-    nrm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
+    nrm = nrm_name   # suffix-insensitive, shared with the ESPN ensemble keys
     try:
         # FantasyPros' own HALF-PPR rest-of-season boards (QB page is scoring-free)
         byname = {(nrm(e["n"]), e["p"]): e for e in players_v.values()}
@@ -325,6 +325,55 @@ for w in weeks_left + PLAYOFF_WEEKS:
     proj[w] = json.load(open(RAW / f"proj_cache_{w}.json"))
 def lpoints(st):
     return sum(scoring.get(k, 0.0) * v for k, v in st.items() if k in scoring)
+
+def nrm_name(s):
+    """Match names across providers: case/punctuation-insensitive, suffixes dropped."""
+    toks = (s or "").lower().split()
+    while toks and toks[-1].rstrip(".") in ("jr", "sr", "ii", "iii", "iv", "v"):
+        toks.pop()
+    return "".join(ch for ch in "".join(toks) if ch.isalpha())
+
+def espn_weekly_half():
+    """ESPN per-week projections at 0.5 PPR (mean of their standard and
+    full-PPR defaults): {(normalized name, pos): {week: pts}}."""
+    flt = json.dumps({"players": {"limit": 350,
+                                  "sortPercOwned": {"sortAsc": False, "sortPriority": 1},
+                                  "filterStatsForSourceIds": {"value": [1]}}})
+    posmap = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DEF"}
+    agg, meta = {}, {}
+    for dflt in (1, 3):
+        url = (f"https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}"
+               f"/segments/0/leaguedefaults/{dflt}?view=kona_player_info")
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0",
+                                                   "X-Fantasy-Filter": flt})
+        with urllib.request.urlopen(req, timeout=40) as r:
+            d = json.loads(r.read())
+        for p in d.get("players", []):
+            pl = p.get("player") or {}
+            eid = pl.get("id")
+            meta[eid] = (pl.get("fullName", ""), posmap.get(pl.get("defaultPositionId"), "?"))
+            for st in (pl.get("stats") or []):
+                if (st.get("statSourceId") == 1 and st.get("statSplitTypeId") == 1
+                        and str(st.get("seasonId")) == str(season)
+                        and cur_week <= (st.get("scoringPeriodId") or 0) <= 17):
+                    wk = agg.setdefault(eid, {})
+                    wk[st["scoringPeriodId"]] = wk.get(st["scoringPeriodId"], 0.0) + (st.get("appliedTotal") or 0) / 2.0
+    return {(nrm_name(meta[k][0]), meta[k][1]): v for k, v in agg.items() if meta[k][1] != "?"}
+
+# the projection ensemble: (Sleeper + ESPN)/2 whenever both expect the player
+# to play; Sleeper alone otherwise, since it zeroes ruled-out players fastest
+espn_wk = {}
+try:
+    espn_wk = espn_weekly_half()
+    print(f"projection ensemble: ESPN weekly numbers for {len(espn_wk)} players")
+except Exception as _ee:
+    print(f"  projection ensemble unavailable ({_ee}); using Sleeper alone")
+
+def eproj(pid, w):
+    s = lpoints(proj[w].get(pid) or {})
+    info = players.get(pid) or {}
+    e = espn_wk.get((nrm_name(info.get("full_name") or ""), info.get("position")), {}).get(w)
+    return (s + e) / 2.0 if (s > 0 and e and e > 0) else s
 rostered = set()
 for r in rosters:
     rostered.update(r["players"] or [])
@@ -341,7 +390,7 @@ for w in weeks_left + PLAYOFF_WEEKS:
 pool = {r["roster_id"]: [p for p in (r["players"] or []) if p not in set(r.get("reserve") or [])
                          and players.get(p) and players[p].get("position") in POS] for r in rosters}
 def wproj(rid, w):
-    cand = sorted(((lpoints(proj[w].get(p) or {}), players[p]["position"]) for p in pool[rid]), reverse=True)
+    cand = sorted(((eproj(p, w), players[p]["position"]) for p in pool[rid]), reverse=True)
     lineup, used = [], []
     pools = {pos: [c for c in cand if c[1] == pos] for pos in POS}
     take = lambda pos, n: [pools[pos].pop(0)[0] if pools[pos] else 0.0 for _ in range(n)]
@@ -365,31 +414,6 @@ for w in weeks_left + PLAYOFF_WEEKS:
         if v:
             ros_pts[pid] += v
 
-def espn_ros_half():
-    """ESPN rest-of-season projections at 0.5 PPR: the mean of their standard
-    and full-PPR league defaults, which differ only in reception points."""
-    flt = json.dumps({"players": {"limit": 350,
-                                  "sortPercOwned": {"sortAsc": False, "sortPriority": 1},
-                                  "filterStatsForSourceIds": {"value": [1]}}})
-    out = defaultdict(float)
-    meta = {}
-    posmap = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DEF"}
-    for dflt in (1, 3):
-        url = (f"https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}"
-               f"/segments/0/leaguedefaults/{dflt}?view=kona_player_info")
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0",
-                                                   "X-Fantasy-Filter": flt})
-        with urllib.request.urlopen(req, timeout=40) as r:
-            d = json.loads(r.read())
-        for p in d.get("players", []):
-            pl = p.get("player") or {}
-            tot = sum((st.get("appliedTotal") or 0) for st in (pl.get("stats") or [])
-                      if st.get("statSourceId") == 1 and st.get("statSplitTypeId") == 1
-                      and cur_week <= (st.get("scoringPeriodId") or 0) <= 17)
-            out[pl.get("id")] += tot / 2.0
-            meta[pl.get("id")] = (pl.get("fullName", ""), posmap.get(pl.get("defaultPositionId"), "?"))
-    return {meta[k]: v for k, v in out.items() if meta.get(k, ("", "?"))[1] != "?"}
-
 # positional scarcity: projections become value over a replacement-level
 # starter (12-team, 1QB/2RB/2WR/TE/flex lineups)
 REPL_RANK = {"QB": 13, "RB": 29, "WR": 31, "TE": 14, "K": 13, "DEF": 13}
@@ -404,15 +428,10 @@ def vor_by_pos(items):
     return {k: v - repl[pos] for k, pos, v in items
             if pos in repl and v - repl[pos] > 0}
 
-ESPN_POSMAP = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DEF"}
-_nrm = lambda s: "".join(ch for ch in s.lower() if ch.isalpha())
 es_vor = {}
-try:
-    es_raw = espn_ros_half()   # espn id -> (summed halves); meta captured below
-    es_vor = vor_by_pos([((_nrm(nm), pos), pos, v) for (nm, pos), v in es_raw.items()])
-    print(f"trade values: ESPN ROS projections for {len(es_raw)} players")
-except Exception as ex:
-    print(f"  trade values failed (ESPN ROS): {ex}")
+if espn_wk:   # same fetch feeds the ensemble and the ESPN value column
+    es_vor = vor_by_pos([(k, k[1], sum(wkv.values())) for k, wkv in espn_wk.items()])
+    print(f"trade values: ESPN ROS totals for {len(espn_wk)} players")
 
 ros_vor = vor_by_pos([(pid, (players.get(pid) or {}).get("position"), v)
                       for pid, v in ros_pts.items()])
@@ -478,7 +497,7 @@ if weeks_left:
                 if pid and pid != "0" and nflteam in nfl_rem:
                     # slot locked: banked points + remaining share of projection
                     r = nfl_rem[nflteam]
-                    locked_sum += (ppts.get(pid) or 0.0) + r * lpoints(proj[cur_week].get(pid) or {})
+                    locked_sum += (ppts.get(pid) or 0.0) + r * eproj(pid, cur_week)
                     locked_pids.add(pid)
                     inplay_w += r
                 else:
@@ -486,7 +505,7 @@ if weeks_left:
             # unlocked candidates: active roster, game not yet kicked off
             r_ = rposmap[rid]
             resv = set(r_.get("reserve") or [])
-            cand = sorted(((lpoints(proj[cur_week].get(p) or {}), players[p]["position"])
+            cand = sorted(((eproj(p, cur_week), players[p]["position"])
                            for p in (r_["players"] or [])
                            if p not in resv and p not in locked_pids
                            and (players.get(p) or {}).get("position") in SKILL
@@ -500,7 +519,7 @@ if weeks_left:
                 elif slot == "FLEX":
                     flex_n += 1
                 else:   # K, DEF etc: keep the current occupant, no mid-week streaming
-                    open_proj += lpoints(proj[cur_week].get(pid) or {})
+                    open_proj += eproj(pid, cur_week)
             flexpool = sorted(pools["RB"] + pools["WR"] + pools["TE"], reverse=True)
             for i in range(flex_n):
                 vals.append((flexpool[i][0] if i < len(flexpool) else 0.0, "FLEX"))
@@ -1187,7 +1206,7 @@ if weeks_left:
         tradepool={OWNER[r["roster_id"]]: [
             dict(id=p, pos=players[p]["position"],
                  n=players[p].get("full_name") or players[p].get("last_name") or p,
-                 pw={str(w): round(lpoints(proj[w].get(p) or {}), 1)
+                 pw={str(w): round(eproj(p, w), 1)
                      for w in weeks_left + PLAYOFF_WEEKS},
                  **({"ir": True} if p in set(r.get("reserve") or []) else {}))
             for p in (r["players"] or [])
@@ -1211,8 +1230,10 @@ now = dict(
     odds=sorted([dict(owner=OWNER[t], pct=round(100 * made[t] / N, 1)) for t in TEAMS],
                 key=lambda o: -o["pct"]),
     oddsnote="100,000 full-season simulations (regular season + playoff bracket). Weekly player "
-             "projections, optimized lineups (no K/DEF), bye and injury holes filled with a waiver "
-             "add (top-5 free agent average). League tiebreakers applied."
+             "projections are a Sleeper + ESPN ensemble (averaged when both expect the player to "
+             "play, scored at this league's settings), optimized lineups (no K/DEF), bye and "
+             "injury holes filled with a waiver add (top-5 free agent average). League "
+             "tiebreakers applied."
              + (" This week's finished games are locked in: those starters count at their actual "
                 "points in their actual slots, and only players who haven't kicked off are projected."
                 if blended else ""),
