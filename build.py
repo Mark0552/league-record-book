@@ -25,6 +25,16 @@ ALIAS = {"Tim": "Timmy", "Marty": "Martin", "Auggie": "Austin", "Cosmo": "Steve"
 def canon(name):
     return ALIAS.get(name, name)
 
+# 2014: recovered from the commissioner's ESPN e-mails (ESPN purged pre-2015
+# seasons). Weeks 1-7 are scored and standings-validated; weeks 8-13 and the
+# playoff point totals were lost, so 2014 never counts as a complete season
+# and is excluded from streak continuity and season-total records.
+PARTIAL_YEARS = {2014}
+E14 = {}
+_p14 = Path("data/espn2014.json")
+if _p14.exists():
+    E14 = json.load(open(_p14, encoding="utf-8"))
+
 # ---------------- sheet game log (2015-2025) ----------------
 games = []  # dicts: year, week, type ('Regular'|'Playoff'|'Consolation'), a, sa, b, sb
 sheet_2026 = []
@@ -100,6 +110,7 @@ for g in sheet_2026:
         matched += 1
 print(f"alias verification: {matched}/{checked} played 2026 sheet games match Sleeper under alias map")
 games.extend(sleeper_2026)
+games.extend(E14.get("games") or [])
 
 games.sort(key=lambda g: (g["year"], g["week"]))
 OWNERS = sorted({g["a"] for g in games} | {g["b"] for g in games})
@@ -160,7 +171,8 @@ for g in games:
             a = alltime[me]
             a["g"] += 1; a["pf"] += sm; a["pa"] += sy
             a["w" if res == "W" else "l" if res == "L" else "t"] += 1
-            streak_seq[me].append(res)
+            if g["year"] not in PARTIAL_YEARS:   # streaks need unbroken records
+                streak_seq[me].append(res)
             hh = h2h[me][you]
             hh["pf"] += sm; hh["pa"] += sy
             hh["w" if res == "W" else "l" if res == "L" else "t"] += 1
@@ -277,7 +289,8 @@ for g in games:
             e = season_pf[(o, g["year"])]
             e["pf"] += pts; e["g"] += 1
 complete_years = {y for y, wks in reg_weeks_by_year.items()
-                  if y < CUR_SEASON or len(wks) >= playoff_start_26 - 1}
+                  if y not in PARTIAL_YEARS
+                  and (y < CUR_SEASON or len(wks) >= playoff_start_26 - 1)}
 season_rows = [dict(owner=o, year=y, pf=round(v["pf"], 2), g=v["g"], ppg=round(v["pf"] / v["g"], 1))
                for (o, y), v in season_pf.items() if y in complete_years]
 season_high = sorted(season_rows, key=lambda r: -r["pf"])[:10]
@@ -672,6 +685,7 @@ for r in rows[1:]:
             pts = round(pts, 1)
         sides.append(dict(owner=o, gave=gave[o], got=got, pts=pts))
     trade_list.append(dict(year=year, week=week, sides=sides))
+trade_list.extend(E14.get("trades") or [])   # 2014 trades recovered from ESPN e-mails
 trade_list.sort(key=lambda t: (-t["year"], -t["week"]))
 
 # Sleeper transactions are the authoritative trade record for 2020+ (the sheet runs behind);
@@ -698,9 +712,11 @@ for season in SLEEPER_SEASONS:
                     if rr == r:
                         info = players.get(pid) or {}
                         got.append(info.get("full_name") or info.get("last_name") or pid)
-                        # only weeks the player was actually on the acquiring roster
+                        # only weeks the player was actually on the acquiring roster;
+                        # the trade week itself counts when his points landed there
+                        # (a pre-kickoff trade means he plays that week for the buyer)
                         pts += sum(v for wk2, (v, rid2) in pwk[season].get(pid, {}).items()
-                                   if wk2 > week and rid2 == r)
+                                   if wk2 >= week and rid2 == r)
                 for dp in t.get("draft_picks") or []:
                     if dp.get("owner_id") == r:
                         got.append(f"{dp.get('season')} round-{dp.get('round')} pick")
@@ -850,6 +866,17 @@ for yr in range(2015, 2020):
                                player=info.get("n") or f"player {pid}",
                                pos=ESPN_POS.get(info.get("p"), "?"),
                                pts=totals.get(pid, 0.0)))
+# 2014 draft from the e-mail archive; season totals re-scored from nflverse
+# weekly stats at ESPN-standard 2014 scoring (8-team league -> its own rounds)
+_t14f = espn_dir / "2014_totals.json"
+if E14.get("draft") and _t14f.exists():
+    _t14 = json.load(open(_t14f, encoding="utf-8"))
+    _n14 = lambda s: _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", _re.sub(r"[^a-z ]", "", s.lower())).replace(" ", "")
+    for p in E14["draft"]:
+        draft_data.append(dict(season=2014, pick=p["pick"], owner=p["owner"],
+                               player=p["player"], pos=p["pos"],
+                               pts=_t14.get(_n14(p["player"]), 0.0),
+                               round=(p["pick"] - 1) // 8 + 1))
 
 # expected points: same season, same position, same round neighborhood
 # (within-season comparison keeps a half-played season fair; within-position stops
@@ -857,7 +884,7 @@ for yr in range(2015, 2020):
 N_TEAMS = 12
 bygroup = defaultdict(list)  # (season, pos, round) -> [pts]
 for d in draft_data:
-    d["round"] = (d["pick"] - 1) // N_TEAMS + 1
+    d["round"] = d.get("round") or (d["pick"] - 1) // N_TEAMS + 1
     bygroup[(d["season"], d["pos"], d["round"])].append(d["pts"])
 def expected(d):
     for spread in (1, 2, 4, 15):
@@ -1058,6 +1085,8 @@ adj_players = [dict(pts=round(e[0], 1), name=e[1], pos=e[2], owner=e[3], year=e[
 
 adj_expand = []
 for g in games:
+    if g["year"] in PARTIAL_YEARS:   # no player data to re-score 2014 with
+        continue
     da = team_delta.get((g["year"], g["week"], g["a"]), 0.0)
     db = team_delta.get((g["year"], g["week"], g["b"]), 0.0)
     adj_expand.append((g["sa"] + da, g["a"], g["sb"] + db, g["b"], g))
@@ -1262,6 +1291,10 @@ clinch_rows = dict(spot=[], bye=[], elim=[])
 divhist = {}   # year -> division names + owner assignments, for division standings
 _ch_warn = []
 for yr in sorted({g["year"] for g in games}):
+    if yr in PARTIAL_YEARS:   # 7 of 13 weeks: clinch replay impossible, but divisions are known
+        if E14.get("divisions"):
+            divhist[str(yr)] = dict(names=E14["divisions"]["names"], owners=E14["divisions"]["owners"])
+        continue
     dmap, dnames = _ch_divmap(yr)
     reg = [g for g in games if g["year"] == yr and g["type"] == "Regular"]
     weeks = sorted({g["week"] for g in reg})
@@ -1368,6 +1401,8 @@ payload = dict(
         adj=adj,
         clinches={k: two_tiers(v, key=lambda r: r["spare"]) for k, v in clinch_rows.items()},
     ),
+    partial=({"2014": dict(note=E14.get("note", ""), playoffs=E14.get("playoffs") or [])}
+             if E14 else {}),
     rings=rings,
     money=money,
     luck=luck,

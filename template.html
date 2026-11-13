@@ -905,7 +905,9 @@ function regStandings(year){
 }
 function renderSeason(){
   const year = +$('seasonSel').value;
-  $('ss_hdr').textContent = year + ' final standings' + (year===YEARS[0]?' (so far)':'');
+  const part = (DATA.partial||{})[String(year)];
+  $('ss_hdr').textContent = year + (part ? ' standings (recovered, through week 7)'
+    : ' final standings' + (year===YEARS[0]?' (so far)':''));
   const champ = DATA.champs.find(c=>c.year===year);
   const shame = DATA.shame.find(c=>c.year===year);
   const rows = regStandings(year);
@@ -920,11 +922,15 @@ function renderSeason(){
     ordered = [...rows.filter(r=>poSet.has(r.o)), ...rows.filter(r=>!poSet.has(r.o))];
     cut = poSet.size;
   } else {
-    ordered = rows; cut = 6;
+    ordered = rows; cut = part ? -1 : 6;
   }
   $('ss_stand').innerHTML = '<tr><th>#</th><th>Owner</th><th class="num">W-L</th><th class="num">PF</th><th class="num">PA</th></tr>' +
     ordered.map((r,i)=>`<tr class="srow${i===cut?' line':''}" style="cursor:pointer" data-o="${esc(r.o)}"><td>${i+1}</td><td><b>${esc(r.o)}</b>${champ&&champ.owner===r.o?' <span class="badge gold">🏆 Buck Wong Bowl</span>':''}${shame&&shame.owner===r.o?' <span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">🥄 Lerch Cup</span>':''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td><td class="num">${f1(r.pa)}</td></tr>`).join('');
-  $('ss_note').textContent = (champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''}). ` : '')
+  $('ss_note').textContent = part
+    ? (champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''}). ` : '')
+      + (part.playoffs||[]).map(p=>`${p.round}: ${p.winner} def. ${p.loser}`).join(' · ')
+      + (part.playoffs&&part.playoffs.length ? '. ' : '') + part.note
+    : (champ ? `Champion: ${champ.owner} (${champ.team}${champ.record?', '+champ.record:''}). ` : '')
     + 'Ordered by league tiebreakers; playoff teams above the dashed cut (division winners earn seeds regardless of record). Tap an owner for who they started that season.'
     + (year===YEARS[0] && !poSet.size ? ' Current-season order mirrors the live League Status seeding.' : '');
   const dv = (DATA.divisions||{})[String(year)];

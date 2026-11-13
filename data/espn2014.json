@@ -1,0 +1,1113 @@
+{
+ "note": "Recovered from ESPN league e-mails (ESPN purged pre-2015 seasons). Weeks 1-7 scored and validated against the e-mailed standings; weeks 8-13 and playoff point totals were lost.",
+ "divisions": {
+  "names": [
+   "East",
+   "West"
+  ],
+  "owners": {
+   "Cliff": 1,
+   "Neville": 1,
+   "Sam": 1,
+   "Austin": 1,
+   "Mark": 2,
+   "Martin": 2,
+   "Lerch": 2,
+   "Bob": 2
+  }
+ },
+ "games": [
+  {
+   "year": 2014,
+   "week": 1,
+   "type": "Regular",
+   "a": "Sam",
+   "sa": 75.0,
+   "b": "Cliff",
+   "sb": 110.0
+  },
+  {
+   "year": 2014,
+   "week": 1,
+   "type": "Regular",
+   "a": "Neville",
+   "sa": 90.0,
+   "b": "Austin",
+   "sb": 70.0
+  },
+  {
+   "year": 2014,
+   "week": 1,
+   "type": "Regular",
+   "a": "Bob",
+   "sa": 75.0,
+   "b": "Lerch",
+   "sb": 118.0
+  },
+  {
+   "year": 2014,
+   "week": 1,
+   "type": "Regular",
+   "a": "Martin",
+   "sa": 88.0,
+   "b": "Mark",
+   "sb": 96.0
+  },
+  {
+   "year": 2014,
+   "week": 2,
+   "type": "Regular",
+   "a": "Neville",
+   "sa": 79.0,
+   "b": "Sam",
+   "sb": 94.0
+  },
+  {
+   "year": 2014,
+   "week": 2,
+   "type": "Regular",
+   "a": "Cliff",
+   "sa": 77.0,
+   "b": "Austin",
+   "sb": 95.0
+  },
+  {
+   "year": 2014,
+   "week": 2,
+   "type": "Regular",
+   "a": "Bob",
+   "sa": 86.0,
+   "b": "Martin",
+   "sb": 92.0
+  },
+  {
+   "year": 2014,
+   "week": 2,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 97.0,
+   "b": "Lerch",
+   "sb": 85.0
+  },
+  {
+   "year": 2014,
+   "week": 3,
+   "type": "Regular",
+   "a": "Sam",
+   "sa": 73.0,
+   "b": "Austin",
+   "sb": 96.0
+  },
+  {
+   "year": 2014,
+   "week": 3,
+   "type": "Regular",
+   "a": "Cliff",
+   "sa": 107.0,
+   "b": "Neville",
+   "sb": 89.0
+  },
+  {
+   "year": 2014,
+   "week": 3,
+   "type": "Regular",
+   "a": "Martin",
+   "sa": 59.0,
+   "b": "Lerch",
+   "sb": 32.0
+  },
+  {
+   "year": 2014,
+   "week": 3,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 81.0,
+   "b": "Bob",
+   "sb": 43.0
+  },
+  {
+   "year": 2014,
+   "week": 4,
+   "type": "Regular",
+   "a": "Martin",
+   "sa": 91.0,
+   "b": "Sam",
+   "sb": 77.0
+  },
+  {
+   "year": 2014,
+   "week": 4,
+   "type": "Regular",
+   "a": "Bob",
+   "sa": 71.0,
+   "b": "Neville",
+   "sb": 114.0
+  },
+  {
+   "year": 2014,
+   "week": 4,
+   "type": "Regular",
+   "a": "Lerch",
+   "sa": 95.0,
+   "b": "Austin",
+   "sb": 90.0
+  },
+  {
+   "year": 2014,
+   "week": 4,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 61.0,
+   "b": "Cliff",
+   "sb": 80.0
+  },
+  {
+   "year": 2014,
+   "week": 5,
+   "type": "Regular",
+   "a": "Cliff",
+   "sa": 82.0,
+   "b": "Martin",
+   "sb": 68.0
+  },
+  {
+   "year": 2014,
+   "week": 5,
+   "type": "Regular",
+   "a": "Austin",
+   "sa": 73.0,
+   "b": "Bob",
+   "sb": 81.0
+  },
+  {
+   "year": 2014,
+   "week": 5,
+   "type": "Regular",
+   "a": "Sam",
+   "sa": 81.0,
+   "b": "Lerch",
+   "sb": 113.0
+  },
+  {
+   "year": 2014,
+   "week": 5,
+   "type": "Regular",
+   "a": "Neville",
+   "sa": 74.0,
+   "b": "Mark",
+   "sb": 103.0
+  },
+  {
+   "year": 2014,
+   "week": 6,
+   "type": "Regular",
+   "a": "Martin",
+   "sa": 72.0,
+   "b": "Neville",
+   "sb": 96.0
+  },
+  {
+   "year": 2014,
+   "week": 6,
+   "type": "Regular",
+   "a": "Bob",
+   "sa": 79.0,
+   "b": "Sam",
+   "sb": 105.0
+  },
+  {
+   "year": 2014,
+   "week": 6,
+   "type": "Regular",
+   "a": "Lerch",
+   "sa": 84.0,
+   "b": "Cliff",
+   "sb": 89.0
+  },
+  {
+   "year": 2014,
+   "week": 6,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 118.0,
+   "b": "Austin",
+   "sb": 106.0
+  },
+  {
+   "year": 2014,
+   "week": 7,
+   "type": "Regular",
+   "a": "Austin",
+   "sa": 74.0,
+   "b": "Martin",
+   "sb": 43.0
+  },
+  {
+   "year": 2014,
+   "week": 7,
+   "type": "Regular",
+   "a": "Cliff",
+   "sa": 83.0,
+   "b": "Bob",
+   "sb": 90.0
+  },
+  {
+   "year": 2014,
+   "week": 7,
+   "type": "Regular",
+   "a": "Neville",
+   "sa": 112.0,
+   "b": "Lerch",
+   "sb": 77.0
+  },
+  {
+   "year": 2014,
+   "week": 7,
+   "type": "Regular",
+   "a": "Sam",
+   "sa": 118.0,
+   "b": "Mark",
+   "sb": 106.0
+  }
+ ],
+ "draft": [
+  {
+   "pick": 1,
+   "owner": "Sam",
+   "player": "LeSean McCoy",
+   "pos": "RB"
+  },
+  {
+   "pick": 2,
+   "owner": "Cliff",
+   "player": "Adrian Peterson",
+   "pos": "RB"
+  },
+  {
+   "pick": 3,
+   "owner": "Neville",
+   "player": "Jamaal Charles",
+   "pos": "RB"
+  },
+  {
+   "pick": 4,
+   "owner": "Austin",
+   "player": "Marshawn Lynch",
+   "pos": "RB"
+  },
+  {
+   "pick": 5,
+   "owner": "Martin",
+   "player": "Calvin Johnson",
+   "pos": "WR"
+  },
+  {
+   "pick": 6,
+   "owner": "Mark",
+   "player": "Peyton Manning",
+   "pos": "QB"
+  },
+  {
+   "pick": 7,
+   "owner": "Bob",
+   "player": "Matt Forte",
+   "pos": "RB"
+  },
+  {
+   "pick": 8,
+   "owner": "Lerch",
+   "player": "Eddie Lacy",
+   "pos": "RB"
+  },
+  {
+   "pick": 9,
+   "owner": "Lerch",
+   "player": "Arian Foster",
+   "pos": "RB"
+  },
+  {
+   "pick": 10,
+   "owner": "Bob",
+   "player": "Aaron Rodgers",
+   "pos": "QB"
+  },
+  {
+   "pick": 11,
+   "owner": "Mark",
+   "player": "DeMarco Murray",
+   "pos": "RB"
+  },
+  {
+   "pick": 12,
+   "owner": "Martin",
+   "player": "Jimmy Graham",
+   "pos": "TE"
+  },
+  {
+   "pick": 13,
+   "owner": "Austin",
+   "player": "Doug Martin",
+   "pos": "RB"
+  },
+  {
+   "pick": 14,
+   "owner": "Neville",
+   "player": "Drew Brees",
+   "pos": "QB"
+  },
+  {
+   "pick": 15,
+   "owner": "Cliff",
+   "player": "Le'Veon Bell",
+   "pos": "RB"
+  },
+  {
+   "pick": 16,
+   "owner": "Sam",
+   "player": "Montee Ball",
+   "pos": "RB"
+  },
+  {
+   "pick": 17,
+   "owner": "Sam",
+   "player": "Jordy Nelson",
+   "pos": "WR"
+  },
+  {
+   "pick": 18,
+   "owner": "Cliff",
+   "player": "Andrew Luck",
+   "pos": "QB"
+  },
+  {
+   "pick": 19,
+   "owner": "Neville",
+   "player": "Demaryius Thomas",
+   "pos": "WR"
+  },
+  {
+   "pick": 20,
+   "owner": "Austin",
+   "player": "Zac Stacy",
+   "pos": "RB"
+  },
+  {
+   "pick": 21,
+   "owner": "Martin",
+   "player": "Robert Griffin III",
+   "pos": "QB"
+  },
+  {
+   "pick": 22,
+   "owner": "Mark",
+   "player": "A.J. Green",
+   "pos": "WR"
+  },
+  {
+   "pick": 23,
+   "owner": "Bob",
+   "player": "Brandon Marshall",
+   "pos": "WR"
+  },
+  {
+   "pick": 24,
+   "owner": "Lerch",
+   "player": "Alshon Jeffery",
+   "pos": "WR"
+  },
+  {
+   "pick": 25,
+   "owner": "Lerch",
+   "player": "Julius Thomas",
+   "pos": "TE"
+  },
+  {
+   "pick": 26,
+   "owner": "Bob",
+   "player": "Julian Edelman",
+   "pos": "WR"
+  },
+  {
+   "pick": 27,
+   "owner": "Mark",
+   "player": "Alfred Morris",
+   "pos": "RB"
+  },
+  {
+   "pick": 28,
+   "owner": "Martin",
+   "player": "Reggie Bush",
+   "pos": "RB"
+  },
+  {
+   "pick": 29,
+   "owner": "Austin",
+   "player": "Dez Bryant",
+   "pos": "WR"
+  },
+  {
+   "pick": 30,
+   "owner": "Neville",
+   "player": "Frank Gore",
+   "pos": "RB"
+  },
+  {
+   "pick": 31,
+   "owner": "Cliff",
+   "player": "Julio Jones",
+   "pos": "WR"
+  },
+  {
+   "pick": 32,
+   "owner": "Sam",
+   "player": "Nick Foles",
+   "pos": "QB"
+  },
+  {
+   "pick": 33,
+   "owner": "Sam",
+   "player": "Rob Gronkowski",
+   "pos": "TE"
+  },
+  {
+   "pick": 34,
+   "owner": "Cliff",
+   "player": "Vernon Davis",
+   "pos": "TE"
+  },
+  {
+   "pick": 35,
+   "owner": "Neville",
+   "player": "Antonio Brown",
+   "pos": "WR"
+  },
+  {
+   "pick": 36,
+   "owner": "Austin",
+   "player": "Randall Cobb",
+   "pos": "WR"
+  },
+  {
+   "pick": 37,
+   "owner": "Martin",
+   "player": "Giovani Bernard",
+   "pos": "RB"
+  },
+  {
+   "pick": 38,
+   "owner": "Mark",
+   "player": "Vincent Jackson",
+   "pos": "WR"
+  },
+  {
+   "pick": 39,
+   "owner": "Bob",
+   "player": "C.J. Spiller",
+   "pos": "RB"
+  },
+  {
+   "pick": 40,
+   "owner": "Lerch",
+   "player": "Matthew Stafford",
+   "pos": "QB"
+  },
+  {
+   "pick": 41,
+   "owner": "Lerch",
+   "player": "Andre Johnson",
+   "pos": "WR"
+  },
+  {
+   "pick": 42,
+   "owner": "Bob",
+   "player": "Dennis Pitta",
+   "pos": "TE"
+  },
+  {
+   "pick": 43,
+   "owner": "Mark",
+   "player": "Ben Tate",
+   "pos": "RB"
+  },
+  {
+   "pick": 44,
+   "owner": "Martin",
+   "player": "Larry Fitzgerald",
+   "pos": "WR"
+  },
+  {
+   "pick": 45,
+   "owner": "Austin",
+   "player": "Cam Newton",
+   "pos": "QB"
+  },
+  {
+   "pick": 46,
+   "owner": "Neville",
+   "player": "Ryan Mathews",
+   "pos": "RB"
+  },
+  {
+   "pick": 47,
+   "owner": "Cliff",
+   "player": "DeSean Jackson",
+   "pos": "WR"
+  },
+  {
+   "pick": 48,
+   "owner": "Sam",
+   "player": "Jason Witten",
+   "pos": "TE"
+  },
+  {
+   "pick": 49,
+   "owner": "Sam",
+   "player": "Keenan Allen",
+   "pos": "WR"
+  },
+  {
+   "pick": 50,
+   "owner": "Cliff",
+   "player": "Victor Cruz",
+   "pos": "WR"
+  },
+  {
+   "pick": 51,
+   "owner": "Neville",
+   "player": "Percy Harvin",
+   "pos": "WR"
+  },
+  {
+   "pick": 52,
+   "owner": "Austin",
+   "player": "Seahawks D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 53,
+   "owner": "Martin",
+   "player": "Ray Rice",
+   "pos": "RB"
+  },
+  {
+   "pick": 54,
+   "owner": "Mark",
+   "player": "Pierre Garcon",
+   "pos": "WR"
+  },
+  {
+   "pick": 55,
+   "owner": "Bob",
+   "player": "Rashad Jennings",
+   "pos": "RB"
+  },
+  {
+   "pick": 56,
+   "owner": "Lerch",
+   "player": "Michael Crabtree",
+   "pos": "WR"
+  },
+  {
+   "pick": 57,
+   "owner": "Lerch",
+   "player": "Andre Ellington",
+   "pos": "RB"
+  },
+  {
+   "pick": 58,
+   "owner": "Bob",
+   "player": "Jeremy Maclin",
+   "pos": "WR"
+  },
+  {
+   "pick": 59,
+   "owner": "Mark",
+   "player": "Jordan Cameron",
+   "pos": "TE"
+  },
+  {
+   "pick": 60,
+   "owner": "Martin",
+   "player": "Roddy White",
+   "pos": "WR"
+  },
+  {
+   "pick": 61,
+   "owner": "Austin",
+   "player": "Toby Gerhart",
+   "pos": "RB"
+  },
+  {
+   "pick": 62,
+   "owner": "Neville",
+   "player": "Colin Kaepernick",
+   "pos": "QB"
+  },
+  {
+   "pick": 63,
+   "owner": "Cliff",
+   "player": "Joique Bell",
+   "pos": "RB"
+  },
+  {
+   "pick": 64,
+   "owner": "Sam",
+   "player": "Russell Wilson",
+   "pos": "QB"
+  },
+  {
+   "pick": 65,
+   "owner": "Sam",
+   "player": "Chris Johnson",
+   "pos": "RB"
+  },
+  {
+   "pick": 66,
+   "owner": "Cliff",
+   "player": "Kyle Rudolph",
+   "pos": "TE"
+  },
+  {
+   "pick": 67,
+   "owner": "Neville",
+   "player": "Greg Olsen",
+   "pos": "TE"
+  },
+  {
+   "pick": 68,
+   "owner": "Austin",
+   "player": "Torrey Smith",
+   "pos": "WR"
+  },
+  {
+   "pick": 69,
+   "owner": "Martin",
+   "player": "Steven Jackson",
+   "pos": "RB"
+  },
+  {
+   "pick": 70,
+   "owner": "Mark",
+   "player": "Trent Richardson",
+   "pos": "RB"
+  },
+  {
+   "pick": 71,
+   "owner": "Bob",
+   "player": "Tony Romo",
+   "pos": "QB"
+  },
+  {
+   "pick": 72,
+   "owner": "Lerch",
+   "player": "Golden Tate",
+   "pos": "WR"
+  },
+  {
+   "pick": 73,
+   "owner": "Lerch",
+   "player": "Stevan Ridley",
+   "pos": "RB"
+  },
+  {
+   "pick": 74,
+   "owner": "Bob",
+   "player": "Shane Vereen",
+   "pos": "RB"
+  },
+  {
+   "pick": 75,
+   "owner": "Mark",
+   "player": "Cordarrelle Patterson",
+   "pos": "WR"
+  },
+  {
+   "pick": 76,
+   "owner": "Martin",
+   "player": "Panthers D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 77,
+   "owner": "Austin",
+   "player": "Michael Floyd",
+   "pos": "WR"
+  },
+  {
+   "pick": 78,
+   "owner": "Neville",
+   "player": "Reggie Wayne",
+   "pos": "WR"
+  },
+  {
+   "pick": 79,
+   "owner": "Cliff",
+   "player": "Stephen Gostkowski",
+   "pos": "K"
+  },
+  {
+   "pick": 80,
+   "owner": "Sam",
+   "player": "T.Y. Hilton",
+   "pos": "WR"
+  },
+  {
+   "pick": 81,
+   "owner": "Sam",
+   "player": "Marques Colston",
+   "pos": "WR"
+  },
+  {
+   "pick": 82,
+   "owner": "Cliff",
+   "player": "Emmanuel Sanders",
+   "pos": "WR"
+  },
+  {
+   "pick": 83,
+   "owner": "Neville",
+   "player": "Mike Wallace",
+   "pos": "WR"
+  },
+  {
+   "pick": 84,
+   "owner": "Austin",
+   "player": "Martellus Bennett",
+   "pos": "TE"
+  },
+  {
+   "pick": 85,
+   "owner": "Martin",
+   "player": "Mike Evans",
+   "pos": "WR"
+  },
+  {
+   "pick": 86,
+   "owner": "Mark",
+   "player": "Patriots D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 87,
+   "owner": "Bob",
+   "player": "Danny Woodhead",
+   "pos": "RB"
+  },
+  {
+   "pick": 88,
+   "owner": "Lerch",
+   "player": "Bishop Sankey",
+   "pos": "RB"
+  },
+  {
+   "pick": 89,
+   "owner": "Lerch",
+   "player": "Kendall Wright",
+   "pos": "WR"
+  },
+  {
+   "pick": 90,
+   "owner": "Bob",
+   "player": "Eric Decker",
+   "pos": "WR"
+  },
+  {
+   "pick": 91,
+   "owner": "Mark",
+   "player": "Sammy Watkins",
+   "pos": "WR"
+  },
+  {
+   "pick": 92,
+   "owner": "Martin",
+   "player": "Bobby Rainey",
+   "pos": "RB"
+  },
+  {
+   "pick": 93,
+   "owner": "Austin",
+   "player": "Pierre Thomas",
+   "pos": "RB"
+  },
+  {
+   "pick": 94,
+   "owner": "Neville",
+   "player": "49ers D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 95,
+   "owner": "Cliff",
+   "player": "Jay Cutler",
+   "pos": "QB"
+  },
+  {
+   "pick": 96,
+   "owner": "Sam",
+   "player": "DeAndre Hopkins",
+   "pos": "WR"
+  },
+  {
+   "pick": 97,
+   "owner": "Sam",
+   "player": "Bengals D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 98,
+   "owner": "Cliff",
+   "player": "Broncos D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 99,
+   "owner": "Neville",
+   "player": "Chris Ivory",
+   "pos": "RB"
+  },
+  {
+   "pick": 100,
+   "owner": "Austin",
+   "player": "Justin Tucker",
+   "pos": "K"
+  },
+  {
+   "pick": 101,
+   "owner": "Martin",
+   "player": "Austin Seferian-Jenkins",
+   "pos": "TE"
+  },
+  {
+   "pick": 102,
+   "owner": "Mark",
+   "player": "Jeremy Hill",
+   "pos": "RB"
+  },
+  {
+   "pick": 103,
+   "owner": "Bob",
+   "player": "Raiders D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 104,
+   "owner": "Lerch",
+   "player": "Roy Helu",
+   "pos": "RB"
+  },
+  {
+   "pick": 105,
+   "owner": "Lerch",
+   "player": "Texans D/ST",
+   "pos": "DEF"
+  },
+  {
+   "pick": 106,
+   "owner": "Bob",
+   "player": "Robbie Gould",
+   "pos": "K"
+  },
+  {
+   "pick": 107,
+   "owner": "Mark",
+   "player": "Andre Williams",
+   "pos": "RB"
+  },
+  {
+   "pick": 108,
+   "owner": "Martin",
+   "player": "Terrance Williams",
+   "pos": "WR"
+  },
+  {
+   "pick": 109,
+   "owner": "Austin",
+   "player": "Tom Brady",
+   "pos": "QB"
+  },
+  {
+   "pick": 110,
+   "owner": "Neville",
+   "player": "Adam Vinatieri",
+   "pos": "K"
+  },
+  {
+   "pick": 111,
+   "owner": "Cliff",
+   "player": "Anquan Boldin",
+   "pos": "WR"
+  },
+  {
+   "pick": 112,
+   "owner": "Sam",
+   "player": "DeAngelo Williams",
+   "pos": "RB"
+  },
+  {
+   "pick": 113,
+   "owner": "Sam",
+   "player": "Antonio Gates",
+   "pos": "TE"
+  },
+  {
+   "pick": 114,
+   "owner": "Cliff",
+   "player": "Fred Jackson",
+   "pos": "RB"
+  },
+  {
+   "pick": 115,
+   "owner": "Neville",
+   "player": "Shonn Greene",
+   "pos": "RB"
+  },
+  {
+   "pick": 116,
+   "owner": "Austin",
+   "player": "Wes Welker",
+   "pos": "WR"
+  },
+  {
+   "pick": 117,
+   "owner": "Martin",
+   "player": "Maurice Jones-Drew",
+   "pos": "RB"
+  },
+  {
+   "pick": 118,
+   "owner": "Mark",
+   "player": "Steven Hauschka",
+   "pos": "K"
+  },
+  {
+   "pick": 119,
+   "owner": "Bob",
+   "player": "Cecil Shorts",
+   "pos": "WR"
+  },
+  {
+   "pick": 120,
+   "owner": "Lerch",
+   "player": "Jordan Reed",
+   "pos": "TE"
+  },
+  {
+   "pick": 121,
+   "owner": "Lerch",
+   "player": "Brandon McManus",
+   "pos": "K"
+  },
+  {
+   "pick": 122,
+   "owner": "Bob",
+   "player": "Darren Sproles",
+   "pos": "RB"
+  },
+  {
+   "pick": 123,
+   "owner": "Mark",
+   "player": "Tim Wright",
+   "pos": "TE"
+  },
+  {
+   "pick": 124,
+   "owner": "Martin",
+   "player": "Mason Crosby",
+   "pos": "K"
+  },
+  {
+   "pick": 125,
+   "owner": "Austin",
+   "player": "Steve Smith",
+   "pos": "WR"
+  },
+  {
+   "pick": 126,
+   "owner": "Neville",
+   "player": "Greg Jennings",
+   "pos": "WR"
+  },
+  {
+   "pick": 127,
+   "owner": "Cliff",
+   "player": "Riley Cooper",
+   "pos": "WR"
+  },
+  {
+   "pick": 128,
+   "owner": "Sam",
+   "player": "Shayne Graham",
+   "pos": "K"
+  }
+ ],
+ "trades": [
+  {
+   "year": 2014,
+   "week": 9,
+   "sides": [
+    {
+     "owner": "Martin",
+     "gave": [
+      "Steven Jackson"
+     ],
+     "got": [
+      "Jerick McKinnon"
+     ],
+     "pts": null
+    },
+    {
+     "owner": "Sam",
+     "gave": [
+      "Jerick McKinnon"
+     ],
+     "got": [
+      "Steven Jackson"
+     ],
+     "pts": null
+    }
+   ]
+  },
+  {
+   "year": 2014,
+   "week": 10,
+   "sides": [
+    {
+     "owner": "Martin",
+     "gave": [
+      "Jerick McKinnon",
+      "Jimmy Graham"
+     ],
+     "got": [
+      "Steven Jackson",
+      "Antonio Gates"
+     ],
+     "pts": null
+    },
+    {
+     "owner": "Sam",
+     "gave": [
+      "Steven Jackson",
+      "Antonio Gates"
+     ],
+     "got": [
+      "Jerick McKinnon",
+      "Jimmy Graham"
+     ],
+     "pts": null
+    }
+   ]
+  }
+ ],
+ "playoffs": [
+  {
+   "round": "Semifinal",
+   "winner": "Mark",
+   "loser": "Neville"
+  },
+  {
+   "round": "Championship",
+   "winner": "Mark",
+   "loser": "Cliff"
+  }
+ ]
+}
