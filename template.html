@@ -1538,7 +1538,7 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
       const chips = pt.gets.map(id=>{
         const v = valById[id], pp = poolById[id]||{};
         return `<div class="elim" style="border-left-color:var(--accent);padding:7px 10px;margin:6px 0">` +
-          `<div style="display:flex;justify-content:space-between;align-items:center"><span><b>${esc(nameOf(id))}</b> <span class="d">${esc(pp.pos||'')} · from ${esc(ownerOf[id]||'?')}</span></span><span data-del="${id}" data-pt="${i}" style="cursor:pointer;color:var(--red);font-weight:700;padding:0 6px">×</span></div>` +
+          `<div style="display:flex;justify-content:space-between;align-items:center"><span><b>${esc(nameOf(id))}</b> <span class="d">${esc(pp.pos||'')}${pp.ir?' · <span style="color:var(--red);font-weight:700">IR</span>':''} · from ${esc(ownerOf[id]||'?')}</span></span><span data-del="${id}" data-pt="${i}" style="cursor:pointer;color:var(--red);font-weight:700;padding:0 6px">×</span></div>` +
           (v?`<div style="font-size:11px;color:var(--ink2)">${SRC.map(([k,nm])=>`${nm.split(' ')[0]} ${v[k]!=null?(PTS(k)?v[k].toFixed(0):v[k]):'—'}`).join(' · ')}</div>`:'') + `</div>`;
       }).join('');
       return `<div style="border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px">` +
@@ -1569,11 +1569,11 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
         const nm = nameOf(p.id);
         if(q && !nm.toLowerCase().includes(q)) continue;
         const v = valById[p.id];
-        pool.push({id:p.id, nm, pos:p.pos, from:pt.owner, sc: v?score(v):sumPw(p)/10});
+        pool.push({id:p.id, nm, pos:p.pos, ir:p.ir, from:pt.owner, sc: v?score(v):sumPw(p)/10});
       }
     }
     pool.sort((a,b)=>b.sc-a.sc);
-    box.innerHTML = pool.slice(0, q?8:30).map(p=>`<div class="meet" style="cursor:pointer" data-add="${p.id}" data-pt="${i}"><span><b>${esc(p.nm)}</b> <span class="d">${esc(p.pos)} · ${esc(p.from)}</span></span><span class="d">${Math.round(p.sc)}</span></div>`).join('');
+    box.innerHTML = pool.slice(0, q?8:30).map(p=>`<div class="meet" style="cursor:pointer" data-add="${p.id}" data-pt="${i}"><span><b>${esc(p.nm)}</b> <span class="d">${esc(p.pos)}${p.ir?' · <span style="color:var(--red);font-weight:700">IR</span>':''} · ${esc(p.from)}</span></span><span class="d">${Math.round(p.sc)}</span></div>`).join('');
   }
   function totals(){
     const recv = {}, sent = {};
@@ -1583,7 +1583,7 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
   }
   function lineupPts(list, w){
     const pools = {QB:[],RB:[],WR:[],TE:[]};
-    list.forEach(p=>{ if(pools[p.pos]) pools[p.pos].push((p.pw && p.pw[w]) || 0); });
+    list.forEach(p=>{ if(!p.ir && pools[p.pos]) pools[p.pos].push((p.pw && p.pw[w]) || 0); });
     for(const k in pools) pools[k].sort((a,b)=>b-a);
     const R = (MP.replw||{})[w] || {};
     const take = (pos,nn)=>{ const o=[]; for(let j=0;j<nn;j++) o.push([pools[pos].length?pools[pos].shift():0, pos]); return o; };
@@ -1620,7 +1620,7 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
       return `<div class="elim" style="border-left-color:${dp>=-0.05?'var(--accent)':'var(--red)'}"><b>${esc(t)}</b> <span class="d">after this trade</span>` +
         `<div style="font-size:13px;margin-top:3px">Playoffs ${b0[t].p.toFixed(1)}% → ${b1[t].p.toFixed(1)}% ${f(dp)} &nbsp;·&nbsp; Title ${b0[t].c.toFixed(1)}% → ${b1[t].c.toFixed(1)}% ${f(dc)}</div></div>`;
     }).join('') +
-    '<div class="note">20,000 paired simulations with lineups re-optimized for every remaining week (this week excluded — already underway). K/DEF aren\'t modeled.</div>';
+    '<div class="note">20,000 paired simulations with lineups re-optimized for every remaining week (this week excluded — already underway). K/DEF aren\'t modeled, and IR-slotted players don\'t count toward lineups until activated — their trade value shows, their odds impact doesn\'t.</div>';
   }
   function verdict(){
     const owners = partyOwners();

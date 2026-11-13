@@ -1183,11 +1183,16 @@ if weeks_left:
         sdw=({OWNER[t]: round(WSD[t][cur_week], 1) for t in TEAMS} if blended else None),
         # per-player weekly projections + waiver-replacement levels, so the
         # trade calculator can re-optimize lineups and re-run the odds sim
-        tradepool={OWNER[t]: [dict(id=p, pos=players[p]["position"],
-                                   n=players[p].get("full_name") or players[p].get("last_name") or p,
-                                   pw={str(w): round(lpoints(proj[w].get(p) or {}), 1)
-                                       for w in weeks_left + PLAYOFF_WEEKS})
-                              for p in pool[t]] for t in TEAMS},
+        # full skill rosters, IR slots included (flagged so lineups skip them)
+        tradepool={OWNER[r["roster_id"]]: [
+            dict(id=p, pos=players[p]["position"],
+                 n=players[p].get("full_name") or players[p].get("last_name") or p,
+                 pw={str(w): round(lpoints(proj[w].get(p) or {}), 1)
+                     for w in weeks_left + PLAYOFF_WEEKS},
+                 **({"ir": True} if p in set(r.get("reserve") or []) else {}))
+            for p in (r["players"] or [])
+            if players.get(p) and players[p].get("position") in POS]
+            for r in rosters},
         replw={str(w): {ps: round(repl[w].get(ps, 0.0), 1) for ps in ("QB", "RB", "WR", "TE")}
                for w in weeks_left + PLAYOFF_WEEKS},
         wins={OWNER[t]: wins0[t] for t in TEAMS},
