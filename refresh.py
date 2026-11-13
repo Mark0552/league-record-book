@@ -360,20 +360,93 @@ def espn_weekly_half():
                     wk[st["scoringPeriodId"]] = wk.get(st["scoringPeriodId"], 0.0) + (st.get("appliedTotal") or 0) / 2.0
     return {(nrm_name(meta[k][0]), meta[k][1]): v for k, v in agg.items() if meta[k][1] != "?"}
 
-# the projection ensemble: (Sleeper + ESPN)/2 whenever both expect the player
-# to play; Sleeper alone otherwise, since it zeroes ruled-out players fastest
+FP_KEY = "zjxN52G3lP4fORpHRftGI2mTU8cTwxVNvkjByM3j"   # FantasyPros' public partner key, embedded in their own pages
+FP_STATMAP = {"pass_yds": "pass_yd", "pass_tds": "pass_td", "pass_ints": "pass_int",
+              "rush_yds": "rush_yd", "rush_tds": "rush_td",
+              "rec_rec": "rec", "rec_yds": "rec_yd", "rec_tds": "rec_td",
+              "fumbles": "fum_lost", "2pt_tds": "rush_2pt", "ret_tds": "st_td",
+              "rush_yds_100": "bonus_rush_yd_100", "rush_yds_200": "bonus_rush_yd_200",
+              "rec_yds_100": "bonus_rec_yd_100", "rec_yds_200": "bonus_rec_yd_200"}
+
+def _fp_unpack(weeks_map, wanted):
+    out = {}
+    for ws, m in weeks_map.items():
+        if int(ws) in wanted:
+            for k, v in m.items():
+                nm, pos = k.rsplit("|", 1)
+                out.setdefault((nm, pos), {})[int(ws)] = v
+    return out
+
+def fp_weekly():
+    """FantasyPros consensus weekly projections scored under this league's
+    exact settings: {(normalized name, pos): {week: pts}}. Disk-cached ~4h so
+    the 5-minute live runs never touch their API."""
+    cache = Path("data/fp_proj.json")
+    wanted = weeks_left + PLAYOFF_WEEKS
+    c = {}
+    if cache.exists():
+        try:
+            c = json.load(open(cache, encoding="utf-8"))
+        except Exception:
+            c = {}
+    if (c.get("season") == str(season)
+            and __import__("time").time() - c.get("at", 0) < 4 * 3600 - 120
+            and all(str(w) in (c.get("weeks") or {}) for w in wanted)):
+        return _fp_unpack(c["weeks"], wanted), "cached"
+    try:
+        weeks_out = {}
+        for w in wanted:
+            m = {}
+            for pos in ("QB", "RB", "WR", "TE"):
+                url = (f"https://api.fantasypros.com/public/v2/json/nfl/{season}"
+                       f"/projections?position={pos}&week={w}&scoring=HALF")
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0",
+                                                           "x-api-key": FP_KEY})
+                with urllib.request.urlopen(req, timeout=25) as r:
+                    d = json.loads(r.read())
+                for p in d.get("players", []):
+                    pts = sum(scoring.get(FP_STATMAP.get(k, ""), 0.0) * (v or 0)
+                              for k, v in (p.get("stats") or {}).items())
+                    if pts > 0:
+                        m[f'{nrm_name(p.get("name") or "")}|{pos}'] = round(pts, 2)
+            weeks_out[str(w)] = m
+        json.dump(dict(at=int(__import__("time").time()), season=str(season), weeks=weeks_out),
+                  open(cache, "w", encoding="utf-8"))
+        return _fp_unpack(weeks_out, wanted), "fresh"
+    except Exception as e:
+        if c.get("weeks"):
+            print(f"  FantasyPros fetch failed ({e}); using the stale cache")
+            return _fp_unpack(c["weeks"], wanted), "stale"
+        raise
+
+# the projection ensemble: Sleeper, ESPN and FantasyPros averaged wherever each
+# expects the player to play; Sleeper alone decides the zeros, since it rules
+# out injured players fastest
 espn_wk = {}
 try:
     espn_wk = espn_weekly_half()
     print(f"projection ensemble: ESPN weekly numbers for {len(espn_wk)} players")
 except Exception as _ee:
-    print(f"  projection ensemble unavailable ({_ee}); using Sleeper alone")
+    print(f"  ESPN weekly projections unavailable ({_ee})")
+fp_wk = {}
+try:
+    fp_wk, _src = fp_weekly()
+    print(f"projection ensemble: FantasyPros weekly numbers for {len(fp_wk)} players ({_src})")
+except Exception as _fe:
+    print(f"  FantasyPros weekly projections unavailable ({_fe})")
 
 def eproj(pid, w):
     s = lpoints(proj[w].get(pid) or {})
+    if s <= 0:
+        return s
     info = players.get(pid) or {}
-    e = espn_wk.get((nrm_name(info.get("full_name") or ""), info.get("position")), {}).get(w)
-    return (s + e) / 2.0 if (s > 0 and e and e > 0) else s
+    key = (nrm_name(info.get("full_name") or ""), info.get("position"))
+    vals = [s]
+    for src in (espn_wk, fp_wk):
+        v = src.get(key, {}).get(w)
+        if v and v > 0:
+            vals.append(v)
+    return sum(vals) / len(vals)
 rostered = set()
 for r in rosters:
     rostered.update(r["players"] or [])
@@ -1230,10 +1303,10 @@ now = dict(
     odds=sorted([dict(owner=OWNER[t], pct=round(100 * made[t] / N, 1)) for t in TEAMS],
                 key=lambda o: -o["pct"]),
     oddsnote="100,000 full-season simulations (regular season + playoff bracket). Weekly player "
-             "projections are a Sleeper + ESPN ensemble (averaged when both expect the player to "
-             "play, scored at this league's settings), optimized lineups (no K/DEF), bye and "
-             "injury holes filled with a waiver add (top-5 free agent average). League "
-             "tiebreakers applied."
+             "projections are a Sleeper + ESPN + FantasyPros ensemble, averaged wherever each "
+             "source expects the player to play and scored at this league's settings. Optimized "
+             "lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free "
+             "agent average). League tiebreakers applied."
              + (" This week's finished games are locked in: those starters count at their actual "
                 "points in their actual slots, and only players who haven't kicked off are projected."
                 if blended else ""),
