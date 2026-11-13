@@ -111,7 +111,29 @@ for w in range(1, 19):
     get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/matchups/{w}", yr_dir / f"matchups_{w}.json")
     get(f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/transactions/{w}", yr_dir / f"transactions_{w}.json")
 print("fetching players + sheet ...")
-get("https://api.sleeper.app/v1/players/nfl", RAW / "players.json")
+# players.json is too churny to commit, so a compact snapshot (players_min.json)
+# is committed instead: refreshed after every successful fetch, and the fallback
+# if Sleeper ever stops serving the full database.
+try:
+    get("https://api.sleeper.app/v1/players/nfl", RAW / "players.json")
+    _pl = json.load(open(RAW / "players.json", encoding="utf-8"))
+    _min = {}
+    for _pid, _p in _pl.items():
+        if _p:
+            _min[_pid] = {k: v for k, v in dict(
+                full_name=_p.get("full_name"), first_name=_p.get("first_name"),
+                last_name=_p.get("last_name"), position=_p.get("position"),
+                team=_p.get("team"), search_full_name=_p.get("search_full_name"),
+                search_rank=_p.get("search_rank"),
+                fantasy_positions=_p.get("fantasy_positions")).items() if v is not None}
+    json.dump(_min, open("data/players_min.json", "w", encoding="utf-8"))
+except Exception as _pe:
+    if (RAW / "players.json").exists():
+        print(f"  players fetch failed ({_pe}); using the cached copy")
+    else:
+        print(f"  players fetch failed ({_pe}); rebuilding from the committed snapshot")
+        _min = json.load(open("data/players_min.json", encoding="utf-8"))
+        json.dump(_min, open(RAW / "players.json", "w", encoding="utf-8"))
 for name, gid in SHEET_TABS.items():
     get(f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={gid}",
         RAW / "sheet" / f"{name}.csv")

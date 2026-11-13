@@ -304,7 +304,9 @@ loss_high = sorted([e for e in expand if e[0] < e[2]], key=lambda x: -x[0])[:10]
 win_low = sorted([e for e in no_consol if e[0] > e[2]], key=lambda x: x[0])[:10]   # daylight robberies
 
 # ---------------- player records (Sleeper 2020+, starters only) ----------------
-players = json.load(open(RAW / "players.json", encoding="utf-8"))
+# fall back to the committed snapshot if the full database isn't on disk
+_pf = RAW / "players.json" if (RAW / "players.json").exists() else Path("data/players_min.json")
+players = json.load(open(_pf, encoding="utf-8"))
 # (week, rounded score) -> owner, per season, from the canonical game log
 score_owner = defaultdict(dict)
 for g in games:
