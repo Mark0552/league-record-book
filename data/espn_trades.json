@@ -1,0 +1,476 @@
+[
+ {
+  "year": 2014,
+  "week": 9,
+  "sides": [
+   {
+    "owner": "Martin",
+    "gave": [
+     "Steven Jackson"
+    ],
+    "got": [
+     "Jerick McKinnon"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Sam",
+    "gave": [
+     "Jerick McKinnon"
+    ],
+    "got": [
+     "Steven Jackson"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2014,
+  "week": 10,
+  "sides": [
+   {
+    "owner": "Martin",
+    "gave": [
+     "Jerick McKinnon",
+     "Jimmy Graham"
+    ],
+    "got": [
+     "Steven Jackson",
+     "Antonio Gates"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Sam",
+    "gave": [
+     "Steven Jackson",
+     "Antonio Gates"
+    ],
+    "got": [
+     "Jerick McKinnon",
+     "Jimmy Graham"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2016,
+  "week": 6,
+  "sides": [
+   {
+    "owner": "Sam",
+    "gave": [
+     "Jeremy Hill"
+    ],
+    "got": [
+     "Ryan Mathews"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Timmy",
+    "gave": [
+     "Ryan Mathews"
+    ],
+    "got": [
+     "Jeremy Hill"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2017,
+  "week": 5,
+  "sides": [
+   {
+    "owner": "Bob",
+    "gave": [
+     "Charles Clay"
+    ],
+    "got": [
+     "Martellus Bennett"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Luke",
+    "gave": [
+     "Martellus Bennett"
+    ],
+    "got": [
+     "Charles Clay"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2017,
+  "week": 9,
+  "sides": [
+   {
+    "owner": "Will",
+    "gave": [
+     "Davante Adams"
+    ],
+    "got": [
+     "Frank Gore"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Bob",
+    "gave": [
+     "Frank Gore"
+    ],
+    "got": [
+     "Davante Adams"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2017,
+  "week": 10,
+  "sides": [
+   {
+    "owner": "Martin",
+    "gave": [
+     "Golden Tate"
+    ],
+    "got": [
+     "Ameer Abdullah"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Sam",
+    "gave": [
+     "Ameer Abdullah"
+    ],
+    "got": [
+     "Golden Tate"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2017,
+  "week": 11,
+  "sides": [
+   {
+    "owner": "Steve",
+    "gave": [
+     "Evan Engram",
+     "Eric Decker"
+    ],
+    "got": [
+     "Joe Mixon",
+     "Jordy Nelson"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Martin",
+    "gave": [
+     "Joe Mixon",
+     "Jordy Nelson"
+    ],
+    "got": [
+     "Evan Engram",
+     "Eric Decker"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2017,
+  "week": 11,
+  "sides": [
+   {
+    "owner": "Will",
+    "gave": [
+     "Duke Johnson Jr."
+    ],
+    "got": [
+     "Robby Anderson"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Cliff",
+    "gave": [
+     "Robby Anderson"
+    ],
+    "got": [
+     "Duke Johnson Jr."
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2018,
+  "week": 3,
+  "sides": [
+   {
+    "owner": "Will",
+    "gave": [
+     "Chris Thompson",
+     "Emmanuel Sanders"
+    ],
+    "got": [
+     "Le'Veon Bell",
+     "Mike Williams"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Sam",
+    "gave": [
+     "Le'Veon Bell",
+     "Mike Williams"
+    ],
+    "got": [
+     "Chris Thompson",
+     "Emmanuel Sanders"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2018,
+  "week": 6,
+  "sides": [
+   {
+    "owner": "Will",
+    "gave": [
+     "Deshaun Watson"
+    ],
+    "got": [
+     "Doug Baldwin"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Luke",
+    "gave": [
+     "Doug Baldwin"
+    ],
+    "got": [
+     "Deshaun Watson"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2018,
+  "week": 10,
+  "sides": [
+   {
+    "owner": "Luke",
+    "gave": [
+     "Matt Breida"
+    ],
+    "got": [
+     "Mitchell Trubisky"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Timmy",
+    "gave": [
+     "Mitchell Trubisky"
+    ],
+    "got": [
+     "Matt Breida"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2018,
+  "week": 11,
+  "sides": [
+   {
+    "owner": "Cliff",
+    "gave": [
+     "Royce Freeman",
+     "Michael Thomas"
+    ],
+    "got": [
+     "Le'Veon Bell",
+     "LeSean McCoy"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Will",
+    "gave": [
+     "Le'Veon Bell",
+     "LeSean McCoy"
+    ],
+    "got": [
+     "Royce Freeman",
+     "Michael Thomas"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2018,
+  "week": 11,
+  "sides": [
+   {
+    "owner": "Will",
+    "gave": [
+     "Sony Michel",
+     "Doug Baldwin",
+     "Le'Veon Bell"
+    ],
+    "got": [
+     "Adam Thielen",
+     "Adam Humphries",
+     "Austin Ekeler"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Clancy",
+    "gave": [
+     "Adam Thielen",
+     "Adam Humphries",
+     "Austin Ekeler"
+    ],
+    "got": [
+     "Sony Michel",
+     "Doug Baldwin",
+     "Le'Veon Bell"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2019,
+  "week": 1,
+  "sides": [
+   {
+    "owner": "Sam",
+    "gave": [
+     "Adrian Peterson",
+     "Hunter Henry"
+    ],
+    "got": [
+     "Corey Davis",
+     "Doug Baldwin"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Clancy",
+    "gave": [
+     "Corey Davis",
+     "Doug Baldwin"
+    ],
+    "got": [
+     "Adrian Peterson",
+     "Hunter Henry"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2019,
+  "week": 1,
+  "sides": [
+   {
+    "owner": "Mark",
+    "gave": [
+     "Dante Pettis"
+    ],
+    "got": [
+     "Ka'imi Fairbairn"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Clancy",
+    "gave": [
+     "Ka'imi Fairbairn"
+    ],
+    "got": [
+     "Dante Pettis"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2019,
+  "week": 12,
+  "sides": [
+   {
+    "owner": "Martin",
+    "gave": [
+     "Frank Gore",
+     "Matthew Stafford"
+    ],
+    "got": [
+     "Marvin Jones Jr.",
+     "Christian Kirk"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Will",
+    "gave": [
+     "Marvin Jones Jr.",
+     "Christian Kirk"
+    ],
+    "got": [
+     "Frank Gore",
+     "Matthew Stafford"
+    ],
+    "pts": null
+   }
+  ]
+ },
+ {
+  "year": 2019,
+  "week": 12,
+  "sides": [
+   {
+    "owner": "Luke",
+    "gave": [
+     "Josh Gordon"
+    ],
+    "got": [
+     "Adam Thielen"
+    ],
+    "pts": null
+   },
+   {
+    "owner": "Will",
+    "gave": [
+     "Adam Thielen"
+    ],
+    "got": [
+     "Josh Gordon"
+    ],
+    "pts": null
+   }
+  ]
+ }
+]

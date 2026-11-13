@@ -687,7 +687,21 @@ for r in rows[1:]:
             pts = round(pts, 1)
         sides.append(dict(owner=o, gave=gave[o], got=got, pts=pts))
     trade_list.append(dict(year=year, week=week, sides=sides))
-trade_list.extend(E14.get("trades") or [])   # 2014 trades recovered from ESPN e-mails
+# ESPN-era trades recovered from the league's notification e-mails (the API has
+# no pre-2020 transactions). The sheet keeps precedence where it recorded one.
+_etf = Path("data/espn_trades.json")
+if _etf.exists():
+    _nn = lambda s: _re.sub(r"[^a-z]", "", _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", s.lower()))
+    _known = {(t["year"], frozenset(_nn(p) for s in t["sides"] for p in s["gave"]))
+              for t in trade_list}
+    _mailed = 0
+    for t in json.load(open(_etf, encoding="utf-8")):
+        k = (t["year"], frozenset(_nn(p) for s in t["sides"] for p in s["gave"]))
+        if k not in _known:
+            _known.add(k)
+            trade_list.append(t)
+            _mailed += 1
+    print(f"trades: {_mailed} ESPN-era trades added from the e-mail archive")
 trade_list.sort(key=lambda t: (-t["year"], -t["week"]))
 
 # Sleeper transactions are the authoritative trade record for 2020+ (the sheet runs behind);
