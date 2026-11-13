@@ -1184,6 +1184,7 @@ if weeks_left:
         # per-player weekly projections + waiver-replacement levels, so the
         # trade calculator can re-optimize lineups and re-run the odds sim
         tradepool={OWNER[t]: [dict(id=p, pos=players[p]["position"],
+                                   n=players[p].get("full_name") or players[p].get("last_name") or p,
                                    pw={str(w): round(lpoints(proj[w].get(p) or {}), 1)
                                        for w in weeks_left + PLAYOFF_WEEKS})
                               for p in pool[t]] for t in TEAMS},

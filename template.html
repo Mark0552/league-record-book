@@ -357,21 +357,16 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="trade">
     <div class="card"><h2>Build the trade</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div><div style="font-weight:700;margin-bottom:6px;color:var(--accent)">Side A gets</div>
-          <input class="flt" id="tcA" type="search" placeholder="Add player..." autocomplete="off">
-          <div id="tcAsug"></div><div id="tcAlist"></div></div>
-        <div><div style="font-weight:700;margin-bottom:6px;color:var(--gold)">Side B gets</div>
-          <input class="flt" id="tcB" type="search" placeholder="Add player..." autocomplete="off">
-          <div id="tcBsug"></div><div id="tcBlist"></div></div>
-      </div>
+      <div class="note" style="margin-bottom:8px">Pick two or more teams. Each team's "gets" list draws from the other teams' actual rosters &mdash; the sender is whoever has the player today.</div>
+      <div id="tcTeams"></div>
+      <button class="btn" id="tcAddTeam" style="display:none">+ Add another team</button>
       <button class="btn" id="tcReset" style="display:none">Clear the trade</button></div>
     <div class="card" id="tcVcard" style="display:none"><h2>Verdict</h2>
       <div id="tcVerdict"></div>
       <div id="tcImpact"></div>
       <div class="tscroll"><table id="tcTable"></table></div>
-      <div class="note">Every source is <em>redraft</em> &mdash; no dynasty values, so age and rookie premiums don't distort win-now trades. FantasyCalc is computed for this league's exact settings (12-team, 1 QB, 0.5 PPR redraft) and its curve prices the rank-based sources: ROS Consensus = Dynasty Daddy's rest-of-season consensus rank (ESPN/FantasyPros/FanDuel aggregate, provider-default scoring), FantasyPros ECR = their <em>half-PPR</em> rest-of-season expert consensus, each valued at what FantasyCalc pays that rank at the position. Sleeper VOR and ESPN VOR = rest-of-season projected points <em>above a replacement-level starter</em> (12-team lineups), so positional scarcity counts everywhere; ESPN's 0.5 PPR is the mean of their standard and full-PPR projections. The verdict averages each player's share of the top value in every source that lists them. &mdash; = not listed by that source.</div></div>
-  </section>
+      <div class="note">Every source is <em>redraft</em> &mdash; no dynasty values. FantasyCalc is computed for this league's exact settings (12-team, 1 QB, 0.5 PPR redraft) and its curve prices the rank sources: ROS Consensus = Dynasty Daddy's rest-of-season consensus rank (provider-default scoring), FantasyPros ECR = their half-PPR rest-of-season consensus. Sleeper VOR and ESPN VOR = rest-of-season projected points above a replacement-level starter (12-team lineups). The table is each team's <em>net</em>: value received minus value sent, per source; players no source lists count as 0.</div></div>
+</section>
 
   <section id="draft">
     <div class="card"><h2>Draft report card (2015&ndash;2026)</h2><div class="tscroll"><table id="d_grades"></table></div>
@@ -1507,60 +1502,91 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
 
 /* ---------------- TRADE CALCULATOR ---------------- */
 (function(){
+  const MP = (DATA.now && DATA.now.machine) || null;
   const TC = DATA.trade || [];
-  if(!TC.length){ $('tcA').placeholder = $('tcB').placeholder = 'Values arrive with the next update'; return; }
+  if(!MP || !MP.tradepool){
+    const s = document.getElementById('tcTeams');
+    if(s) s.innerHTML = '<div class="note">The trade calculator runs during the regular season.</div>';
+    return;
+  }
+  const valById = {}; TC.forEach(p=>valById[p.id]=p);
+  const ownerOf = {}, poolById = {};
+  for(const o in MP.tradepool) MP.tradepool[o].forEach(p=>{ ownerOf[p.id]=o; poolById[p.id]=p; });
   const SRC = [['fc','FantasyCalc'],['rc','ROS Consensus'],['fp','FantasyPros ECR'],['rs','Sleeper VOR'],['es','ESPN VOR']];
   const PTS = k => k==='rs'||k==='es';
-  const MAX = {}; SRC.forEach(([k])=>MAX[k] = Math.max(...TC.map(p=>p[k]||0)));
-  const byId = {}; TC.forEach(p=>byId[p.id]=p);
-  const sides = {A:[], B:[]};
-  const score = p => { const s = SRC.filter(([k])=>p[k]); return s.length ? s.reduce((a,[k])=>a+p[k]/MAX[k]*100,0)/s.length : 0; };
-  function sug(side){
-    const q = $('tc'+side).value.trim().toLowerCase();
-    const box = $('tc'+side+'sug');
-    if(q.length < 2){ box.innerHTML=''; return; }
-    const hits = TC.filter(p=>p.n.toLowerCase().includes(q) && !sides.A.includes(p.id) && !sides.B.includes(p.id)).slice(0,8);
-    box.innerHTML = hits.map(p=>`<div class="meet" style="cursor:pointer" data-add="${p.id}" data-side="${side}"><span><b>${esc(p.n)}</b> <span class="d">${esc(p.p)}${p.t?' · '+esc(p.t):''}</span></span><span class="d">${Math.round(score(p))}</span></div>`).join('');
+  const MAX = {}; SRC.forEach(([k])=>MAX[k] = Math.max(1, ...TC.map(p=>p[k]||0)));
+  const score = p => { const s = SRC.filter(([k])=>p && p[k]); return s.length ? s.reduce((a,[k])=>a+p[k]/MAX[k]*100,0)/s.length : 0; };
+  const sumPw = p => Object.values(p.pw||{}).reduce((a,b)=>a+b,0);
+  const nameOf = id => (valById[id]&&valById[id].n) || (poolById[id]&&poolById[id].n) || id;
+
+  let parties = [{owner:'',gets:[]},{owner:'',gets:[]}];
+  const partyOwners = () => parties.map(p=>p.owner).filter(Boolean);
+
+  function prune(){
+    const owners = partyOwners();
+    for(const pt of parties)
+      pt.gets = pt.gets.filter(id => owners.includes(ownerOf[id]) && ownerOf[id] !== pt.owner);
   }
-  function chips(side){
-    $('tc'+side+'list').innerHTML = sides[side].map(id=>{ const p = byId[id];
-      return `<div class="elim" style="border-left-color:${side==='A'?'var(--accent)':'var(--gold)'};padding:8px 10px">`+
-        `<div style="display:flex;justify-content:space-between;align-items:center"><b>${esc(p.n)}</b><span data-del="${id}" data-side="${side}" style="cursor:pointer;color:var(--red);font-weight:700;padding:0 4px">×</span></div>`+
-        `<div style="font-size:11.5px;color:var(--ink2)">${esc(p.p)}${p.t?' · '+esc(p.t):''} · ${SRC.map(([k,n])=>`${n.split(' ')[0]} ${p[k]!=null?(PTS(k)?p[k].toFixed(0):p[k]):'—'}`).join(' · ')}</div></div>`;
+  function renderTeams(){
+    prune();
+    $('tcTeams').innerHTML = parties.map((pt,i)=>{
+      const others = partyOwners().filter(o=>o!==pt.owner);
+      const opts = '<option value="">— pick a team —</option>' + MP.torder.map(o=>{
+        const taken = partyOwners().includes(o) && pt.owner!==o;
+        return `<option value="${esc(o)}"${pt.owner===o?' selected':''}${taken?' disabled':''}>${esc(o)}</option>`;
+      }).join('');
+      const chips = pt.gets.map(id=>{
+        const v = valById[id], pp = poolById[id]||{};
+        return `<div class="elim" style="border-left-color:var(--accent);padding:7px 10px;margin:6px 0">` +
+          `<div style="display:flex;justify-content:space-between;align-items:center"><span><b>${esc(nameOf(id))}</b> <span class="d">${esc(pp.pos||'')} · from ${esc(ownerOf[id]||'?')}</span></span><span data-del="${id}" data-pt="${i}" style="cursor:pointer;color:var(--red);font-weight:700;padding:0 6px">×</span></div>` +
+          (v?`<div style="font-size:11px;color:var(--ink2)">${SRC.map(([k,nm])=>`${nm.split(' ')[0]} ${v[k]!=null?(PTS(k)?v[k].toFixed(0):v[k]):'—'}`).join(' · ')}</div>`:'') + `</div>`;
+      }).join('');
+      return `<div style="border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px">` +
+        `<div style="display:flex;align-items:center;gap:8px">` +
+        `<select data-own="${i}" class="flt" style="flex:1;margin:0">${opts}</select>` +
+        (parties.length>2?`<span data-rmteam="${i}" style="cursor:pointer;color:var(--red);font-weight:700;padding:0 6px;font-size:18px">×</span>`:'') + `</div>` +
+        (pt.owner ? (others.length
+          ? `<div style="font-weight:700;font-size:12.5px;margin:8px 0 4px">${esc(pt.owner)} gets:</div>` +
+            `<input class="flt" data-q="${i}" type="search" placeholder="Add from ${others.map(esc).join(' / ')} — tap for rosters" autocomplete="off">` +
+            `<div data-sug="${i}"></div><div>${chips}</div>`
+          : '<div class="note" style="margin-top:6px">Pick another team to trade with.</div>')
+        : '') + `</div>`;
     }).join('');
+    $('tcAddTeam').style.display = parties.length < 4 && partyOwners().length >= 2 ? '' : 'none';
+    $('tcReset').style.display = parties.some(pt=>pt.owner||pt.gets.length) ? '' : 'none';
   }
-  function verdict(){
-    const any = sides.A.length || sides.B.length;
-    $('tcVcard').style.display = any ? '' : 'none';
-    $('tcReset').style.display = any ? '' : 'none';
-    if(!any) return;
-    const rows = SRC.map(([k, name])=>{
-      const tot = s => sides[s].reduce((a,id)=>a+(byId[id][k]||0),0);
-      const miss = s => sides[s].some(id=>byId[id][k]==null);
-      const fmt = (v,s) => (PTS(k)?v.toFixed(0):Math.round(v).toLocaleString()) + (miss(s)?' *':'');
-      return `<tr><td>${name}</td><td class="num">${fmt(tot('A'),'A')}</td><td class="num">${fmt(tot('B'),'B')}</td></tr>`;
-    }).join('');
-    const avg = s => sides[s].reduce((a,id)=>a+score(byId[id]),0);
-    const a = avg('A'), b = avg('B');
-    $('tcTable').innerHTML = `<tr><th>Source</th><th class="num">Side A</th><th class="num">Side B</th></tr>${rows}`+
-      `<tr style="font-weight:700"><td>Average (0&ndash;100/player)</td><td class="num">${a.toFixed(1)}</td><td class="num">${b.toFixed(1)}</td></tr>`;
-    const hi = Math.max(a,b), diff = hi ? (Math.abs(a-b)/hi*100) : 0;
-    const win = a>b?'A':'B';
-    $('tcVerdict').innerHTML = `<div class="elim" style="border-left-color:${diff<7?'var(--accent)':'var(--red)'}"><b>${
-      diff<2?'Dead even.':diff<7?'Fair trade.':`Side ${win} wins by ${diff.toFixed(0)}%.`}</b>`+
-      `<div style="font-size:12.5px;color:var(--ink2);margin-top:3px">By the averaged value share across every source. * = a player missing from that source's table.</div></div>`;
-    tradeImpact();
+  function sugFor(i){
+    const box = document.querySelector(`[data-sug="${i}"]`);
+    const inp = document.querySelector(`[data-q="${i}"]`);
+    if(!box || !inp) return;
+    const q = inp.value.trim().toLowerCase();
+    const taken = new Set(parties.flatMap(pt=>pt.gets));
+    const pool = [];
+    for(const pt of parties){
+      if(!pt.owner || pt.owner===parties[i].owner) continue;
+      for(const p of (MP.tradepool[pt.owner]||[])){
+        if(taken.has(p.id)) continue;
+        const nm = nameOf(p.id);
+        if(q && !nm.toLowerCase().includes(q)) continue;
+        const v = valById[p.id];
+        pool.push({id:p.id, nm, pos:p.pos, from:pt.owner, sc: v?score(v):sumPw(p)/10});
+      }
+    }
+    pool.sort((a,b)=>b.sc-a.sc);
+    box.innerHTML = pool.slice(0, q?8:30).map(p=>`<div class="meet" style="cursor:pointer" data-add="${p.id}" data-pt="${i}"><span><b>${esc(p.nm)}</b> <span class="d">${esc(p.pos)} · ${esc(p.from)}</span></span><span class="d">${Math.round(p.sc)}</span></div>`).join('');
   }
-  // what the trade does to each team's actual playoff & title odds
-  const MP = (DATA.now && DATA.now.machine) || null;
-  const ownerOf = {}, poolById = {};
-  if(MP && MP.tradepool) for(const o in MP.tradepool) MP.tradepool[o].forEach(p=>{ ownerOf[p.id]=o; poolById[p.id]=p; });
+  function totals(){
+    const recv = {}, sent = {};
+    for(const pt of parties) if(pt.owner){ recv[pt.owner]=pt.gets.slice(); sent[pt.owner]=[]; }
+    for(const pt of parties) for(const id of pt.gets){ const o=ownerOf[id]; if(o in sent) sent[o].push(id); }
+    return {recv, sent};
+  }
   function lineupPts(list, w){
     const pools = {QB:[],RB:[],WR:[],TE:[]};
     list.forEach(p=>{ if(pools[p.pos]) pools[p.pos].push((p.pw && p.pw[w]) || 0); });
     for(const k in pools) pools[k].sort((a,b)=>b-a);
     const R = (MP.replw||{})[w] || {};
-    const take = (pos,nn)=>{ const o=[]; for(let i=0;i<nn;i++) o.push([pools[pos].length?pools[pos].shift():0, pos]); return o; };
+    const take = (pos,nn)=>{ const o=[]; for(let j=0;j<nn;j++) o.push([pools[pos].length?pools[pos].shift():0, pos]); return o; };
     const vals = [...take('QB',1), ...take('RB',2), ...take('WR',2), ...take('TE',1)];
     const flex = [...pools.RB, ...pools.WR, ...pools.TE].sort((a,b)=>b-a);
     vals.push([flex.length?flex[0]:0, 'FLEX']);
@@ -1569,52 +1595,86 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
       s += v >= 0.5 ? v : (sl==='FLEX' ? Math.max(R.RB||0, R.WR||0, R.TE||0) : (R[sl]||0));
     return s;
   }
-  function tradeImpact(){
-    const el = $('tcImpact');
-    if(!el) return;
-    if(!MP || !MP.tradepool || !window.__tradeOdds || !sides.A.length || !sides.B.length){ el.innerHTML=''; return; }
-    const ownersOn = s => [...new Set(sides[s].map(id=>ownerOf[id]).filter(Boolean))];
-    const oA = ownersOn('A'), oB = ownersOn('B');
-    if(oA.length!==1 || oB.length!==1 || oA[0]===oB[0]){
-      el.innerHTML = '<div class="note">For playoff-odds impact, each side must receive players from one (different) league roster. Free agents and K/DEF aren\'t modeled.</div>';
-      return;
-    }
-    // the players a side RECEIVES come off the other team's roster
-    const tA = oB[0], tB = oA[0];
-    const wksList = Object.keys(((MP.tradepool[tA]||[])[0]||{pw:{}}).pw);
-    const skipW = String(Math.min(...Object.keys(MP.weeks).map(Number)));   // current week already underway
-    const after = (t, inIds, outIds) => MP.tradepool[t].filter(p=>!outIds.includes(p.id)).concat(inIds.map(id=>poolById[id]).filter(Boolean));
-    const idxT = {}; MP.torder.forEach((t,i)=>idxT[t]=i);
-    const mkAdj = (t, inIds, outIds) => {
-      const base = MP.tradepool[t], post = after(t, inIds, outIds), m = {};
+  function tradeImpact(recv, sent, owners){
+    const el = $('tcImpact'); el.innerHTML = '';
+    if(!window.__tradeOdds) return;
+    const wksList = Object.keys(((MP.tradepool[owners[0]]||[])[0]||{pw:{}}).pw);
+    const skipW = String(Math.min(...Object.keys(MP.weeks).map(Number)));
+    const idxT = {}; MP.torder.forEach((t,j)=>idxT[t]=j);
+    const adjust = {};
+    for(const o of owners){
+      const base = MP.tradepool[o];
+      const post = base.filter(p=>!sent[o].includes(p.id)).concat(recv[o].map(id=>poolById[id]).filter(Boolean));
+      const m = {};
       for(const w of wksList){
         if(w===skipW) continue;
         const d = lineupPts(post, w) - lineupPts(base, w);
         if(Math.abs(d) > 0.05) m[+w] = d;
       }
-      return m;
-    };
-    const adjust = {};
-    adjust[idxT[tA]] = mkAdj(tA, sides.A, sides.B);
-    adjust[idxT[tB]] = mkAdj(tB, sides.B, sides.A);
+      adjust[idxT[o]] = m;
+    }
     const b0 = window.__tradeOdds(null), b1 = window.__tradeOdds(adjust);
-    const line = t => {
+    const f = d => `<span style="color:${d>0.05?'var(--accent)':d<-0.05?'var(--red)':'var(--ink3)'};font-weight:700">${d>=0?'+':''}${d.toFixed(1)}</span>`;
+    el.innerHTML = owners.map(t=>{
       const dp = b1[t].p-b0[t].p, dc = b1[t].c-b0[t].c;
-      const f = d => `<span style="color:${d>0.05?'var(--accent)':d<-0.05?'var(--red)':'var(--ink3)'};font-weight:700">${d>=0?'+':''}${d.toFixed(1)}</span>`;
       return `<div class="elim" style="border-left-color:${dp>=-0.05?'var(--accent)':'var(--red)'}"><b>${esc(t)}</b> <span class="d">after this trade</span>` +
         `<div style="font-size:13px;margin-top:3px">Playoffs ${b0[t].p.toFixed(1)}% → ${b1[t].p.toFixed(1)}% ${f(dp)} &nbsp;·&nbsp; Title ${b0[t].c.toFixed(1)}% → ${b1[t].c.toFixed(1)}% ${f(dc)}</div></div>`;
-    };
-    el.innerHTML = line(tA) + line(tB) +
-      '<div class="note">20,000 paired simulations with re-optimized lineups for every remaining week (this week excluded — it\'s already underway).</div>';
+    }).join('') +
+    '<div class="note">20,000 paired simulations with lineups re-optimized for every remaining week (this week excluded — already underway). K/DEF aren\'t modeled.</div>';
   }
-  ['A','B'].forEach(s=>$('tc'+s).addEventListener('input', ()=>sug(s)));
-  $('trade').addEventListener('click', e=>{
-    const add = e.target.closest('[data-add]');
-    if(add){ sides[add.dataset.side].push(add.dataset.add); $('tc'+add.dataset.side).value=''; sug(add.dataset.side); chips(add.dataset.side); verdict(); return; }
-    const del = e.target.closest('[data-del]');
-    if(del){ const s = del.dataset.side; sides[s] = sides[s].filter(x=>x!==del.dataset.del); chips(s); verdict(); }
+  function verdict(){
+    const owners = partyOwners();
+    const any = parties.some(pt=>pt.gets.length);
+    $('tcVcard').style.display = any ? '' : 'none';
+    if(!any) return;
+    const {recv, sent} = totals();
+    const rows = SRC.map(([k,name])=>'<tr><td>'+name+'</td>' + owners.map(o=>{
+      const r = recv[o].reduce((a,id)=>a+((valById[id]||{})[k]||0),0);
+      const s = sent[o].reduce((a,id)=>a+((valById[id]||{})[k]||0),0);
+      const d = r - s;
+      const txt = PTS(k) ? d.toFixed(0) : Math.round(d).toLocaleString();
+      return `<td class="num" style="color:${d>0?'var(--accent)':d<0?'var(--red)':'var(--ink3)'}">${d>0?'+':''}${txt}</td>`;
+    }).join('') + '</tr>').join('');
+    const nrm = {};
+    owners.forEach(o=>{
+      nrm[o] = recv[o].reduce((a,id)=>a+score(valById[id]),0) - sent[o].reduce((a,id)=>a+score(valById[id]),0);
+    });
+    $('tcTable').innerHTML = `<tr><th>Source (net)</th>${owners.map(o=>`<th class="num">${esc(o)}</th>`).join('')}</tr>` + rows +
+      `<tr style="font-weight:700"><td>Average (0–100/player)</td>${owners.map(o=>`<td class="num">${nrm[o]>0?'+':''}${nrm[o].toFixed(1)}</td>`).join('')}</tr>`;
+    const best = owners.reduce((a,b)=>nrm[a]>=nrm[b]?a:b);
+    const worst = owners.reduce((a,b)=>nrm[a]<=nrm[b]?a:b);
+    const spread = (nrm[best]||0)-(nrm[worst]||0);
+    $('tcVerdict').innerHTML = `<div class="elim" style="border-left-color:${spread<15?'var(--accent)':'var(--red)'}"><b>${
+      spread<8 ? 'Fair for everyone.' : `${esc(best)} comes out ahead on value; ${esc(worst)} gives up the most.`}</b>` +
+      `<div style="font-size:12.5px;color:var(--ink2);margin-top:3px">By net value (received − sent) averaged across the sources.</div></div>`;
+    tradeImpact(recv, sent, owners);
+  }
+  const root = document.getElementById('trade');
+  root.addEventListener('change', e=>{
+    const sel = e.target.closest('select[data-own]');
+    if(!sel) return;
+    parties[+sel.dataset.own].owner = sel.value;
+    renderTeams(); verdict();
   });
-  $('tcReset').addEventListener('click', ()=>{ sides.A=[]; sides.B=[]; chips('A'); chips('B'); verdict(); });
+  root.addEventListener('input', e=>{
+    const inp = e.target.closest('input[data-q]');
+    if(inp) sugFor(+inp.dataset.q);
+  });
+  root.addEventListener('focusin', e=>{
+    const inp = e.target.closest('input[data-q]');
+    if(inp) sugFor(+inp.dataset.q);
+  });
+  root.addEventListener('click', e=>{
+    const add = e.target.closest('[data-add]');
+    if(add){ parties[+add.dataset.pt].gets.push(add.dataset.add); renderTeams(); verdict(); return; }
+    const del = e.target.closest('[data-del]');
+    if(del){ const pt = parties[+del.dataset.pt]; pt.gets = pt.gets.filter(x=>x!==del.dataset.del); renderTeams(); verdict(); return; }
+    const rm = e.target.closest('[data-rmteam]');
+    if(rm){ parties.splice(+rm.dataset.rmteam, 1); renderTeams(); verdict(); return; }
+    if(e.target.id==='tcAddTeam'){ parties.push({owner:'',gets:[]}); renderTeams(); return; }
+    if(e.target.id==='tcReset'){ parties = [{owner:'',gets:[]},{owner:'',gets:[]}]; renderTeams(); verdict(); }
+  });
+  renderTeams();
 })();
 
 /* ---------------- PUBLICATIONS ---------------- */
