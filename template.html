@@ -1327,7 +1327,7 @@ function renderRecordLists(){
   const adjMode = $('rMode').value === 'adj';
   const M = adjMode ? R.adj : R;
   $('rModeNote').textContent = adjMode
-    ? 'Adjusted: every season re-scored under today’s rules — 2015–2018 get 0.5 PPR (receptions via nflverse), and 2015–2023 get the rush 100–199 yd (+2) / 200+ yd (+4) game bonuses added in 2024. Rec yardage bonuses existed every year, so no change there. Season lists ranked by points per game to level 13- vs 14-game schedules. Not adjusted: the −1 missed-XP rule added in 2025 (worth only a point or two per season league-wide). Blowouts, streaks and money always use raw scores.'
+    ? 'Adjusted: every season re-scored under today’s rules — 2014–2018 get 0.5 PPR (receptions via nflverse), and 2014–2023 get the rush 100–199 yd (+2) / 200+ yd (+4) game bonuses added in 2024. Rec yardage bonuses existed every year, so no change there. Season lists ranked by points per game to level 13- vs 14-game schedules. Not adjusted: the −1 missed-XP rule added in 2025 (worth only a point or two per season league-wide). Blowouts, streaks and money always use raw scores.'
     : 'Raw: every score exactly as it counted at the time. Rule changes along the way: 0.5 PPR arrived in 2019 (standard scoring before); rush 100/200-yd game bonuses (+2/+4) arrived in 2024; missed XPs cost −1 from 2025. Rec 100/200-yd bonuses (+2/+4) have been there since 2015.';
   const lu = e => `class="lurow" style="cursor:pointer" data-y="${e.year}" data-w="${e.week}" data-a="${esc(e.owner)}" data-b="${esc(e.opp)}"`;
   $('r_top').innerHTML = M.top.map(e=>`<li ${lu(e)}><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">vs ${esc(e.opp)} · ${e.year} wk${e.week}</span></span></li>`).join('');

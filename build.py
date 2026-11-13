@@ -128,7 +128,7 @@ ESPN_POS = {1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DEF"}
 espn_dir = RAW / "espn"
 espn_owner = {}
 espn_totals = {}
-for yr in range(2015, 2020):
+for yr in range(2014, 2020):
     f = espn_dir / f"{yr}.json"
     if not f.exists():
         continue
@@ -389,8 +389,8 @@ for season in SLEEPER_SEASONS:
                     pts=round(bpts, 2), name=info.get("full_name") or info.get("last_name") or pid,
                     pos=pos or "?", owner=ro.get(x["roster_id"], "?"), year=season, week=w,
                     v=verdict, gain=round(gain, 2), margin=round(op - x["points"], 2)))
-# ---- ESPN era (2015-2019): starters' weekly points ----
-for yr in range(2015, 2020):
+# ---- ESPN era (2014-2019): starters' weekly points ----
+for yr in range(2014, 2020):
     for w in range(1, 17):
         f = espn_dir / f"{yr}_box_{w}.json"
         if not f.exists():
@@ -762,7 +762,7 @@ steals.sort(key=lambda s: -s["pts"])
 
 # ---- ESPN-era forensic reconstruction: who played for a team that didn't draft them ----
 espn_pickups, espn_swaps = [], []
-for yr in range(2015, 2020):
+for yr in range(2014, 2020):
     df = espn_dir / f"{yr}_draft.json"
     pf_ = espn_dir / f"{yr}_players.json"
     if not (df.exists() and pf_.exists()):
@@ -957,7 +957,7 @@ with open(RAW / "sheet" / "worst.csv", encoding="utf-8") as f:
 
 # ================= STARTING LINEUPS for every game =================
 lineups = {}  # "year|week|owner" -> [[name, pos, pts], ...]
-for yr in range(2015, 2020):
+for yr in range(2014, 2020):
     for w in range(1, 17):
         f = espn_dir / f"{yr}_box_{w}.json"
         if not f.exists():
@@ -1045,8 +1045,8 @@ if canon_name:
 # Scoring rules changed over the years (verified from ESPN mSettings + Sleeper
 # scoring_settings): 0.5 PPR arrived in 2019; rush 100-199 (+2) / 200+ (+4)
 # game bonuses arrived in 2024 (rec equivalents existed every year; pass
-# bonuses never did). Adjusted mode re-scores 2015-2018 at 0.5 PPR and
-# retro-applies the rush bonuses to 2015-2023 using nflverse weekly stats,
+# bonuses never did). Adjusted mode re-scores 2014-2018 at 0.5 PPR and
+# retro-applies the rush bonuses to 2014-2023 using nflverse weekly stats,
 # and ranks seasons per-game. XP-miss -1 (added 2025) is NOT retro-applied
 # (no per-week kicking source; worth ~1-2 pts/season league-wide).
 def norm_infl(s):
@@ -1054,14 +1054,14 @@ def norm_infl(s):
     s = _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", s)
     return s.replace(" ", "")
 recmaps = {}
-for yr in range(2015, 2019):
+for yr in range(2014, 2019):
     fp = espn_dir / f"rec_{yr}.json"
     if fp.exists():
         recmaps[yr] = json.load(open(fp, encoding="utf-8"))
 def rec_of(yr, w, name):
     return (recmaps.get(yr) or {}).get(f"{w}|{norm_infl(name)}", 0.0)
 rushmaps = {}
-for yr in range(2015, 2024):
+for yr in range(2014, 2024):
     fp = espn_dir / f"rush_{yr}.json"
     if fp.exists():
         rushmaps[yr] = json.load(open(fp, encoding="utf-8"))
@@ -1087,7 +1087,7 @@ adj_players = [dict(pts=round(e[0], 1), name=e[1], pos=e[2], owner=e[3], year=e[
 
 adj_expand = []
 for g in games:
-    if g["year"] < 2015:   # no player-level data to re-score 2014 with
+    if g.get("agg"):   # two-week playoff totals aren't single-game scores
         continue
     da = team_delta.get((g["year"], g["week"], g["a"]), 0.0)
     db = team_delta.get((g["year"], g["week"], g["b"]), 0.0)
