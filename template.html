@@ -293,8 +293,12 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="swpane on"><ol class="rec" id="r_top"></ol></div>
       <div class="swpane"><ol class="rec" id="r_low"></ol>
         <div class="note">Consolation games don't count here &mdash; those rosters often weren't even set, and a forfeit isn't a record.</div></div></div>
-    <div class="card"><h2>Best player games (starters, since 2015)</h2><ol class="rec" id="r_players"></ol>
-      <div class="note">Scored under that season's league settings (ESPN era 2015-2019, Sleeper era 2020+).</div></div>
+    <div class="card swcard" data-sw="0"><h2>Best player games</h2>
+      <div class="swtabs"><button class="swtab on">Starters</button><button class="swtab">Left on the bench</button></div>
+      <div class="swpane on"><ol class="rec" id="r_players"></ol>
+        <div class="note">Scored under that season's league settings (ESPN era 2015-2019, Sleeper era 2020+).</div></div>
+      <div class="swpane"><ol class="rec" id="r_benchgames"></ol>
+        <div class="note">The biggest games ever left on a bench (Sleeper era 2020+ &mdash; ESPN kept no bench scores). The what-if swaps him in for the lowest-scoring starter he could legally replace.</div></div></div>
     <div class="card swcard" data-sw="0"><h2>Margins</h2>
       <div class="swtabs"><button class="swtab on">Biggest blowouts</button><button class="swtab">Closest finishes</button></div>
       <div class="swpane on"><ol class="rec" id="r_blow"></ol></div>
@@ -1319,6 +1323,12 @@ const lue = e => `class="lurow" style="cursor:pointer" data-y="${e.year}" data-w
 $('r_losshi').innerHTML = R.loss_high.map(e=>`<li ${lue(e)}><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">lost to ${esc(e.opp)}'s ${f2(e.opp_pts)} · ${e.year} wk${e.week}</span></span></li>`).join('');
 $('r_winlo').innerHTML = R.win_low.map(e=>`<li ${lue(e)}><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">beat ${esc(e.opp)}'s ${f2(e.opp_pts)} · ${e.year} wk${e.week}</span></span></li>`).join('');
 renderRecordLists();
+$('r_benchgames').innerHTML = (R.bench_games||[]).map(b=>{
+  const what = b.v==='flip' ? `<span style="color:var(--accent);font-weight:600">starting him flips the ${b.margin.toFixed(1)}-pt loss</span>`
+    : b.v==='won' ? 'team won anyway'
+    : `still loses by ${(b.margin-b.gain).toFixed(1)}`;
+  return `<li><span class="v">${f2(b.pts)}</span><span><b>${esc(b.name)}</b> <span class="d">${esc(b.pos)} · ${esc(b.owner)}'s bench · ${b.year} wk${b.week} · ${what}</span></span></li>`;
+}).join('') || '<li><span class="d">No bench data yet</span></li>';
 // record holder(s) at the top value, then one expandable "N tied" row for the next tier
 const tieDetails = {};
 function attachTieClicks(el){

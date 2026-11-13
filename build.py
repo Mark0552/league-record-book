@@ -301,6 +301,7 @@ for r in load(2026, "rosters"):
     uid26[r["owner_id"]] = ROSTER_OWNER_2026[r["roster_id"]]
 
 player_games = []
+bench_games = []   # best games left on the bench (Sleeper era only: ESPN kept no bench scores)
 for season in SLEEPER_SEASONS:
     rost = load(season, "rosters")
     if not rost:
@@ -325,16 +326,54 @@ for season in SLEEPER_SEASONS:
         ro[r["roster_id"]] = owner
     lgs = load(season, "league")
     pstart = lgs["settings"]["playoff_week_start"]
+    slots_b = [s for s in (lgs.get("roster_positions") or []) if s not in ("BN", "IR")]
     for w in range(1, 19):
+        if season == CUR_SEASON and w > last_scored_26:
+            break   # mid-week partials never enter the record book
         m = load(season, f"matchups_{w}")
         if not m:
             continue
+        opp_pts = {}
+        pair_b = defaultdict(list)
+        for x in m:
+            if x.get("matchup_id") is not None:
+                pair_b[x["matchup_id"]].append(x)
+        for xs in pair_b.values():
+            if len(xs) == 2:
+                opp_pts[xs[0]["roster_id"]] = xs[1]["points"]
+                opp_pts[xs[1]["roster_id"]] = xs[0]["points"]
         for x in m:
             pts_map = x.get("players_points") or {}
-            for pid in (x.get("starters") or []):
+            st = x.get("starters") or []
+            for pid in st:
                 pts = pts_map.get(pid)
                 if pts and pts > 0:
                     player_games.append((pts, pid, ro.get(x["roster_id"], "?"), season, w))
+            # bench heartbreakers: what if the big bench game had started?
+            op = opp_pts.get(x["roster_id"])
+            if op is None or (x["points"] == 0 and op == 0):
+                continue
+            stset = set(st)
+            for pid in (x.get("players") or []):
+                if pid in stset:
+                    continue
+                bpts = pts_map.get(pid) or 0
+                if bpts < 20:
+                    continue
+                pos = (players.get(pid) or {}).get("position")
+                # cheapest legal swap: his position's slots, plus FLEX if eligible
+                swap = [pts_map.get(st[i]) or 0 for i, sl in enumerate(slots_b) if i < len(st)
+                        and (sl == pos or (sl == "FLEX" and pos in ("RB", "WR", "TE")))]
+                if not swap:
+                    continue
+                gain = bpts - min(swap)
+                verdict = ("won" if x["points"] > op else
+                           "flip" if gain > 0 and x["points"] + gain > op else "short")
+                info = players.get(pid) or {}
+                bench_games.append(dict(
+                    pts=round(bpts, 2), name=info.get("full_name") or info.get("last_name") or pid,
+                    pos=pos or "?", owner=ro.get(x["roster_id"], "?"), year=season, week=w,
+                    v=verdict, gain=round(gain, 2), margin=round(op - x["points"], 2)))
 # ---- ESPN era (2015-2019): starters' weekly points ----
 for yr in range(2015, 2020):
     for w in range(1, 17):
@@ -360,6 +399,7 @@ for pts, pid, owner, season, w in player_games[:15]:
         pos = info.get("position", "?")
     top_players.append(dict(pts=round(pts, 2), name=nm, pos=pos,
                             owner=owner, year=season, week=w))
+bench_games = sorted(bench_games, key=lambda b: -b["pts"])[:10]
 
 # ================= MONEY =================
 from collections import Counter
@@ -963,6 +1003,7 @@ if canon_name:
             if it.get(field) in canon_name:
                 it[field] = canon_name[it[field]]
     _remap(top_players, "name")
+    _remap(bench_games, "name")
     _remap(espn_pickups)
     _remap(espn_swaps)
     for lst in moves["waivers"].values():
@@ -1323,6 +1364,7 @@ payload = dict(
         loss_high=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in loss_high],
         win_low=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in win_low],
         players=top_players,
+        bench_games=bench_games,
         adj=adj,
         clinches={k: two_tiers(v, key=lambda r: r["spare"]) for k, v in clinch_rows.items()},
     ),
