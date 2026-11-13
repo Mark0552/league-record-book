@@ -846,10 +846,14 @@ for t in trade_list:
 for e in espn_swaps:
     e["how"] = ("trade" if (e["year"], e["owner"], normname(e["player"])) in sheet_trade_gets
                 else "waivers")
-# a dropped-then-claimed player is a waiver pickup like any other
+# a dropped-then-claimed player is a waiver pickup like any other; with the
+# trade log complete, "changed hands" needs no card of its own — trades live
+# in the trade history, everything else was a pickup
 espn_pickups.extend(e for e in espn_swaps if e["how"] == "waivers")
-espn_pickups.sort(key=lambda e: -e["pts"])
-espn_swaps.sort(key=lambda e: -e["pts"])
+all_pickups = steals + [dict(owner=e["owner"], player=e["player"], pos=e["pos"],
+                             year=e["year"], week=e["week"], pts=e["pts"],
+                             games=e.get("games")) for e in espn_pickups]
+all_pickups.sort(key=lambda s: -s["pts"])
 
 # ESPN-era trades: points while STARTING for the acquirer, from the trade week
 # on (bench data wasn't archived, so roster tenure isn't knowable)
@@ -867,6 +871,27 @@ for t in trade_list:
                         if wk else dict(n=pname, pts=None))
         side["gotd"] = gotd
 
+# most lopsided trades: gap between what each side's haul went on to score
+lopsided = []
+for t in trade_list:
+    tots = []
+    for s in t["sides"]:
+        if s.get("pts") is not None:
+            tots.append((s["pts"], s))
+        elif s.get("gotd"):
+            tots.append((round(sum(p.get("pts") or 0 for p in s["gotd"]), 1), s))
+    if len(tots) < 2:
+        continue
+    tots.sort(key=lambda x: -x[0])
+    margin = round(tots[0][0] - tots[-1][0], 1)
+    if margin <= 0:
+        continue
+    lopsided.append(dict(year=t["year"], week=t["week"], margin=margin,
+                         winner=tots[0][1]["owner"], wpts=tots[0][0], wgot=tots[0][1]["got"],
+                         loser=tots[-1][1]["owner"], lpts=tots[-1][0], lgot=tots[-1][1]["got"]))
+lopsided.sort(key=lambda e: -e["margin"])
+lopsided = lopsided[:10]
+
 def by_position(items, per_pos=5):
     out = {}
     for it in items:   # already sorted by points desc
@@ -876,9 +901,8 @@ def by_position(items, per_pos=5):
     return {p: out[p] for p in ("QB", "RB", "WR", "TE", "K", "DEF") if out.get(p)}
 
 moves = dict(trades=trade_list,
-             waivers=by_position(steals),
-             espn_pickups=by_position(espn_pickups, 4),
-             espn_swaps=espn_swaps[:15])
+             waivers=by_position(all_pickups),
+             lopsided=lopsided)
 
 # ================= DRAFT REPORT CARDS (2020+) =================
 draft_data = []

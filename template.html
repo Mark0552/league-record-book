@@ -340,12 +340,10 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   <section id="moves">
     <div class="card"><h2>Trade history</h2><div id="v_trades"></div>
       <div class="note">The complete recorded history: Sleeper transactions (2020+) plus every ESPN-era trade (2014&ndash;2019) recovered from the league's notification e-mails. Points = everything the player scored while on the acquiring roster from the trade week on, started or benched, that season &mdash; with the weeks he stayed rostered. A week ends after Monday night, so Tuesday/Wednesday trades count toward the next week. ESPN-era trades (no bench data archived) show points and <em>starts</em> for the acquirer instead of roster tenure.</div></div>
-    <div class="card"><h2>Best waiver pickups by position, Sleeper era (2020&ndash;present)</h2><div id="v_waivers"></div>
-      <div class="note">Points scored while on the claiming team's roster, from pickup week on. FAAB bid shown for waiver claims. Updates daily.</div></div>
-    <div class="card"><h2>Best waiver pickups by position, ESPN era</h2><div id="v_epick"></div>
-      <div class="note">ESPN kept no waiver logs, so this is reconstructed from drafts vs weekly lineups, cross-checked against the recovered trade log: undrafted players who were claimed and started, plus drafted players dropped by one team and claimed by another (no matching trade on record). Points = while starting for that team; week = first start.</div></div>
-    <div class="card"><h2>Changed hands mid-season, ESPN era</h2><ol class="rec" id="v_eswap"></ol>
-      <div class="note">Players who started for a team other than the one that drafted them, with how they moved now settled by the recovered trade log: "trade" = in the log; "waivers" = no trade on record, so they were dropped and claimed. Points = while starting for the new team.</div></div>
+    <div class="card"><h2>Most lopsided trades</h2><ol class="rec" id="v_lopsided"></ol>
+      <div class="note">The gap between what each side's haul went on to score after the trade. Sleeper era counts everything scored while on the acquiring roster; ESPN era counts starts only (bench data wasn't archived), so old-era gaps are conservative. Current-season trades are marked "so far".</div></div>
+    <div class="card"><h2>Best waiver &amp; undrafted pickups by position, 2014&ndash;present</h2><div id="v_waivers"></div>
+      <div class="note">Sleeper era (2020+): points while on the claiming roster from pickup week on, FAAB bids shown. ESPN era: no waiver logs survive, so pickups are reconstructed from drafts vs weekly lineups and cross-checked against the recovered trade log &mdash; undrafted players who started, plus drops claimed by another team with no trade on record; points count starts only.</div></div>
   </section>
 
   <section id="pubs">
@@ -1492,11 +1490,10 @@ function posGroups(obj, line){
     `<h2 style="margin:12px 0 2px">${esc(pos)}</h2><ol class="rec">${list.map(line).join('')}</ol>`).join('');
 }
 $('v_waivers').innerHTML = posGroups(DATA.moves.waivers, s=>
-  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.owner)} · ${s.year} wk${s.week}${s.bid?' · $'+s.bid+' FAAB':''}</span></span></li>`);
-$('v_epick').innerHTML = posGroups(DATA.moves.espn_pickups, s=>
-  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.owner)} · ${s.year}, first start wk${s.week} · ${s.games} starts</span></span></li>`);
-$('v_eswap').innerHTML = (DATA.moves.espn_swaps||[]).map(s=>
-  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · drafted by ${esc(s.src)}, played for ${esc(s.owner)} · ${s.year}, from wk${s.week} · <span style="color:${s.how==='trade'?'var(--accent)':'var(--ink3)'}">${esc(s.how)}</span></span></span></li>`).join('');
+  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.owner)} · ${s.year} wk${s.week}${s.bid?' · $'+s.bid+' FAAB':''}${s.games?' · '+s.games+' starts':''}</span></span></li>`);
+$('v_lopsided').innerHTML = (DATA.moves.lopsided||[]).map(e=>
+  `<li><span class="v">+${e.margin.toFixed(0)}</span><span><b>${esc(e.winner)}</b> got ${e.wgot.map(esc).join(', ')} <span class="d">(${e.wpts.toFixed(0)} pts)</span><br>` +
+  `<span class="d">${esc(e.loser)} got ${e.lgot.map(esc).join(', ')||'—'} (${e.lpts.toFixed(0)} pts) · ${e.year} wk${e.week}${e.year===YEARS[0]?' · so far':''}</span></span></li>`).join('');
 const byYr = {};
 DATA.moves.trades.forEach(t=>{ (byYr[t.year]=byYr[t.year]||[]).push(t); });
 $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
