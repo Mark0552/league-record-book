@@ -339,7 +339,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="moves">
     <div class="card"><h2>Trade history</h2><div id="v_trades"></div>
-      <div class="note">The complete recorded history. ESPN did not retain transaction logs, so trades before 2018 are lost to time. Points = scored by the acquired players after the trade, that season (Sleeper era only).</div></div>
+      <div class="note">The complete recorded history: Sleeper transactions (2020+) plus every ESPN-era trade (2014&ndash;2019) recovered from the league's notification e-mails. Points = everything the player scored while on the acquiring roster from the trade week on, started or benched, that season &mdash; with the weeks he stayed rostered. ESPN kept no transaction logs, so points-after exists for the Sleeper era only.</div></div>
     <div class="card"><h2>Best waiver pickups by position, Sleeper era (2020&ndash;present)</h2><div id="v_waivers"></div>
       <div class="note">Points scored while on the claiming team's roster, from pickup week on. FAAB bid shown for waiver claims. Updates daily.</div></div>
     <div class="card"><h2>Best undrafted pickups by position, ESPN era</h2><div id="v_epick"></div>
@@ -1223,7 +1223,7 @@ function lineupSide(y, w, o){
   const gap = off!=null ? off - lu.reduce((s,p)=>s+p[2],0) : 0;
   return `<div style="flex:1;min-width:150px"><b style="font-size:13px">${esc(o)}</b>` +
     lu.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span><span style="color:var(--ink3)">${esc(p[1])}</span> ${esc(p[0])}</span><span style="font-variant-numeric:tabular-nums">${p[2].toFixed(1)}</span></div>`).join('') +
-    (gap > 0.5 ? `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0;color:var(--ink3);font-style:italic"><span>unrecorded starter(s) — lost from ESPN's archive</span><span style="font-variant-numeric:tabular-nums">${gap.toFixed(1)}</span></div>` : '') + '</div>';
+    (Math.abs(gap) > 0.5 ? `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0;color:var(--ink3);font-style:italic"><span>unrecorded starter(s) — lost from ESPN's archive</span><span style="font-variant-numeric:tabular-nums">${gap.toFixed(1)}</span></div>` : '') + '</div>';
 }
 const lineupPanel = (y,w,a,b) => `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${lineupSide(y,w,a)}${lineupSide(y,w,b)}</div>`;
 $('gTable').addEventListener('click', e=>{
@@ -1503,8 +1503,16 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
   const list = byYr[yr].map(t=>{
     const best = Math.max(...t.sides.map(s=>s.pts==null?-1:s.pts));
     return `<div class="elim" style="border-left-color:var(--accent)">` +
-      t.sides.map(s=>`<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${s.got.map(esc).join(', ')||'—'}` +
-        (s.pts!=null?` <span style="color:${s.pts===best?'var(--accent)':'var(--ink3)'};font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:'') + `</div>`).join('') +
+      t.sides.map(s=>{
+        const col = s.pts!=null && s.pts===best ? 'var(--accent)' : 'var(--ink3)';
+        const body = s.gotd && s.gotd.length
+          ? s.gotd.map(p=>`${esc(p.n)}${p.pts!=null?` <span style="color:${col};font-size:11.5px">(${p.pts.toFixed(0)} pts · ${p.wks} wk${p.wks===1?'':'s'} on roster)</span>`:''}`).join(', ')
+          : s.got.map(esc).join(', ');
+        const scored = s.gotd ? s.gotd.filter(p=>p.pts!=null).length : 0;
+        return `<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${body||'—'}` +
+          (scored>1?` <span style="color:${col};font-size:12px;font-weight:700">= ${s.pts.toFixed(0)} pts</span>`:'') +
+          (!s.gotd && s.pts!=null?` <span style="color:${col};font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:'') + `</div>`;
+      }).join('') +
       `<div style="font-size:11.5px;color:var(--ink3)">week ${t.week}</div></div>`;
   }).join('');
   return `<details><summary style="cursor:pointer;font-weight:700;padding:8px 2px;font-size:15px">${yr} <span style="color:var(--ink3);font-weight:500;font-size:12.5px">· ${byYr[yr].length} trade${byYr[yr].length>1?'s':''}</span></summary>${list}</details>`;

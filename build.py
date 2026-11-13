@@ -722,24 +722,30 @@ for season in SLEEPER_SEASONS:
             week = t.get("leg") or w
             sides = []
             for r in t.get("roster_ids") or []:
-                got = []
+                got, gotd = [], []
                 pts = 0.0
                 for pid, rr in adds.items():
                     if rr == r:
                         info = players.get(pid) or {}
-                        got.append(info.get("full_name") or info.get("last_name") or pid)
-                        # only weeks the player was actually on the acquiring roster;
-                        # the trade week itself counts when his points landed there
-                        # (a pre-kickoff trade means he plays that week for the buyer)
-                        pts += sum(v for wk2, (v, rid2) in pwk[season].get(pid, {}).items()
-                                   if wk2 >= week and rid2 == r)
+                        nm = info.get("full_name") or info.get("last_name") or pid
+                        got.append(nm)
+                        # points while ON the acquiring roster (started or benched),
+                        # from the trade week on; a pre-kickoff trade plays that week
+                        # for the buyer, and a mid-week one still credits the seller
+                        hist = [v for wk2, (v, rid2) in pwk[season].get(pid, {}).items()
+                                if wk2 >= week and rid2 == r]
+                        ppts = sum(hist)
+                        pts += ppts
+                        gotd.append(dict(n=nm, pts=round(ppts, 1), wks=len(hist)))
                 for dp in t.get("draft_picks") or []:
                     if dp.get("owner_id") == r:
                         got.append(f"{dp.get('season')} round-{dp.get('round')} pick")
+                        gotd.append(dict(n=f"{dp.get('season')} round-{dp.get('round')} pick", pts=None))
                 for b in t.get("waiver_budget") or []:
                     if b.get("receiver") == r:
                         got.append(f"${b.get('amount')} FAAB")
-                sides.append(dict(owner=ro.get(r, "?"), gave=[], got=got, pts=round(pts, 1)))
+                        gotd.append(dict(n=f"${b.get('amount')} FAAB", pts=None))
+                sides.append(dict(owner=ro.get(r, "?"), gave=[], got=got, gotd=gotd, pts=round(pts, 1)))
             sleeper_trades.append(dict(year=season, week=week, sides=sides))
 trade_list = [t for t in trade_list if t["year"] < 2020] + sleeper_trades
 trade_list.sort(key=lambda t: (-t["year"], -t["week"]))

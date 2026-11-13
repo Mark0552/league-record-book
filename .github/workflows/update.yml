@@ -88,6 +88,9 @@ jobs:
         run: |
           python refresh.py
           cp site/index.html index.html
+      - name: Validate the build   # a broken build must never publish
+        if: steps.live.outcome == 'skipped' || steps.live.outputs.live == 'true' || steps.live.outputs.injuries == 'true'
+        run: python validate.py
       - name: Refresh headlines only
         if: steps.live.outputs.news == 'true' && steps.live.outputs.injuries != 'true'
         run: python refresh.py --news-only
