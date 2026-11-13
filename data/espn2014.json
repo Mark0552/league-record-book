@@ -1,5 +1,5 @@
 {
- "note": "Recovered from ESPN league e-mails (ESPN purged pre-2015 seasons). Weeks 1-7 scored and validated against the e-mailed standings; weeks 8-13 and playoff point totals were lost.",
+ "note": "8-team season (East/West, 13 games, standard scoring), recovered in full from the ESPN archive after they removed pre-2015 seasons from public view. Playoff rounds were two NFL weeks each (semifinals weeks 14-15, championship 16-17); bracket scores shown are the two-week totals.",
  "divisions": {
   "names": [
    "East",
@@ -39,19 +39,19 @@
    "year": 2014,
    "week": 1,
    "type": "Regular",
-   "a": "Bob",
-   "sa": 75.0,
-   "b": "Lerch",
-   "sb": 118.0
+   "a": "Martin",
+   "sa": 88.0,
+   "b": "Mark",
+   "sb": 96.0
   },
   {
    "year": 2014,
    "week": 1,
    "type": "Regular",
-   "a": "Martin",
-   "sa": 88.0,
-   "b": "Mark",
-   "sb": 96.0
+   "a": "Bob",
+   "sa": 75.0,
+   "b": "Lerch",
+   "sb": 118.0
   },
   {
    "year": 2014,
@@ -138,6 +138,15 @@
    "year": 2014,
    "week": 4,
    "type": "Regular",
+   "a": "Mark",
+   "sa": 61.0,
+   "b": "Cliff",
+   "sb": 80.0
+  },
+  {
+   "year": 2014,
+   "week": 4,
+   "type": "Regular",
    "a": "Bob",
    "sa": 71.0,
    "b": "Neville",
@@ -154,21 +163,21 @@
   },
   {
    "year": 2014,
-   "week": 4,
+   "week": 5,
    "type": "Regular",
-   "a": "Mark",
-   "sa": 61.0,
-   "b": "Cliff",
-   "sb": 80.0
+   "a": "Cliff",
+   "sa": 83.0,
+   "b": "Martin",
+   "sb": 68.0
   },
   {
    "year": 2014,
    "week": 5,
    "type": "Regular",
-   "a": "Cliff",
-   "sa": 82.0,
-   "b": "Martin",
-   "sb": 68.0
+   "a": "Neville",
+   "sa": 74.0,
+   "b": "Mark",
+   "sb": 103.0
   },
   {
    "year": 2014,
@@ -186,16 +195,7 @@
    "a": "Sam",
    "sa": 81.0,
    "b": "Lerch",
-   "sb": 113.0
-  },
-  {
-   "year": 2014,
-   "week": 5,
-   "type": "Regular",
-   "a": "Neville",
-   "sa": 74.0,
-   "b": "Mark",
-   "sb": 103.0
+   "sb": 114.0
   },
   {
    "year": 2014,
@@ -205,6 +205,15 @@
    "sa": 72.0,
    "b": "Neville",
    "sb": 96.0
+  },
+  {
+   "year": 2014,
+   "week": 6,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 118.0,
+   "b": "Austin",
+   "sb": 106.0
   },
   {
    "year": 2014,
@@ -226,21 +235,21 @@
   },
   {
    "year": 2014,
-   "week": 6,
-   "type": "Regular",
-   "a": "Mark",
-   "sa": 118.0,
-   "b": "Austin",
-   "sb": 106.0
-  },
-  {
-   "year": 2014,
    "week": 7,
    "type": "Regular",
    "a": "Austin",
    "sa": 74.0,
    "b": "Martin",
    "sb": 43.0
+  },
+  {
+   "year": 2014,
+   "week": 7,
+   "type": "Regular",
+   "a": "Sam",
+   "sa": 118.0,
+   "b": "Mark",
+   "sb": 106.0
   },
   {
    "year": 2014,
@@ -262,12 +271,299 @@
   },
   {
    "year": 2014,
-   "week": 7,
+   "week": 8,
+   "type": "Regular",
+   "a": "Cliff",
+   "sa": 136.0,
+   "b": "Sam",
+   "sb": 122.0
+  },
+  {
+   "year": 2014,
+   "week": 8,
+   "type": "Regular",
+   "a": "Austin",
+   "sa": 84.0,
+   "b": "Neville",
+   "sb": 111.0
+  },
+  {
+   "year": 2014,
+   "week": 8,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 98.0,
+   "b": "Martin",
+   "sb": 115.0
+  },
+  {
+   "year": 2014,
+   "week": 8,
+   "type": "Regular",
+   "a": "Lerch",
+   "sa": 122.0,
+   "b": "Bob",
+   "sb": 101.0
+  },
+  {
+   "year": 2014,
+   "week": 9,
    "type": "Regular",
    "a": "Sam",
-   "sa": 118.0,
+   "sa": 92.0,
+   "b": "Neville",
+   "sb": 103.0
+  },
+  {
+   "year": 2014,
+   "week": 9,
+   "type": "Regular",
+   "a": "Austin",
+   "sa": 90.0,
+   "b": "Cliff",
+   "sb": 132.0
+  },
+  {
+   "year": 2014,
+   "week": 9,
+   "type": "Regular",
+   "a": "Martin",
+   "sa": 81.0,
+   "b": "Bob",
+   "sb": 84.0
+  },
+  {
+   "year": 2014,
+   "week": 9,
+   "type": "Regular",
+   "a": "Lerch",
+   "sa": 109.0,
    "b": "Mark",
-   "sb": 106.0
+   "sb": 102.0
+  },
+  {
+   "year": 2014,
+   "week": 10,
+   "type": "Regular",
+   "a": "Austin",
+   "sa": 103.0,
+   "b": "Sam",
+   "sb": 127.0
+  },
+  {
+   "year": 2014,
+   "week": 10,
+   "type": "Regular",
+   "a": "Neville",
+   "sa": 79.0,
+   "b": "Cliff",
+   "sb": 91.0
+  },
+  {
+   "year": 2014,
+   "week": 10,
+   "type": "Regular",
+   "a": "Lerch",
+   "sa": 100.0,
+   "b": "Martin",
+   "sb": 70.0
+  },
+  {
+   "year": 2014,
+   "week": 10,
+   "type": "Regular",
+   "a": "Bob",
+   "sa": 95.0,
+   "b": "Mark",
+   "sb": 84.0
+  },
+  {
+   "year": 2014,
+   "week": 11,
+   "type": "Regular",
+   "a": "Martin",
+   "sa": 62.0,
+   "b": "Sam",
+   "sb": 67.0
+  },
+  {
+   "year": 2014,
+   "week": 11,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 94.0,
+   "b": "Cliff",
+   "sb": 102.0
+  },
+  {
+   "year": 2014,
+   "week": 11,
+   "type": "Regular",
+   "a": "Bob",
+   "sa": 98.0,
+   "b": "Neville",
+   "sb": 99.0
+  },
+  {
+   "year": 2014,
+   "week": 11,
+   "type": "Regular",
+   "a": "Lerch",
+   "sa": 77.0,
+   "b": "Austin",
+   "sb": 36.0
+  },
+  {
+   "year": 2014,
+   "week": 12,
+   "type": "Regular",
+   "a": "Cliff",
+   "sa": 114.0,
+   "b": "Martin",
+   "sb": 47.0
+  },
+  {
+   "year": 2014,
+   "week": 12,
+   "type": "Regular",
+   "a": "Neville",
+   "sa": 116.0,
+   "b": "Mark",
+   "sb": 126.0
+  },
+  {
+   "year": 2014,
+   "week": 12,
+   "type": "Regular",
+   "a": "Austin",
+   "sa": 75.0,
+   "b": "Bob",
+   "sb": 103.0
+  },
+  {
+   "year": 2014,
+   "week": 12,
+   "type": "Regular",
+   "a": "Sam",
+   "sa": 116.0,
+   "b": "Lerch",
+   "sb": 70.0
+  },
+  {
+   "year": 2014,
+   "week": 13,
+   "type": "Regular",
+   "a": "Martin",
+   "sa": 147.0,
+   "b": "Neville",
+   "sb": 100.0
+  },
+  {
+   "year": 2014,
+   "week": 13,
+   "type": "Regular",
+   "a": "Mark",
+   "sa": 111.0,
+   "b": "Austin",
+   "sb": 82.0
+  },
+  {
+   "year": 2014,
+   "week": 13,
+   "type": "Regular",
+   "a": "Bob",
+   "sa": 63.0,
+   "b": "Sam",
+   "sb": 95.0
+  },
+  {
+   "year": 2014,
+   "week": 13,
+   "type": "Regular",
+   "a": "Lerch",
+   "sa": 92.0,
+   "b": "Cliff",
+   "sb": 137.0
+  },
+  {
+   "year": 2014,
+   "week": 14,
+   "type": "Playoff",
+   "a": "Sam",
+   "sa": 210.0,
+   "b": "Cliff",
+   "sb": 228.0,
+   "agg": 2
+  },
+  {
+   "year": 2014,
+   "week": 14,
+   "type": "Playoff",
+   "a": "Neville",
+   "sa": 186.0,
+   "b": "Mark",
+   "sb": 203.0,
+   "agg": 2
+  },
+  {
+   "year": 2014,
+   "week": 14,
+   "type": "Consolation",
+   "a": "Bob",
+   "sa": 181.0,
+   "b": "Lerch",
+   "sb": 224.0,
+   "agg": 2
+  },
+  {
+   "year": 2014,
+   "week": 14,
+   "type": "Consolation",
+   "a": "Austin",
+   "sa": 194.0,
+   "b": "Martin",
+   "sb": 144.0,
+   "agg": 2
+  },
+  {
+   "year": 2014,
+   "week": 15,
+   "type": "Playoff",
+   "a": "Mark",
+   "sa": 188.0,
+   "b": "Cliff",
+   "sb": 165.0,
+   "agg": 2
+  },
+  {
+   "year": 2014,
+   "week": 15,
+   "type": "Playoff",
+   "a": "Sam",
+   "sa": 164.0,
+   "b": "Neville",
+   "sb": 166.0,
+   "agg": 2
+  },
+  {
+   "year": 2014,
+   "week": 15,
+   "type": "Consolation",
+   "a": "Austin",
+   "sa": 212.0,
+   "b": "Lerch",
+   "sb": 183.0,
+   "agg": 2
+  },
+  {
+   "year": 2014,
+   "week": 15,
+   "type": "Consolation",
+   "a": "Martin",
+   "sa": 154.0,
+   "b": "Bob",
+   "sb": 147.0,
+   "agg": 2
   }
  ],
  "draft": [
@@ -1105,9 +1401,19 @@
    "loser": "Neville"
   },
   {
+   "round": "Semifinal",
+   "winner": "Cliff",
+   "loser": "Sam"
+  },
+  {
    "round": "Championship",
    "winner": "Mark",
    "loser": "Cliff"
+  },
+  {
+   "round": "Third place",
+   "winner": "Neville",
+   "loser": "Sam"
   }
  ]
 }

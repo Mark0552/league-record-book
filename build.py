@@ -25,11 +25,12 @@ ALIAS = {"Tim": "Timmy", "Marty": "Martin", "Auggie": "Austin", "Cosmo": "Steve"
 def canon(name):
     return ALIAS.get(name, name)
 
-# 2014: recovered from the commissioner's ESPN e-mails (ESPN purged pre-2015
-# seasons). Weeks 1-7 are scored and standings-validated; weeks 8-13 and the
-# playoff point totals were lost, so 2014 never counts as a complete season
-# and is excluded from streak continuity and season-total records.
-PARTIAL_YEARS = {2014}
+# 2014: the full 8-team season, recovered from the ESPN archive (hidden from
+# public view since the platform migration; a 2014 member's credentials still
+# unlock it, cached in data/raw/espn/2014.json). Playoff rounds were two NFL
+# weeks each, so bracket entries carry agg=2 and stay out of single-game
+# records. No player-level data survives, so the adjusted-era lists and the
+# (12-team) clinch replay still start at 2015.
 E14 = {}
 _p14 = Path("data/espn2014.json")
 if _p14.exists():
@@ -171,8 +172,7 @@ for g in games:
             a = alltime[me]
             a["g"] += 1; a["pf"] += sm; a["pa"] += sy
             a["w" if res == "W" else "l" if res == "L" else "t"] += 1
-            if g["year"] not in PARTIAL_YEARS:   # streaks need unbroken records
-                streak_seq[me].append(res)
+            streak_seq[me].append(res)
             hh = h2h[me][you]
             hh["pf"] += sm; hh["pa"] += sy
             hh["w" if res == "W" else "l" if res == "L" else "t"] += 1
@@ -271,14 +271,17 @@ payouts = {}   # owner -> net $ string; filled from the per-person split in the 
 # weren't even set, so the lows would just be forfeits.
 expand = []
 for g in games:
+    if g.get("agg"):   # two-week playoff aggregates aren't single-game scores
+        continue
     expand.append((g["sa"], g["a"], g["sb"], g["b"], g))
     expand.append((g["sb"], g["b"], g["sa"], g["a"], g))
 no_consol = [e for e in expand if e[4]["type"] != "Consolation"]
 top_games = sorted(expand, key=lambda x: -x[0])[:10]
 low_games = sorted(no_consol, key=lambda x: x[0])[:10]
-blowouts = sorted(games, key=lambda g: -abs(g["sa"] - g["sb"]))[:10]
-closest = sorted([g for g in games if g["sa"] != g["sb"]], key=lambda g: abs(g["sa"] - g["sb"]))[:10]
-shootouts = sorted(games, key=lambda g: -(g["sa"] + g["sb"]))[:10]
+single = [g for g in games if not g.get("agg")]
+blowouts = sorted(single, key=lambda g: -abs(g["sa"] - g["sb"]))[:10]
+closest = sorted([g for g in single if g["sa"] != g["sb"]], key=lambda g: abs(g["sa"] - g["sb"]))[:10]
+shootouts = sorted(single, key=lambda g: -(g["sa"] + g["sb"]))[:10]
 # season PF totals (regular season only, completed seasons only)
 season_pf = defaultdict(lambda: dict(pf=0.0, g=0))
 reg_weeks_by_year = defaultdict(set)
@@ -289,8 +292,7 @@ for g in games:
             e = season_pf[(o, g["year"])]
             e["pf"] += pts; e["g"] += 1
 complete_years = {y for y, wks in reg_weeks_by_year.items()
-                  if y not in PARTIAL_YEARS
-                  and (y < CUR_SEASON or len(wks) >= playoff_start_26 - 1)}
+                  if y < CUR_SEASON or len(wks) >= playoff_start_26 - 1}
 season_rows = [dict(owner=o, year=y, pf=round(v["pf"], 2), g=v["g"], ppg=round(v["pf"] / v["g"], 1))
                for (o, y), v in season_pf.items() if y in complete_years]
 season_high = sorted(season_rows, key=lambda r: -r["pf"])[:10]
@@ -1085,7 +1087,7 @@ adj_players = [dict(pts=round(e[0], 1), name=e[1], pos=e[2], owner=e[3], year=e[
 
 adj_expand = []
 for g in games:
-    if g["year"] in PARTIAL_YEARS:   # no player data to re-score 2014 with
+    if g["year"] < 2015:   # no player-level data to re-score 2014 with
         continue
     da = team_delta.get((g["year"], g["week"], g["a"]), 0.0)
     db = team_delta.get((g["year"], g["week"], g["b"]), 0.0)
@@ -1291,7 +1293,7 @@ clinch_rows = dict(spot=[], bye=[], elim=[])
 divhist = {}   # year -> division names + owner assignments, for division standings
 _ch_warn = []
 for yr in sorted({g["year"] for g in games}):
-    if yr in PARTIAL_YEARS:   # 7 of 13 weeks: clinch replay impossible, but divisions are known
+    if yr == 2014:   # 8-team season; the solver assumes 12 teams. Divisions are known.
         if E14.get("divisions"):
             divhist[str(yr)] = dict(names=E14["divisions"]["names"], owners=E14["divisions"]["owners"])
         continue
@@ -1375,7 +1377,8 @@ payload = dict(
     built_ts=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     owners=OWNERS,
     active=list(ROSTER_OWNER_2026.values()),
-    games=[[g["year"], g["week"], g["type"][0], g["a"], g["sa"], g["b"], g["sb"]] for g in games],
+    games=[[g["year"], g["week"], g["type"][0], g["a"], g["sa"], g["b"], g["sb"]]
+           + ([1] if g.get("agg") else []) for g in games],
     alltime={o: dict(alltime[o],
                      seasons=len(seasons_played[o]),
                      titles=titles.get(o, 0),

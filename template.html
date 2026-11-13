@@ -906,8 +906,7 @@ function regStandings(year){
 function renderSeason(){
   const year = +$('seasonSel').value;
   const part = (DATA.partial||{})[String(year)];
-  $('ss_hdr').textContent = year + (part ? ' standings (recovered, through week 7)'
-    : ' final standings' + (year===YEARS[0]?' (so far)':''));
+  $('ss_hdr').textContent = year + ' final standings' + (year===YEARS[0]?' (so far)':'');
   const champ = DATA.champs.find(c=>c.year===year);
   const shame = DATA.shame.find(c=>c.year===year);
   const rows = regStandings(year);
@@ -922,7 +921,7 @@ function renderSeason(){
     ordered = [...rows.filter(r=>poSet.has(r.o)), ...rows.filter(r=>!poSet.has(r.o))];
     cut = poSet.size;
   } else {
-    ordered = rows; cut = part ? -1 : 6;
+    ordered = rows; cut = 6;
   }
   $('ss_stand').innerHTML = '<tr><th>#</th><th>Owner</th><th class="num">W-L</th><th class="num">PF</th><th class="num">PA</th></tr>' +
     ordered.map((r,i)=>`<tr class="srow${i===cut?' line':''}" style="cursor:pointer" data-o="${esc(r.o)}"><td>${i+1}</td><td><b>${esc(r.o)}</b>${champ&&champ.owner===r.o?' <span class="badge gold">🏆 Buck Wong Bowl</span>':''}${shame&&shame.owner===r.o?' <span class="badge" style="background:rgba(248,113,113,.14);color:var(--red)">🥄 Lerch Cup</span>':''}</td><td class="num">${r.w}-${r.l}</td><td class="num">${f1(r.pf)}</td><td class="num">${f1(r.pa)}</td></tr>`).join('');
@@ -944,7 +943,7 @@ function renderSeason(){
   // season records: this year's bests and worsts, from the game log
   (function(){
     $('ss_rec_h').textContent = year + ' records';
-    const yg = G.filter(g=>g[0]===year);
+    const yg = G.filter(g=>g[0]===year && !g[7]);   // skip two-week playoff aggregates
     const ex = [];
     for(const g of yg){
       ex.push({pts:g[4], o:g[3], opp:g[5], op:g[6], g});
