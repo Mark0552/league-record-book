@@ -115,27 +115,27 @@
   },
   {
    "owner": "Austin",
-   "pct": 90.1
+   "pct": 91.2
   },
   {
    "owner": "Steve",
-   "pct": 61.1
+   "pct": 61.0
   },
   {
    "owner": "Martin",
-   "pct": 60.9
+   "pct": 60.7
   },
   {
    "owner": "Mark",
-   "pct": 53.9
+   "pct": 53.6
   },
   {
    "owner": "Clancy",
-   "pct": 43.5
+   "pct": 43.3
   },
   {
    "owner": "Luke",
-   "pct": 1.8
+   "pct": 1.5
   },
   {
    "owner": "Sam",
@@ -155,7 +155,7 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 125.2,
+   "pa": 125.0,
    "b": "Lerch",
    "pb": 109.4
   },
@@ -163,11 +163,11 @@
    "a": "Will",
    "pa": 96.2,
    "b": "Timmy",
-   "pb": 79.4
+   "pb": 79.2
   },
   {
    "a": "Bob",
-   "pa": 118.8,
+   "pa": 118.3,
    "b": "Cliff",
    "pb": 96.5
   },
@@ -175,7 +175,7 @@
    "a": "Luke",
    "pa": 94.7,
    "b": "Austin",
-   "pb": 108.8
+   "pb": 112.3
   },
   {
    "a": "Mark",
@@ -234,7 +234,7 @@
   {
    "owner": "Luke",
    "rec": "3-6",
-   "text": "Even winning out only gets Luke to 8-6 \u2014 and the path needs the middle to collapse: Bob (7-2) can win at most 1 more; Lerch (7-2) can win at most 1 more; Cliff (7-2) can win at most 1 more; Austin (6-3) can win at most 2 more; Mark (5-4) can win at most 3 more; Steve (5-4) can win at most 3 more. That leaves a 7-way tie at 8-6 for the last 6 spots. The tie crosses divisions, so it falls to season points-for: Luke (856.1) must out-score 1 of the 6 \u2014 at minimum overtaking Cliff, currently 121.9 points ahead. Simulated odds: 1.8%."
+   "text": "Even winning out only gets Luke to 8-6 \u2014 and the path needs the middle to collapse: Bob (7-2) can win at most 1 more; Lerch (7-2) can win at most 1 more; Cliff (7-2) can win at most 1 more; Austin (6-3) can win at most 2 more; Mark (5-4) can win at most 3 more; Steve (5-4) can win at most 3 more. That leaves a 7-way tie at 8-6 for the last 6 spots. The tie crosses divisions, so it falls to season points-for: Luke (856.1) must out-score 1 of the 6 \u2014 at minimum overtaking Cliff, currently 121.9 points ahead. Simulated odds: 1.5%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -511,32 +511,32 @@
   },
   "10": {
    "playoffs": {
-    "Mark": 53.9,
-    "Clancy": 43.5,
+    "Mark": 53.6,
+    "Clancy": 43.3,
     "Will": 0.0,
     "Sam": 0.7,
-    "Steve": 61.1,
+    "Steve": 61.0,
     "Timmy": 0.0,
     "Bob": 99.1,
     "Lerch": 95.9,
-    "Martin": 60.9,
-    "Luke": 1.8,
-    "Austin": 90.1,
+    "Martin": 60.7,
+    "Luke": 1.5,
+    "Austin": 91.2,
     "Cliff": 93.0
    },
    "champ": {
-    "Mark": 8.34,
-    "Clancy": 5.45,
+    "Mark": 8.28,
+    "Clancy": 5.42,
     "Will": 0.0,
     "Sam": 0.06,
-    "Steve": 7.46,
+    "Steve": 7.42,
     "Timmy": 0.0,
-    "Bob": 21.33,
-    "Lerch": 18.57,
-    "Martin": 9.35,
-    "Luke": 0.1,
-    "Austin": 14.22,
-    "Cliff": 15.12
+    "Bob": 21.24,
+    "Lerch": 18.54,
+    "Martin": 9.34,
+    "Luke": 0.08,
+    "Austin": 14.49,
+    "Cliff": 15.14
    }
   }
  },
@@ -873,7 +873,7 @@
     "17": 99.0
    },
    "Sam": {
-    "10": 125.2,
+    "10": 125.0,
     "11": 93.4,
     "12": 93.2,
     "13": 84.6,
@@ -893,7 +893,7 @@
     "17": 98.9
    },
    "Timmy": {
-    "10": 79.4,
+    "10": 79.2,
     "11": 88.6,
     "12": 82.9,
     "13": 82.1,
@@ -903,7 +903,7 @@
     "17": 86.3
    },
    "Bob": {
-    "10": 118.8,
+    "10": 118.3,
     "11": 80.7,
     "12": 103.9,
     "13": 95.6,
@@ -943,7 +943,7 @@
     "17": 98.3
    },
    "Austin": {
-    "10": 108.8,
+    "10": 112.3,
     "11": 99.0,
     "12": 93.6,
     "13": 97.6,
@@ -981,14 +981,14 @@
    "Mark": 44.8,
    "Clancy": 12.5,
    "Will": 23.2,
-   "Sam": 28.5,
+   "Sam": 28.4,
    "Steve": 13.0,
-   "Timmy": 20.5,
-   "Bob": 24.5,
+   "Timmy": 20.4,
+   "Bob": 24.4,
    "Lerch": 23.5,
    "Martin": 26.8,
    "Luke": 13.0,
-   "Austin": 16.8,
+   "Austin": 16.7,
    "Cliff": 20.1
   },
   "wins": {
