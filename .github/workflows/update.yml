@@ -123,5 +123,7 @@ jobs:
             MSG="Daily auto-update $(date -u +%F)"
           fi
           git commit -m "$MSG"
-          git pull --rebase
+          # -X theirs: on rebase conflicts keep THIS run's freshly built files —
+          # racing runs are seconds apart, so either side's scrape is current
+          git pull --rebase -X theirs
           git push
