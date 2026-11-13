@@ -339,13 +339,13 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 
   <section id="moves">
     <div class="card"><h2>Trade history</h2><div id="v_trades"></div>
-      <div class="note">The complete recorded history: Sleeper transactions (2020+) plus every ESPN-era trade (2014&ndash;2019) recovered from the league's notification e-mails. Points = everything the player scored while on the acquiring roster from the trade week on, started or benched, that season &mdash; with the weeks he stayed rostered. A week ends after Monday night, so Tuesday/Wednesday trades count toward the next week. ESPN kept no transaction logs, so points-after exists for the Sleeper era only.</div></div>
+      <div class="note">The complete recorded history: Sleeper transactions (2020+) plus every ESPN-era trade (2014&ndash;2019) recovered from the league's notification e-mails. Points = everything the player scored while on the acquiring roster from the trade week on, started or benched, that season &mdash; with the weeks he stayed rostered. A week ends after Monday night, so Tuesday/Wednesday trades count toward the next week. ESPN-era trades (no bench data archived) show points and <em>starts</em> for the acquirer instead of roster tenure.</div></div>
     <div class="card"><h2>Best waiver pickups by position, Sleeper era (2020&ndash;present)</h2><div id="v_waivers"></div>
       <div class="note">Points scored while on the claiming team's roster, from pickup week on. FAAB bid shown for waiver claims. Updates daily.</div></div>
-    <div class="card"><h2>Best undrafted pickups by position, ESPN era</h2><div id="v_epick"></div>
-      <div class="note">ESPN kept no waiver logs, so this is reconstructed from drafts vs weekly lineups: players nobody drafted who were picked up and started. Points = while starting for that team; week = first start.</div></div>
+    <div class="card"><h2>Best waiver pickups by position, ESPN era</h2><div id="v_epick"></div>
+      <div class="note">ESPN kept no waiver logs, so this is reconstructed from drafts vs weekly lineups, cross-checked against the recovered trade log: undrafted players who were claimed and started, plus drafted players dropped by one team and claimed by another (no matching trade on record). Points = while starting for that team; week = first start.</div></div>
     <div class="card"><h2>Changed hands mid-season, ESPN era</h2><ol class="rec" id="v_eswap"></ol>
-      <div class="note">Players who started for a team other than the one that drafted them. "trade" = confirmed in the recovered trade log (league e-mails); "likely trade" = a player moved the other way between the same two teams within two weeks; "trade or waiver" = not in the recovered log &mdash; with every e-mailed trade now on record, these were most likely drops picked up off waivers.</div></div>
+      <div class="note">Players who started for a team other than the one that drafted them, with how they moved now settled by the recovered trade log: "trade" = in the log; "waivers" = no trade on record, so they were dropped and claimed. Points = while starting for the new team.</div></div>
   </section>
 
   <section id="pubs">
@@ -1496,23 +1496,25 @@ $('v_waivers').innerHTML = posGroups(DATA.moves.waivers, s=>
 $('v_epick').innerHTML = posGroups(DATA.moves.espn_pickups, s=>
   `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.owner)} · ${s.year}, first start wk${s.week} · ${s.games} starts</span></span></li>`);
 $('v_eswap').innerHTML = (DATA.moves.espn_swaps||[]).map(s=>
-  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · drafted by ${esc(s.src)}, played for ${esc(s.owner)} · ${s.year}, from wk${s.week} · <span style="color:${s.how==='trade'?'var(--accent)':s.how==='likely trade'?'var(--gold)':'var(--ink3)'}">${esc(s.how)}</span></span></span></li>`).join('');
+  `<li><span class="v">${s.pts.toFixed(0)}</span><span><b>${esc(s.player)}</b> <span class="d">${esc(s.pos)} · drafted by ${esc(s.src)}, played for ${esc(s.owner)} · ${s.year}, from wk${s.week} · <span style="color:${s.how==='trade'?'var(--accent)':'var(--ink3)'}">${esc(s.how)}</span></span></span></li>`).join('');
 const byYr = {};
 DATA.moves.trades.forEach(t=>{ (byYr[t.year]=byYr[t.year]||[]).push(t); });
 $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
   const list = byYr[yr].map(t=>{
-    const best = Math.max(...t.sides.map(s=>s.pts==null?-1:s.pts));
+    const tot = s => s.pts!=null ? s.pts : (s.gotd ? s.gotd.reduce((a,p)=>a+(p.pts||0),0) : -1);
+    const best = Math.max(...t.sides.map(tot));
     return `<div class="elim" style="border-left-color:var(--accent)">` +
       t.sides.map(s=>{
-        const col = s.pts!=null && s.pts===best ? 'var(--accent)' : 'var(--ink3)';
+        const col = tot(s)===best ? 'var(--accent)' : 'var(--ink3)';
         const body = s.gotd && s.gotd.length
           ? s.gotd.map(p=>`${esc(p.n)}${p.pts!=null?` <span style="color:${col};font-size:11.5px">(${
-              p.wks===0 && +yr===YEARS[0] ? 'no completed week on roster yet'
+              p.st!=null ? `${p.pts.toFixed(0)} pts · ${p.st} start${p.st===1?'':'s'}`
+              : p.wks===0 && +yr===YEARS[0] ? 'no completed week on roster yet'
               : `${p.pts.toFixed(0)} pts · ${p.wks} wk${p.wks===1?'':'s'} on roster`})</span>`:''}`).join(', ')
           : s.got.map(esc).join(', ');
         const scored = s.gotd ? s.gotd.filter(p=>p.pts!=null).length : 0;
         return `<div style="margin:3px 0;white-space:normal"><b>${esc(s.owner)}</b> got ${body||'—'}` +
-          (scored>1?` <span style="color:${col};font-size:12px;font-weight:700">= ${s.pts.toFixed(0)} pts</span>`:'') +
+          (scored>1?` <span style="color:${col};font-size:12px;font-weight:700">= ${tot(s).toFixed(0)} pts</span>`:'') +
           (!s.gotd && s.pts!=null?` <span style="color:${col};font-size:12px">(${s.pts.toFixed(0)} pts after)</span>`:'') + `</div>`;
       }).join('') +
       `<div style="font-size:11.5px;color:var(--ink3)">week ${t.week}</div></div>`;

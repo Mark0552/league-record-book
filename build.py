@@ -800,6 +800,7 @@ steals.sort(key=lambda s: -s["pts"])
 
 # ---- ESPN-era forensic reconstruction: who played for a team that didn't draft them ----
 espn_pickups, espn_swaps = [], []
+espn_starts = {}   # year -> (name, pos, owner) -> [(week, pts)]
 for yr in range(2014, 2020):
     df = espn_dir / f"{yr}_draft.json"
     pf_ = espn_dir / f"{yr}_players.json"
@@ -823,6 +824,7 @@ for yr in range(2014, 2020):
                 for p in s_.get("players") or []:
                     if p.get("name") and o:
                         starts[(p["name"], ESPN_POS.get(p.get("pos"), "?"), o)].append((w, p.get("pts") or 0))
+        espn_starts[yr] = starts   # kept for the trade log's points-after
     for (nm, pos, o), wk in starts.items():
         src = drafted_by.get(nm)
         if src == o:
@@ -832,24 +834,38 @@ for yr in range(2014, 2020):
         entry = dict(year=yr, player=nm, pos=pos, owner=o, week=first, pts=pts,
                      games=len(wk), src=src or "")
         (espn_swaps if src else espn_pickups).append(entry)
-# classify swaps: sheet-confirmed trade > reciprocal-swap heuristic > unknown
+# classify swaps against the recovered trade log: in it = trade; otherwise the
+# player was dropped and claimed off waivers (the e-mailed record is complete)
 def normname(s):
-    return _re.sub(r"[^a-z]", "", s.lower())
+    return _re.sub(r"[^a-z]", "", _re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", s.lower()))
 sheet_trade_gets = set()
 for t in trade_list:
     for side in t["sides"]:
         for pname in side["got"]:
             sheet_trade_gets.add((t["year"], side["owner"], normname(pname)))
 for e in espn_swaps:
-    if (e["year"], e["owner"], normname(e["player"])) in sheet_trade_gets:
-        e["how"] = "trade"
-    elif any(o["year"] == e["year"] and o["src"] == e["owner"] and o["owner"] == e["src"]
-             and abs(o["week"] - e["week"]) <= 2 for o in espn_swaps if o is not e):
-        e["how"] = "likely trade"
-    else:
-        e["how"] = "trade or waiver"
+    e["how"] = ("trade" if (e["year"], e["owner"], normname(e["player"])) in sheet_trade_gets
+                else "waivers")
+# a dropped-then-claimed player is a waiver pickup like any other
+espn_pickups.extend(e for e in espn_swaps if e["how"] == "waivers")
 espn_pickups.sort(key=lambda e: -e["pts"])
 espn_swaps.sort(key=lambda e: -e["pts"])
+
+# ESPN-era trades: points while STARTING for the acquirer, from the trade week
+# on (bench data wasn't archived, so roster tenure isn't knowable)
+for t in trade_list:
+    if t["year"] not in espn_starts:
+        continue
+    starts_y = espn_starts[t["year"]]
+    for side in t["sides"]:
+        gotd = []
+        for pname in side["got"]:
+            wk = [(w, p) for (nm, pos, o), ws in starts_y.items()
+                  if o == side["owner"] and normname(nm) == normname(pname)
+                  for (w, p) in ws if w >= t["week"]]
+            gotd.append(dict(n=pname, pts=round(sum(p for _, p in wk), 1), st=len(wk))
+                        if wk else dict(n=pname, pts=None))
+        side["gotd"] = gotd
 
 def by_position(items, per_pos=5):
     out = {}

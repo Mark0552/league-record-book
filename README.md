@@ -42,8 +42,11 @@ live APIs). Immutable snapshot: the `archive-2026-11-13` release.
   via a 2014 member's credentials and cross-validated against the
   commissioner's ESPN recap e-mails; see `tools/`.
 - **ESPN-era trades (2014–2019)** come from the league's notification e-mails
-  (ESPN's API serves no pre-2020 transactions). Waiver logs never existed, so
-  pre-2020 pickups remain forensic ("started a player they didn't draft").
+  (ESPN's API serves no pre-2020 transactions), validated against the box-score
+  record: an "accepted" e-mail is kept only if the players actually moved
+  (three phantoms — cancelled or pre-draft offers — were excluded this way).
+  Waiver logs never existed, so pre-2020 pickups remain forensic ("started a
+  player they didn't draft", cross-checked against the trade log).
 - **Ghost starters**: ESPN's archive drops players it no longer lists, leaving
   some 2014–2016 lineups short. 33 were restored (10 named by recap e-mails,
   23 reconstructed by matching missing points against nflverse weekly stats,

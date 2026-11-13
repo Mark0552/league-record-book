@@ -302,36 +302,6 @@
   "week": 11,
   "sides": [
    {
-    "owner": "Cliff",
-    "gave": [
-     "Royce Freeman",
-     "Michael Thomas"
-    ],
-    "got": [
-     "Le'Veon Bell",
-     "LeSean McCoy"
-    ],
-    "pts": null
-   },
-   {
-    "owner": "Will",
-    "gave": [
-     "Le'Veon Bell",
-     "LeSean McCoy"
-    ],
-    "got": [
-     "Royce Freeman",
-     "Michael Thomas"
-    ],
-    "pts": null
-   }
-  ]
- },
- {
-  "year": 2018,
-  "week": 11,
-  "sides": [
-   {
     "owner": "Will",
     "gave": [
      "Sony Michel",
@@ -356,62 +326,6 @@
      "Sony Michel",
      "Doug Baldwin",
      "Le'Veon Bell"
-    ],
-    "pts": null
-   }
-  ]
- },
- {
-  "year": 2019,
-  "week": 1,
-  "sides": [
-   {
-    "owner": "Sam",
-    "gave": [
-     "Adrian Peterson",
-     "Hunter Henry"
-    ],
-    "got": [
-     "Corey Davis",
-     "Doug Baldwin"
-    ],
-    "pts": null
-   },
-   {
-    "owner": "Clancy",
-    "gave": [
-     "Corey Davis",
-     "Doug Baldwin"
-    ],
-    "got": [
-     "Adrian Peterson",
-     "Hunter Henry"
-    ],
-    "pts": null
-   }
-  ]
- },
- {
-  "year": 2019,
-  "week": 1,
-  "sides": [
-   {
-    "owner": "Mark",
-    "gave": [
-     "Dante Pettis"
-    ],
-    "got": [
-     "Ka'imi Fairbairn"
-    ],
-    "pts": null
-   },
-   {
-    "owner": "Clancy",
-    "gave": [
-     "Ka'imi Fairbairn"
-    ],
-    "got": [
-     "Dante Pettis"
     ],
     "pts": null
    }
