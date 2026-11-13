@@ -368,6 +368,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <button class="btn" id="tcReset" style="display:none">Clear the trade</button></div>
     <div class="card" id="tcVcard" style="display:none"><h2>Verdict</h2>
       <div id="tcVerdict"></div>
+      <div id="tcImpact"></div>
       <div class="tscroll"><table id="tcTable"></table></div>
       <div class="note">Every source is <em>redraft</em> &mdash; no dynasty values, so age and rookie premiums don't distort win-now trades. FantasyCalc is computed for this league's exact settings (12-team, 1 QB, 0.5 PPR redraft) and its curve prices the rank-based sources: ROS Consensus = Dynasty Daddy's rest-of-season consensus rank (ESPN/FantasyPros/FanDuel aggregate, provider-default scoring), FantasyPros ECR = their <em>half-PPR</em> rest-of-season expert consensus, each valued at what FantasyCalc pays that rank at the position. Sleeper VOR and ESPN VOR = rest-of-season projected points <em>above a replacement-level starter</em> (12-team lineups), so positional scarcity counts everywhere; ESPN's 0.5 PPR is the mean of their standard and full-PPR projections. The verdict averages each player's share of the top value in every source that lists them. &mdash; = not listed by that source.</div></div>
   </section>
@@ -776,6 +777,32 @@ if(now.standings){
     }
     return {seedCount, champC, lastC, ties, N};
   }
+
+  // trade-impact simulator: the same engine with optional per-team weekly mean
+  // deltas and no user picks; identical RNG seed makes baseline-vs-scenario a
+  // paired comparison, so small odds shifts are real, not sim noise
+  window.__tradeOdds = function(adjust){
+    rnd = mulberry32(7); spare = null;
+    const N = 10000, made = new Int32Array(n), champC = new Int32Array(n);
+    const adj = (t, w) => (adjust && adjust[t] && adjust[t][w]) || 0;
+    const bgT = (x,y,r)=> gauss(pwMean[r][x]+adj(x,PW[r]), sdA[x]) >= gauss(pwMean[r][y]+adj(y,PW[r]), sdA[y]) ? x : y;
+    for(let s=0;s<N;s++){
+      const wins = winsBase.slice(), pf = pfBase.slice(), h2h = h2hBase.slice();
+      for(let i=0;i<sched.length;i++){
+        const g = sched[i];
+        const pa = gauss(g.ma+adj(g.a,g.w), g.da), pb = gauss(g.mb+adj(g.b,g.w), g.db);
+        if(pa>pb){ wins[g.a]++; h2h[g.a*n+g.b]++; } else { wins[g.b]++; h2h[g.b*n+g.a]++; }
+        pf[g.a]+=Math.max(30,pa); pf[g.b]+=Math.max(30,pb);
+      }
+      const S = seedsFor(wins, pf, h2h);
+      for(let k=0;k<6;k++) made[S[k]]++;
+      const q1 = bgT(S[3],S[4],0), q2 = bgT(S[2],S[5],0);
+      champC[bgT(bgT(S[0],q1,1), bgT(S[1],q2,1), 2)]++;
+    }
+    const out = {};
+    T.forEach((t,i)=> out[t] = {p: made[i]/N*100, c: champC[i]/N*100});
+    return out;
+  };
 
   function renderPicks(){
     $('pmWeeks').innerHTML = wkList.map(w =>
@@ -1522,6 +1549,63 @@ $('v_trades').innerHTML = Object.keys(byYr).sort((a,b)=>b-a).map((yr,i)=>{
     $('tcVerdict').innerHTML = `<div class="elim" style="border-left-color:${diff<7?'var(--accent)':'var(--red)'}"><b>${
       diff<2?'Dead even.':diff<7?'Fair trade.':`Side ${win} wins by ${diff.toFixed(0)}%.`}</b>`+
       `<div style="font-size:12.5px;color:var(--ink2);margin-top:3px">By the averaged value share across every source. * = a player missing from that source's table.</div></div>`;
+    tradeImpact();
+  }
+  // what the trade does to each team's actual playoff & title odds
+  const MP = (DATA.now && DATA.now.machine) || null;
+  const ownerOf = {}, poolById = {};
+  if(MP && MP.tradepool) for(const o in MP.tradepool) MP.tradepool[o].forEach(p=>{ ownerOf[p.id]=o; poolById[p.id]=p; });
+  function lineupPts(list, w){
+    const pools = {QB:[],RB:[],WR:[],TE:[]};
+    list.forEach(p=>{ if(pools[p.pos]) pools[p.pos].push((p.pw && p.pw[w]) || 0); });
+    for(const k in pools) pools[k].sort((a,b)=>b-a);
+    const R = (MP.replw||{})[w] || {};
+    const take = (pos,nn)=>{ const o=[]; for(let i=0;i<nn;i++) o.push([pools[pos].length?pools[pos].shift():0, pos]); return o; };
+    const vals = [...take('QB',1), ...take('RB',2), ...take('WR',2), ...take('TE',1)];
+    const flex = [...pools.RB, ...pools.WR, ...pools.TE].sort((a,b)=>b-a);
+    vals.push([flex.length?flex[0]:0, 'FLEX']);
+    let s = 0;
+    for(const [v,sl] of vals)
+      s += v >= 0.5 ? v : (sl==='FLEX' ? Math.max(R.RB||0, R.WR||0, R.TE||0) : (R[sl]||0));
+    return s;
+  }
+  function tradeImpact(){
+    const el = $('tcImpact');
+    if(!el) return;
+    if(!MP || !MP.tradepool || !window.__tradeOdds || !sides.A.length || !sides.B.length){ el.innerHTML=''; return; }
+    const ownersOn = s => [...new Set(sides[s].map(id=>ownerOf[id]).filter(Boolean))];
+    const oA = ownersOn('A'), oB = ownersOn('B');
+    if(oA.length!==1 || oB.length!==1 || oA[0]===oB[0]){
+      el.innerHTML = '<div class="note">For playoff-odds impact, each side must receive players from one (different) league roster. Free agents and K/DEF aren\'t modeled.</div>';
+      return;
+    }
+    // the players a side RECEIVES come off the other team's roster
+    const tA = oB[0], tB = oA[0];
+    const wksList = Object.keys(((MP.tradepool[tA]||[])[0]||{pw:{}}).pw);
+    const skipW = String(Math.min(...Object.keys(MP.weeks).map(Number)));   // current week already underway
+    const after = (t, inIds, outIds) => MP.tradepool[t].filter(p=>!outIds.includes(p.id)).concat(inIds.map(id=>poolById[id]).filter(Boolean));
+    const idxT = {}; MP.torder.forEach((t,i)=>idxT[t]=i);
+    const mkAdj = (t, inIds, outIds) => {
+      const base = MP.tradepool[t], post = after(t, inIds, outIds), m = {};
+      for(const w of wksList){
+        if(w===skipW) continue;
+        const d = lineupPts(post, w) - lineupPts(base, w);
+        if(Math.abs(d) > 0.05) m[+w] = d;
+      }
+      return m;
+    };
+    const adjust = {};
+    adjust[idxT[tA]] = mkAdj(tA, sides.A, sides.B);
+    adjust[idxT[tB]] = mkAdj(tB, sides.B, sides.A);
+    const b0 = window.__tradeOdds(null), b1 = window.__tradeOdds(adjust);
+    const line = t => {
+      const dp = b1[t].p-b0[t].p, dc = b1[t].c-b0[t].c;
+      const f = d => `<span style="color:${d>0.05?'var(--accent)':d<-0.05?'var(--red)':'var(--ink3)'};font-weight:700">${d>=0?'+':''}${d.toFixed(1)}</span>`;
+      return `<div class="elim" style="border-left-color:${dp>=-0.05?'var(--accent)':'var(--red)'}"><b>${esc(t)}</b> <span class="d">after this trade</span>` +
+        `<div style="font-size:13px;margin-top:3px">Playoffs ${b0[t].p.toFixed(1)}% → ${b1[t].p.toFixed(1)}% ${f(dp)} &nbsp;·&nbsp; Title ${b0[t].c.toFixed(1)}% → ${b1[t].c.toFixed(1)}% ${f(dc)}</div></div>`;
+    };
+    el.innerHTML = line(tA) + line(tB) +
+      '<div class="note">20,000 paired simulations with re-optimized lineups for every remaining week (this week excluded — it\'s already underway).</div>';
   }
   ['A','B'].forEach(s=>$('tc'+s).addEventListener('input', ()=>sug(s)));
   $('trade').addEventListener('click', e=>{

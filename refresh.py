@@ -1181,6 +1181,14 @@ if weeks_left:
         proj={OWNER[t]: {str(w): round(WP[t][w], 1) for w in weeks_left + PLAYOFF_WEEKS} for t in TEAMS},
         sd={OWNER[t]: round(sdv[t], 1) for t in TEAMS},
         sdw=({OWNER[t]: round(WSD[t][cur_week], 1) for t in TEAMS} if blended else None),
+        # per-player weekly projections + waiver-replacement levels, so the
+        # trade calculator can re-optimize lineups and re-run the odds sim
+        tradepool={OWNER[t]: [dict(id=p, pos=players[p]["position"],
+                                   pw={str(w): round(lpoints(proj[w].get(p) or {}), 1)
+                                       for w in weeks_left + PLAYOFF_WEEKS})
+                              for p in pool[t]] for t in TEAMS},
+        replw={str(w): {ps: round(repl[w].get(ps, 0.0), 1) for ps in ("QB", "RB", "WR", "TE")}
+               for w in weeks_left + PLAYOFF_WEEKS},
         wins={OWNER[t]: wins0[t] for t in TEAMS},
         pf={OWNER[t]: round(pf0[t], 2) for t in TEAMS},
         h2hw={OWNER[t]: {OWNER[u]: h2h0[t][u][0] for u in TEAMS if u != t} for t in TEAMS},
