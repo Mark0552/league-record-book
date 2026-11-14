@@ -115,30 +115,30 @@
   },
   {
    "owner": "Austin",
-   "pct": 91.5
+   "pct": 91.9
   },
   {
    "owner": "Clancy",
-   "pct": 59.8
+   "pct": 59.7
   },
   {
    "owner": "Steve",
-   "pct": 55.1
+   "pct": 55.0
   },
   {
    "owner": "Mark",
-   "pct": 53.1
+   "pct": 53.0
   },
   {
    "owner": "Martin",
-   "pct": 51.0
-  },
-  {
-   "owner": "Luke",
-   "pct": 0.8
+   "pct": 50.9
   },
   {
    "owner": "Sam",
+   "pct": 0.7
+  },
+  {
+   "owner": "Luke",
    "pct": 0.7
   },
   {
@@ -175,7 +175,7 @@
    "a": "Luke",
    "pa": 99.4,
    "b": "Austin",
-   "pb": 119.8
+   "pb": 121.8
   },
   {
    "a": "Mark",
@@ -234,7 +234,7 @@
   {
    "owner": "Luke",
    "rec": "3-6",
-   "text": "Even winning out only gets Luke to 8-6 \u2014 and the path needs the middle to collapse: Bob (7-2) can win at most 1 more; Lerch (7-2) can win at most 1 more; Cliff (7-2) can win at most 1 more; Austin (6-3) can win at most 2 more; Mark (5-4) can win at most 3 more; Steve (5-4) can win at most 3 more. That leaves a 7-way tie at 8-6 for the last 6 spots. The tie crosses divisions, so it falls to season points-for: Luke (856.1) must out-score 1 of the 6 \u2014 at minimum overtaking Cliff, currently 121.9 points ahead. Simulated odds: 0.8%."
+   "text": "Even winning out only gets Luke to 8-6 \u2014 and the path needs the middle to collapse: Bob (7-2) can win at most 1 more; Lerch (7-2) can win at most 1 more; Cliff (7-2) can win at most 1 more; Austin (6-3) can win at most 2 more; Mark (5-4) can win at most 3 more; Steve (5-4) can win at most 3 more. That leaves a 7-way tie at 8-6 for the last 6 spots. The tie crosses divisions, so it falls to season points-for: Luke (856.1) must out-score 1 of the 6 \u2014 at minimum overtaking Cliff, currently 121.9 points ahead. Simulated odds: 0.7%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -511,31 +511,31 @@
   },
   "10": {
    "playoffs": {
-    "Mark": 53.1,
-    "Clancy": 59.8,
+    "Mark": 53.0,
+    "Clancy": 59.7,
     "Will": 0.0,
     "Sam": 0.7,
-    "Steve": 55.1,
+    "Steve": 55.0,
     "Timmy": 0.0,
     "Bob": 98.3,
     "Lerch": 97.3,
-    "Martin": 51.0,
-    "Luke": 0.8,
-    "Austin": 91.5,
+    "Martin": 50.9,
+    "Luke": 0.7,
+    "Austin": 91.9,
     "Cliff": 92.5
    },
    "champ": {
-    "Mark": 8.33,
-    "Clancy": 8.2,
+    "Mark": 8.32,
+    "Clancy": 8.18,
     "Will": 0.0,
     "Sam": 0.07,
-    "Steve": 6.07,
+    "Steve": 6.04,
     "Timmy": 0.0,
-    "Bob": 15.08,
-    "Lerch": 23.22,
-    "Martin": 6.5,
-    "Luke": 0.04,
-    "Austin": 17.05,
+    "Bob": 15.03,
+    "Lerch": 23.21,
+    "Martin": 6.49,
+    "Luke": 0.03,
+    "Austin": 17.2,
     "Cliff": 15.43
    }
   }
@@ -943,7 +943,7 @@
     "17": 90.0
    },
    "Austin": {
-    "10": 119.8,
+    "10": 121.8,
     "11": 97.2,
     "12": 91.2,
     "13": 96.0,
