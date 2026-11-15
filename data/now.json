@@ -107,15 +107,15 @@
   },
   {
    "owner": "Lerch",
-   "pct": 96.9
+   "pct": 97.0
   },
   {
    "owner": "Austin",
-   "pct": 92.6
+   "pct": 92.4
   },
   {
    "owner": "Cliff",
-   "pct": 91.3
+   "pct": 91.2
   },
   {
    "owner": "Martin",
@@ -123,7 +123,7 @@
   },
   {
    "owner": "Mark",
-   "pct": 56.1
+   "pct": 56.2
   },
   {
    "owner": "Clancy",
@@ -131,11 +131,11 @@
   },
   {
    "owner": "Steve",
-   "pct": 45.8
+   "pct": 45.9
   },
   {
    "owner": "Sam",
-   "pct": 0.7
+   "pct": 0.6
   },
   {
    "owner": "Luke",
@@ -155,39 +155,39 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 121.3,
+   "pa": 119.2,
    "b": "Lerch",
-   "pb": 104.9
+   "pb": 104.0
   },
   {
    "a": "Will",
-   "pa": 81.1,
+   "pa": 83.2,
    "b": "Timmy",
-   "pb": 106.4
+   "pb": 104.8
   },
   {
    "a": "Bob",
-   "pa": 118.9,
+   "pa": 118.3,
    "b": "Cliff",
-   "pb": 91.0
+   "pb": 89.6
   },
   {
    "a": "Luke",
-   "pa": 107.2,
+   "pa": 106.5,
    "b": "Austin",
-   "pb": 126.6
+   "pb": 124.9
   },
   {
    "a": "Mark",
-   "pa": 104.5,
+   "pa": 103.6,
    "b": "Clancy",
-   "pb": 99.9
+   "pb": 99.0
   },
   {
    "a": "Steve",
-   "pa": 129.6,
+   "pa": 128.8,
    "b": "Martin",
-   "pb": 140.2
+   "pb": 139.3
   }
  ],
  "elim": [
@@ -224,7 +224,7 @@
   {
    "owner": "Sam",
    "rec": "2-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Bob (7-2) can't win again; Lerch (7-2) can't win again; Austin (6-3) can win at most 1 more; Mark (5-4) can win at most 2 more; Clancy (5-4) can win at most 2 more; Steve (5-4) can win at most 2 more; Luke (3-6) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (923.0) must out-score 4 of the 7 \u2014 at minimum overtaking Mark, currently 107.7 points ahead. Simulated odds: 0.7%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Bob (7-2) can't win again; Lerch (7-2) can't win again; Austin (6-3) can win at most 1 more; Mark (5-4) can win at most 2 more; Clancy (5-4) can win at most 2 more; Steve (5-4) can win at most 2 more; Luke (3-6) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (923.0) must out-score 4 of the 7 \u2014 at minimum overtaking Mark, currently 107.7 points ahead. Simulated odds: 0.6%."
   },
   {
    "owner": "Timmy",
@@ -511,32 +511,32 @@
   },
   "10": {
    "playoffs": {
-    "Mark": 56.1,
+    "Mark": 56.2,
     "Clancy": 54.4,
     "Will": 0.0,
-    "Sam": 0.7,
-    "Steve": 45.8,
+    "Sam": 0.6,
+    "Steve": 45.9,
     "Timmy": 0.0,
     "Bob": 98.9,
-    "Lerch": 96.9,
+    "Lerch": 97.0,
     "Martin": 62.9,
     "Luke": 0.6,
-    "Austin": 92.6,
-    "Cliff": 91.3
+    "Austin": 92.4,
+    "Cliff": 91.2
    },
    "champ": {
-    "Mark": 8.81,
-    "Clancy": 7.78,
+    "Mark": 8.83,
+    "Clancy": 7.8,
     "Will": 0.0,
     "Sam": 0.06,
-    "Steve": 5.0,
+    "Steve": 5.01,
     "Timmy": 0.0,
-    "Bob": 15.51,
-    "Lerch": 23.05,
+    "Bob": 15.56,
+    "Lerch": 23.14,
     "Martin": 8.11,
     "Luke": 0.02,
-    "Austin": 16.43,
-    "Cliff": 15.23
+    "Austin": 16.32,
+    "Cliff": 15.16
    }
   }
  },
@@ -843,7 +843,7 @@
   ],
   "proj": {
    "Mark": {
-    "10": 104.5,
+    "10": 103.6,
     "11": 83.7,
     "12": 97.3,
     "13": 92.6,
@@ -853,7 +853,7 @@
     "17": 95.2
    },
    "Clancy": {
-    "10": 99.9,
+    "10": 99.0,
     "11": 96.0,
     "12": 92.9,
     "13": 93.6,
@@ -863,7 +863,7 @@
     "17": 93.1
    },
    "Will": {
-    "10": 81.1,
+    "10": 83.2,
     "11": 68.6,
     "12": 89.2,
     "13": 93.1,
@@ -873,7 +873,7 @@
     "17": 93.8
    },
    "Sam": {
-    "10": 121.3,
+    "10": 119.2,
     "11": 94.9,
     "12": 93.5,
     "13": 86.2,
@@ -883,7 +883,7 @@
     "17": 92.6
    },
    "Steve": {
-    "10": 129.6,
+    "10": 128.8,
     "11": 98.7,
     "12": 93.9,
     "13": 81.1,
@@ -893,7 +893,7 @@
     "17": 95.1
    },
    "Timmy": {
-    "10": 106.4,
+    "10": 104.8,
     "11": 80.0,
     "12": 80.3,
     "13": 72.9,
@@ -903,7 +903,7 @@
     "17": 81.4
    },
    "Bob": {
-    "10": 118.9,
+    "10": 118.3,
     "11": 76.9,
     "12": 98.4,
     "13": 90.5,
@@ -913,7 +913,7 @@
     "17": 93.4
    },
    "Lerch": {
-    "10": 104.9,
+    "10": 104.0,
     "11": 86.7,
     "12": 104.7,
     "13": 87.5,
@@ -923,7 +923,7 @@
     "17": 100.8
    },
    "Martin": {
-    "10": 140.2,
+    "10": 139.3,
     "11": 87.9,
     "12": 93.4,
     "13": 94.4,
@@ -933,7 +933,7 @@
     "17": 97.0
    },
    "Luke": {
-    "10": 107.2,
+    "10": 106.5,
     "11": 86.1,
     "12": 91.2,
     "13": 89.2,
@@ -943,7 +943,7 @@
     "17": 90.4
    },
    "Austin": {
-    "10": 126.6,
+    "10": 124.9,
     "11": 97.1,
     "12": 91.1,
     "13": 95.4,
@@ -953,7 +953,7 @@
     "17": 96.8
    },
    "Cliff": {
-    "10": 91.0,
+    "10": 89.6,
     "11": 96.9,
     "12": 96.9,
     "13": 88.5,
@@ -978,18 +978,18 @@
    "Cliff": 20.1
   },
   "sdw": {
-   "Mark": 36.8,
-   "Clancy": 10.7,
-   "Will": 16.7,
-   "Sam": 21.2,
-   "Steve": 9.8,
-   "Timmy": 16.7,
-   "Bob": 21.6,
-   "Lerch": 21.6,
-   "Martin": 22.9,
+   "Mark": 36.5,
+   "Clancy": 10.6,
+   "Will": 16.4,
+   "Sam": 20.8,
+   "Steve": 9.7,
+   "Timmy": 16.6,
+   "Bob": 21.5,
+   "Lerch": 21.5,
+   "Martin": 22.8,
    "Luke": 9.2,
-   "Austin": 12.2,
-   "Cliff": 16.5
+   "Austin": 12.0,
+   "Cliff": 16.4
   },
   "tradepool": {
    "Mark": [
