@@ -274,31 +274,31 @@
   "10": {
    "playoffs": {
     "Mark": 58.3,
-    "Clancy": 56.9,
+    "Clancy": 56.8,
     "Will": 0.0,
-    "Sam": 1.0,
-    "Steve": 37.2,
+    "Sam": 0.9,
+    "Steve": 36.7,
     "Timmy": 0.0,
-    "Bob": 96.9,
-    "Lerch": 96.8,
-    "Martin": 74.9,
-    "Luke": 3.9,
-    "Austin": 79.8,
+    "Bob": 96.8,
+    "Lerch": 96.9,
+    "Martin": 75.4,
+    "Luke": 4.0,
+    "Austin": 79.7,
     "Cliff": 94.4
    },
    "champ": {
-    "Mark": 9.15,
-    "Clancy": 8.55,
+    "Mark": 9.12,
+    "Clancy": 8.52,
     "Will": 0.0,
     "Sam": 0.11,
-    "Steve": 4.01,
+    "Steve": 3.99,
     "Timmy": 0.0,
-    "Bob": 15.41,
-    "Lerch": 21.91,
-    "Martin": 10.28,
+    "Bob": 15.37,
+    "Lerch": 21.93,
+    "Martin": 10.4,
     "Luke": 0.15,
     "Austin": 13.43,
-    "Cliff": 17.0
+    "Cliff": 16.98
    }
   }
  }
