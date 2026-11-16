@@ -120,7 +120,7 @@
   },
   {
    "owner": "Martin",
-   "pct": 77.5
+   "pct": 77.4
   },
   {
    "owner": "Clancy",
@@ -502,7 +502,7 @@
     "Timmy": 0.0,
     "Bob": 98.5,
     "Lerch": 97.5,
-    "Martin": 77.5,
+    "Martin": 77.4,
     "Luke": 0.1,
     "Austin": 94.7,
     "Cliff": 91.5
@@ -515,10 +515,10 @@
     "Steve": 3.21,
     "Timmy": 0.0,
     "Bob": 14.51,
-    "Lerch": 23.78,
-    "Martin": 10.21,
+    "Lerch": 23.79,
+    "Martin": 10.2,
     "Luke": 0.01,
-    "Austin": 16.83,
+    "Austin": 16.84,
     "Cliff": 15.44
    }
   }
