@@ -1,76 +1,76 @@
 {
- "asof": "entering week 10, 2026",
+ "asof": "entering week 11, 2026",
  "sims": 100000,
  "odds": [
   {
    "owner": "Lerch",
-   "playoffs": 95.99,
-   "bye": 38.73,
-   "final": 39.66,
-   "champ": 22.426
+   "playoffs": 96.23,
+   "bye": 39.16,
+   "final": 39.84,
+   "champ": 22.568
   },
   {
    "owner": "Austin",
-   "playoffs": 94.8,
+   "playoffs": 94.73,
    "bye": 30.37,
-   "final": 33.69,
-   "champ": 17.492
+   "final": 33.65,
+   "champ": 17.439
   },
   {
    "owner": "Cliff",
-   "playoffs": 89.61,
-   "bye": 52.94,
-   "final": 29.42,
-   "champ": 15.709
+   "playoffs": 89.86,
+   "bye": 52.78,
+   "final": 29.14,
+   "champ": 15.658
   },
   {
    "owner": "Bob",
-   "playoffs": 99.47,
-   "bye": 59.02,
-   "final": 32.15,
-   "champ": 13.651
+   "playoffs": 99.53,
+   "bye": 59.22,
+   "final": 32.09,
+   "champ": 13.748
   },
   {
    "owner": "Martin",
-   "playoffs": 78.22,
-   "bye": 7.08,
-   "final": 21.59,
-   "champ": 11.251
+   "playoffs": 77.18,
+   "bye": 6.93,
+   "final": 21.29,
+   "champ": 10.895
   },
   {
    "owner": "Clancy",
-   "playoffs": 73.74,
-   "bye": 3.52,
-   "final": 23.91,
-   "champ": 10.349
+   "playoffs": 73.9,
+   "bye": 3.48,
+   "final": 24.14,
+   "champ": 10.356
   },
   {
    "owner": "Mark",
-   "playoffs": 34.45,
-   "bye": 5.73,
-   "final": 11.13,
-   "champ": 5.209
+   "playoffs": 34.66,
+   "bye": 5.6,
+   "final": 11.28,
+   "champ": 5.338
   },
   {
    "owner": "Steve",
-   "playoffs": 32.99,
-   "bye": 2.59,
-   "final": 8.3,
-   "champ": 3.841
+   "playoffs": 33.16,
+   "bye": 2.46,
+   "final": 8.39,
+   "champ": 3.916
   },
   {
    "owner": "Sam",
-   "playoffs": 0.62,
+   "playoffs": 0.64,
    "bye": 0.0,
-   "final": 0.14,
-   "champ": 0.069
+   "final": 0.16,
+   "champ": 0.077
   },
   {
    "owner": "Luke",
-   "playoffs": 0.12,
+   "playoffs": 0.11,
    "bye": 0.0,
    "final": 0.01,
-   "champ": 0.003
+   "champ": 0.005
   },
   {
    "owner": "Will",
