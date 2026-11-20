@@ -108,7 +108,7 @@
   },
   {
    "owner": "Austin",
-   "pct": 96.4
+   "pct": 96.3
   },
   {
    "owner": "Lerch",
@@ -116,27 +116,27 @@
   },
   {
    "owner": "Cliff",
-   "pct": 86.0
+   "pct": 86.1
   },
   {
    "owner": "Clancy",
-   "pct": 79.6
+   "pct": 79.5
   },
   {
    "owner": "Martin",
-   "pct": 77.4
+   "pct": 76.8
   },
   {
    "owner": "Mark",
-   "pct": 34.0
+   "pct": 34.5
   },
   {
    "owner": "Steve",
-   "pct": 30.4
+   "pct": 30.5
   },
   {
    "owner": "Sam",
-   "pct": 0.5
+   "pct": 0.6
   },
   {
    "owner": "Luke",
@@ -156,25 +156,25 @@
  "matchups": [
   {
    "a": "Will",
-   "pa": 84.3,
+   "pa": 84.2,
    "b": "Sam",
    "pb": 111.2
   },
   {
    "a": "Timmy",
-   "pa": 86.6,
+   "pa": 86.3,
    "b": "Lerch",
    "pb": 93.4
   },
   {
    "a": "Bob",
-   "pa": 102.2,
+   "pa": 104.0,
    "b": "Luke",
    "pb": 99.6
   },
   {
    "a": "Austin",
-   "pa": 113.3,
+   "pa": 113.1,
    "b": "Cliff",
    "pb": 97.2
   },
@@ -188,7 +188,7 @@
    "a": "Mark",
    "pa": 105.8,
    "b": "Martin",
-   "pb": 112.9
+   "pb": 111.1
   }
  ],
  "elim": [
@@ -243,7 +243,7 @@
   {
    "owner": "Sam",
    "rec": "3-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.5%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.6%."
   },
   {
    "owner": "Timmy",
@@ -560,32 +560,32 @@
   },
   "11": {
    "playoffs": {
-    "Mark": 34.0,
-    "Clancy": 79.6,
+    "Mark": 34.5,
+    "Clancy": 79.5,
     "Will": 0.0,
-    "Sam": 0.5,
-    "Steve": 30.4,
+    "Sam": 0.6,
+    "Steve": 30.5,
     "Timmy": 0.0,
     "Bob": 99.8,
-    "Lerch": 95.7,
-    "Martin": 77.4,
+    "Lerch": 95.8,
+    "Martin": 76.8,
     "Luke": 0.1,
-    "Austin": 96.4,
-    "Cliff": 86.0
+    "Austin": 96.3,
+    "Cliff": 86.1
    },
    "champ": {
-    "Mark": 4.68,
+    "Mark": 4.76,
     "Clancy": 11.22,
     "Will": 0.0,
     "Sam": 0.07,
     "Steve": 4.0,
     "Timmy": 0.0,
-    "Bob": 14.89,
-    "Lerch": 21.77,
-    "Martin": 10.85,
+    "Bob": 14.94,
+    "Lerch": 21.79,
+    "Martin": 10.72,
     "Luke": 0.01,
-    "Austin": 17.85,
-    "Cliff": 14.66
+    "Austin": 17.84,
+    "Cliff": 14.64
    }
   }
  },
@@ -893,7 +893,7 @@
     "17": 93.6
    },
    "Will": {
-    "11": 84.3,
+    "11": 84.2,
     "12": 86.6,
     "13": 89.4,
     "14": 86.2,
@@ -920,7 +920,7 @@
     "17": 97.5
    },
    "Timmy": {
-    "11": 86.6,
+    "11": 86.3,
     "12": 80.5,
     "13": 73.3,
     "14": 81.6,
@@ -929,7 +929,7 @@
     "17": 80.9
    },
    "Bob": {
-    "11": 102.2,
+    "11": 104.0,
     "12": 101.5,
     "13": 92.2,
     "14": 86.5,
@@ -947,7 +947,7 @@
     "17": 100.0
    },
    "Martin": {
-    "11": 112.9,
+    "11": 111.1,
     "12": 92.9,
     "13": 96.0,
     "14": 94.5,
@@ -965,7 +965,7 @@
     "17": 90.0
    },
    "Austin": {
-    "11": 113.3,
+    "11": 113.1,
     "12": 90.5,
     "13": 97.1,
     "14": 89.9,
@@ -1004,9 +1004,9 @@
    "Sam": 28.7,
    "Steve": 12.3,
    "Timmy": 21.1,
-   "Bob": 24.3,
+   "Bob": 24.2,
    "Lerch": 22.2,
-   "Martin": 32.4,
+   "Martin": 32.2,
    "Luke": 15.3,
    "Austin": 19.5,
    "Cliff": 19.3
