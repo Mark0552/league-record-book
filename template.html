@@ -217,8 +217,9 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
         <div class="note">Playoff odds after each completed week ("draft" = before any games). Past weeks are reconstructed from results to that point; the latest point uses the live projection model. Tap a name or a line to spotlight it.</div></div>
       <div class="swpane"><div id="oddsTrendC"></div>
         <div class="note">Championship odds after each completed week. Tap a name or a line to spotlight it.</div></div></div>
-    <div class="card" id="clinchcard" style="display:none"><h2>Clinch watch</h2><div id="clinches"></div><div class="note" id="clinchnote"></div></div>
+    <div class="card" id="clinchcard" style="display:none"><h2>Clinch watch</h2><div id="clinched"></div><div id="clinches"></div><div class="note" id="clinchnote"></div></div>
     <div class="card swcard" id="elimcard" data-sw="0"><h2>Elimination watch</h2>
+      <div id="elimDone"></div>
       <div class="swtabs"><button class="swtab on" id="tabElims">This week</button><button class="swtab" id="tabPaths">Survival paths</button></div>
       <div class="swpane on"><div id="elims"></div><div class="note" id="elimnote"></div></div>
       <div class="swpane"><div id="paths"></div><div class="note" id="pathnote"></div></div></div>
@@ -589,6 +590,12 @@ if(now.standings){
     draw(elP, 'playoffs', true);
     draw(elC, 'champ', false);
   })();
+  const outsNow = now.standings.filter(s=>s.status==='out');
+  const insNow  = now.standings.filter(s=>s.status==='clinched'||s.status==='bye');
+  if(outsNow.length){
+    $('elimDone').innerHTML = outsNow.map(s=>
+      `<div class="elim"><b>${esc(s.owner)} (${s.rec})</b> — eliminated. No combination of remaining results and tiebreakers reaches the playoffs.</div>`).join('');
+  }
   if((now.elim||[]).length || (now.brink||[]).length){
     $('elims').innerHTML = (now.elim||[]).map(e=>
       `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('')
@@ -607,16 +614,18 @@ if(now.standings){
       `<div class="elim" style="border-left-color:var(--gold)"><b>${esc(p.owner)} (${esc(p.rec)})</b><div style="margin-top:4px;font-size:13px;color:var(--ink2);line-height:1.45">${esc(p.text)}</div></div>`).join('');
     $('pathnote').textContent = now.pathnote || '';
   }
-  $('elimcard').style.display = (hasWatch || hasPaths) ? '' : 'none';
+  $('elimcard').style.display = (hasWatch || hasPaths || outsNow.length) ? '' : 'none';
   $('tabElims').style.display = hasWatch ? '' : 'none';
   $('tabPaths').style.display = hasPaths ? '' : 'none';
   if(!(hasWatch && hasPaths)) $('elimcard').querySelector('.swtabs').style.display = 'none';
   swSet($('elimcard'), hasWatch ? 0 : 1);
-  if((now.clinch||[]).length){
+  if((now.clinch||[]).length || insNow.length){
     $('clinchcard').style.display = '';
-    $('clinches').innerHTML = now.clinch.map(e=>
+    $('clinched').innerHTML = insNow.map(s=>
+      `<div class="elim" style="border-left-color:${s.status==='bye'?'var(--gold)':'var(--accent)'}"><b>${esc(s.owner)} (${s.rec})</b> — clinched ${s.status==='bye'?`the ${esc(s.div)} title + first-round bye`:'a playoff spot'}. Locked in no matter what happens the rest of the season.</div>`).join('');
+    $('clinches').innerHTML = (now.clinch||[]).map(e=>
       `<div class="elim" style="border-left-color:${e.kind==='bye'?'var(--gold)':'var(--accent)'}"><b>${esc(e.owner)}</b> clinches ${e.kind==='bye'?`the ${esc(e.div)} title + first-round bye`:'a playoff spot'} if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('');
-    $('clinchnote').textContent = now.clinchnote || '';
+    $('clinchnote').textContent = (now.clinch||[]).length ? (now.clinchnote || '') : '';
   }
   if(now.brackets){
     const renderBracket = (list, el) => {

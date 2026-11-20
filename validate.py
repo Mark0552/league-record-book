@@ -107,6 +107,19 @@ now = D.get("now") or {}
 if now.get("odds"):
     tot = sum(o["pct"] for o in now["odds"])
     check(abs(tot - 600) < 3, f"odds: playoff pcts sum {tot:.1f}, expected ~600")
+
+# ---- watch cards never contradict the settled clinch/elimination status ----
+# (an already-out team must not have an "is out if" / brink / survival card;
+# a clinched team's only legal scenario card is a division-bye clinch)
+st = {s["owner"]: s.get("status") for s in now.get("standings") or []}
+for key in ("elim", "brink", "paths"):
+    for c in now.get(key) or []:
+        check(not st.get(c["owner"]),
+              f"{key}: {c['owner']} is already {st.get(c['owner'])} but still has a watch card")
+for c in now.get("clinch") or []:
+    s = st.get(c["owner"])
+    check(s is None or (s == "clinched" and c.get("kind") == "bye"),
+          f"clinch: {c['owner']} is already {s} but has a {c.get('kind')} scenario card")
 mach = now.get("machine")
 if mach:
     check(len(mach.get("tradepool") or {}) == 12, "machine: tradepool missing owners")

@@ -1078,6 +1078,13 @@ if weeks_left:
         elif not can_miss(x, wins_eff, h2h_eff, future_eff):
             status[x] = "clinched"
 
+    # a settled team gets its own section on the site, not a watch card: an
+    # eliminated team's "is out if" card is vacuous (it is out in every branch,
+    # win or lose), and a clinched team can never be on the brink
+    _settled = {OWNER[x] for x in status}
+    elim_cards = [c for c in elim_cards if c["owner"] not in _settled]
+    brink_cards = [c for c in brink_cards if c["owner"] not in _settled]
+
     # clinch scenarios: can any combination of this week's results LOCK a playoff spot?
     if not FAST and future_eff.get(cur_week):
         print("running clinch-scenario solver ...")
