@@ -896,22 +896,31 @@ def alive(x, wins_now, h2h_now, future_games, tie_ok=True):
             return True
     return False
 
-def factor_conditions(combos, games_list):
+def factor_conditions(combos, games_list, dontcare=None):
     """Factor winner-combos into readable conditions: constant winners as AND lines,
-    the remainder minimized into an OR-of-ANDs clause."""
+    the remainder minimized into an OR-of-ANDs clause. dontcare combos (already
+    covered by an earlier, stronger condition on the same card) may be absorbed
+    to shorten the clause, but never form conditions on their own."""
     needs = []
-    residual_idx = []
+    residual_idx, const = [], {}
     for i, (a, b) in enumerate(games_list):
         winners_i = {c[i] for c in combos}
         if len(winners_i) == 1:
             wteam = winners_i.pop()
+            const[i] = wteam
             needs.append(f"{OWNER[wteam]} beats {OWNER[b if wteam == a else a]}")
         else:
             residual_idx.append(i)
     if residual_idx:
         variants = {tuple(c[i] for i in residual_idx) for c in combos}
-        if len(variants) < 2 ** len(residual_idx):
-            terms, changed = set(variants), True
+        dc = set()
+        for c in (dontcare or ()):
+            # only don't-cares consistent with the constant AND lines may absorb
+            if all(c[i] == w for i, w in const.items()):
+                dc.add(tuple(c[i] for i in residual_idx))
+        dc -= variants
+        if len(variants | dc) < 2 ** len(residual_idx):
+            terms, changed = variants | dc, True
             while changed:
                 changed = False
                 tl = sorted(terms, key=str); new, used = set(), set()
@@ -923,6 +932,9 @@ def factor_conditions(combos, games_list):
                             m = tuple(None if k == diff[0] else a_[k] for k in range(len(a_)))
                             new.add(m); used.add(a_); used.add(b_); changed = True
                 terms = (terms - used) | new
+            # a term that only re-covers don't-cares adds nothing
+            cov = lambda t, v: all(tk is None or tk == vk for tk, vk in zip(t, v))
+            terms = {t for t in terms if any(cov(t, v) for v in variants)}
             alts = []
             for v in sorted(terms, key=str):
                 parts = []
@@ -934,9 +946,10 @@ def factor_conditions(combos, games_list):
                 if parts:
                     alts.append(" AND ".join(parts))
             if alts and len(alts) <= 4:
-                needs.append("Plus one of: " + "  |  ".join(alts))
+                needs.append(("Plus one of: " if needs else "One of: ") + "  |  ".join(alts))
             elif alts:
-                needs.append("Plus specific combinations of the other games")
+                needs.append("Plus specific combinations of the other games" if needs
+                             else "Specific combinations of this week's games")
     return needs
 
 # ---------------- 3a. games already decided on the field ----------------
@@ -970,38 +983,49 @@ if not FAST and future_eff.get(cur_week):
     WEEKG = future_eff[cur_week]
     FUTA = {w: future_eff[w] for w in future_eff if w > cur_week}
     for x in TEAMS:
-        other = [(a, b) for a, b in WEEKG if x not in (a, b)]
         xg = [(a, b) for a, b in WEEKG if x in (a, b)]
-        if not xg:
-            continue
-        opp = xg[0][0] if xg[0][1] == x else xg[0][1]
+        opp = (xg[0][0] if xg[0][1] == x else xg[0][1]) if xg else None
+        xi = WEEKG.index(xg[0]) if xg else None
         combos, brink_combos = [], []
-        for combo in itertools.product(*[[a, b] for a, b in other]):
-            w9 = dict(wins_eff); w9[opp] += 1
+        # every combination of THIS week's results, x's own game included: a
+        # team can be eliminated by other results even in a week it wins
+        # (e.g. a rival whose win caps the only remaining survival path)
+        for combo in itertools.product(*[[a, b] for a, b in WEEKG]):
+            w9 = dict(wins_eff)
             hh = {t: {u: list(v) for u, v in dd.items()} for t, dd in h2h_eff.items()}
             def rec2(wi, lo):
                 hh[wi][lo][1] += 1; hh[lo][wi][1] += 1; hh[wi][lo][0] += 1
-            rec2(opp, x)
-            for wt, (a, b) in zip(combo, other):
+            for wt, (a, b) in zip(combo, WEEKG):
                 w9[wt] += 1; rec2(wt, b if wt == a else a)
             if not alive(x, w9, hh, FUTA):
                 combos.append(combo)
             elif not alive(x, w9, hh, FUTA, tie_ok=False):
                 brink_combos.append(combo)
+
+        def conds(cc, dontcare=None):
+            # on x's own card, "Opp beats X" reads better as "Loses to Opp"
+            return [f"Loses to {OWNER[opp]}" if opp and c == f"{OWNER[opp]} beats {OWNER[x]}" else c
+                    for c in factor_conditions(cc, WEEKG, dontcare)]
+        all_loss = lambda cc: opp is not None and all(c[xi] == opp for c in cc)
         if combos:
             # one card per team: the brink branch rides along on the elim card
             # instead of appearing as a separate entry further down the list
-            card = dict(owner=OWNER[x],
-                        needs=[f"Loses to {OWNER[opp]}"] + factor_conditions(combos, other))
+            card = dict(owner=OWNER[x], needs=conds(combos))
             if brink_combos:
-                card["brinkneeds"] = factor_conditions(brink_combos, other)
-                card["odds"] = lose_odds.get(x)
-                # together the two branches cover EVERY other result: any loss ends it
-                card["allout"] = len(combos) + len(brink_combos) == 2 ** len(other)
+                # the out-combos are don't-cares here: the card reads top-down,
+                # so the brink clause only has to be right where "out" isn't
+                card["brinkneeds"] = conds(brink_combos, dontcare=combos)
+                if all_loss(brink_combos):
+                    card["odds"] = lose_odds.get(x)   # odds are conditioned on the loss
+                nall = len(combos) + len(brink_combos)
+                if nall == 2 ** len(WEEKG):
+                    card["allout"] = "week"           # out or brink no matter what happens
+                elif all_loss(combos) and all_loss(brink_combos) and nall == 2 ** (len(WEEKG) - 1):
+                    card["allout"] = "loss"           # any loss ends it, a win keeps hope
             elim_cards.append(card)
         elif brink_combos:
-            needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(brink_combos, other)
-            brink_cards.append(dict(owner=OWNER[x], needs=needs, odds=lose_odds.get(x)))
+            brink_cards.append(dict(owner=OWNER[x], needs=conds(brink_combos),
+                                    **({"odds": lose_odds.get(x)} if all_loss(brink_combos) else {})))
     elimnote = "Shown only when no combination of results and tiebreakers could save the team — a spot still reachable via a points-for tiebreak counts as alive."
 
 # ---------------- 4a. clinched / eliminated right now ----------------

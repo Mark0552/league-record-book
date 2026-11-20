@@ -116,6 +116,8 @@ for key in ("elim", "brink", "paths"):
     for c in now.get(key) or []:
         check(not st.get(c["owner"]),
               f"{key}: {c['owner']} is already {st.get(c['owner'])} but still has a watch card")
+for c in (now.get("elim") or []) + (now.get("brink") or []):
+    check(bool(c.get("needs")), f"watch: empty conditions on {c['owner']}'s card")
 for c in now.get("clinch") or []:
     s = st.get(c["owner"])
     check(s is None or (s == "clinched" and c.get("kind") == "bye"),
@@ -129,6 +131,9 @@ if mach:
             check(all(isinstance(v, (int, float)) for v in p["pw"].values()),
                   f"machine: bad pw for {p.get('n')}")
             break
+    for k, wnr in (mach.get("final") or {}).items():
+        parts = k.split("|")
+        check(len(parts) == 3 and wnr in parts[1:], f"machine: bad final-game entry {k} -> {wnr}")
 
 # ---- committed data files parse ----
 for f in ("data/now.json", "data/values.json", "data/feeds.json", "data/espn2014.json",
