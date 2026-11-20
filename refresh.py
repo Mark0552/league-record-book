@@ -989,9 +989,17 @@ if not FAST and future_eff.get(cur_week):
             elif not alive(x, w9, hh, FUTA, tie_ok=False):
                 brink_combos.append(combo)
         if combos:
-            needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(combos, other)
-            elim_cards.append(dict(owner=OWNER[x], needs=needs))
-        if brink_combos:
+            # one card per team: the brink branch rides along on the elim card
+            # instead of appearing as a separate entry further down the list
+            card = dict(owner=OWNER[x],
+                        needs=[f"Loses to {OWNER[opp]}"] + factor_conditions(combos, other))
+            if brink_combos:
+                card["brinkneeds"] = factor_conditions(brink_combos, other)
+                card["odds"] = lose_odds.get(x)
+                # together the two branches cover EVERY other result: any loss ends it
+                card["allout"] = len(combos) + len(brink_combos) == 2 ** len(other)
+            elim_cards.append(card)
+        elif brink_combos:
             needs = [f"Loses to {OWNER[opp]}"] + factor_conditions(brink_combos, other)
             brink_cards.append(dict(owner=OWNER[x], needs=needs, odds=lose_odds.get(x)))
     elimnote = "Shown only when no combination of results and tiebreakers could save the team — a spot still reachable via a points-for tiebreak counts as alive."
@@ -1344,7 +1352,7 @@ now = dict(
     elim=elim_cards,
     elimnote=elimnote,
     brink=brink_cards,
-    brinknote="On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out." if brink_cards else "",
+    brinknote="On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out." if (brink_cards or any("brinkneeds" in c for c in elim_cards)) else "",
     paths=paths_cards,
     pathnote="The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week." if paths_cards else "",
     oddshist=({str(k): v for k, v in sorted(odds_hist.items())} if odds_hist else None),

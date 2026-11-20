@@ -597,8 +597,23 @@ if(now.standings){
       `<div class="elim"><b>${esc(s.owner)} (${s.rec})</b> — eliminated. No combination of remaining results and tiebreakers reaches the playoffs.</div>`).join('');
   }
   if((now.elim||[]).length || (now.brink||[]).length){
-    $('elims').innerHTML = (now.elim||[]).map(e=>
-      `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`).join('')
+    const li = ns => ns.map(n=>'<li>'+esc(n)+'</li>').join('');
+    $('elims').innerHTML = (now.elim||[]).map(e=>{
+      if(!e.brinkneeds)
+        return `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${e.needs.map(n=>'<li>'+esc(n)+'</li>').join('')}</ul></div>`;
+      const eff = e.odds != null && e.odds < 1;
+      const bl = eff ? 'effectively out' : 'on the brink';
+      const oddsTxt = e.odds != null ? ` (~${e.odds}% to make the playoffs in sims)` : '';
+      if(e.allout){
+        // the two branches cover every other result: the loss alone ends it
+        const rest = e.needs.slice(1).map(s=>s.replace(/^Plus one of: /,'one of: '));
+        return `<div class="elim"><b>${esc(e.owner)}</b> — ${esc(e.needs[0].replace(/^Loses to /,'a loss to '))} ends it:<ul>` +
+          `<li>Fully out if ${esc(rest.join(' and '))}</li>` +
+          `<li>Otherwise ${bl} — alive only through a points-for tiebreak${esc(oddsTxt)}</li></ul></div>`;
+      }
+      return `<div class="elim"><b>${esc(e.owner)}</b> is out if:<ul>${li(e.needs)}</ul>` +
+        `<div style="margin-top:6px">…and ${bl} — alive only through a points-for tiebreak${esc(oddsTxt)} — if instead:</div><ul>${li(e.brinkneeds)}</ul></div>`;
+    }).join('')
       + (now.brink||[]).map(e=>{
         const eff = e.odds != null && e.odds < 1;
         const oddsTxt = e.odds != null
