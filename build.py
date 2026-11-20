@@ -112,6 +112,7 @@ for g in sheet_2026:
 print(f"alias verification: {matched}/{checked} played 2026 sheet games match Sleeper under alias map")
 games.extend(sleeper_2026)
 games.extend(E14.get("games") or [])
+AGG_WEEKS = {(g["year"], g["week"]) for g in games if g.get("agg")}
 
 games.sort(key=lambda g: (g["year"], g["week"]))
 OWNERS = sorted({g["a"] for g in games} | {g["b"] for g in games})
@@ -396,6 +397,8 @@ for yr in range(2014, 2020):
     for w in range(1, 17):
         f = espn_dir / f"{yr}_box_{w}.json"
         if not f.exists():
+            continue
+        if (yr, w) in AGG_WEEKS:   # two-week playoff totals aren't single games
             continue
         for row in json.load(open(f, encoding="utf-8")):
             for side in ("home", "away"):
@@ -1035,6 +1038,18 @@ with open(RAW / "sheet" / "worst.csv", encoding="utf-8") as f:
 
 # ================= STARTING LINEUPS for every game =================
 lineups = {}  # "year|week|owner" -> [[name, pos, pts], ...]
+lineup_gaps = {}  # same key -> starting slots the ESPN archive no longer holds
+espn_slots = {}   # year -> {pos: starters}
+for _yr in range(2014, 2020):
+    _lf = espn_dir / f"{_yr}.json"
+    if _lf.exists():
+        try:
+            _lc = json.load(open(_lf, encoding="utf-8"))["settings"]["rosterSettings"]["lineupSlotCounts"]
+            espn_slots[_yr] = {n: int(_lc.get(i, 0)) for i, n in
+                               (("0", "QB"), ("2", "RB"), ("4", "WR"), ("6", "TE"),
+                                ("23", "FLEX"), ("17", "K"), ("16", "DEF")) if int(_lc.get(i, 0))}
+        except Exception:
+            pass
 for yr in range(2014, 2020):
     for w in range(1, 17):
         f = espn_dir / f"{yr}_box_{w}.json"
@@ -1048,7 +1063,20 @@ for yr in range(2014, 2020):
                 if o and pls:
                     lineups[f"{yr}|{row.get('matchupPeriodId')}|{o}"] = [
                         [p.get("name") or "?", ESPN_POS.get(p.get("pos"), "?"), round(p.get("pts") or 0, 1)]
+                        + ([1] if p.get("ghost") else [])   # reconstructed, not in ESPN's archive
                         for p in pls]
+                    # which starting slots does the archive still lack?
+                    cnt = Counter(ESPN_POS.get(p.get("pos"), "?") for p in pls)
+                    sc_ = espn_slots.get(yr)
+                    if sc_ and (yr, row.get("matchupPeriodId")) not in AGG_WEEKS                             and len(pls) < sum(sc_.values()):
+                        miss = []
+                        for ps_ in ("QB", "K", "DEF"):
+                            miss += [ps_] * max(0, sc_.get(ps_, 0) - cnt[ps_])
+                        need = []
+                        for ps_ in ("RB", "WR", "TE"):
+                            need += [ps_] * max(0, sc_.get(ps_, 0) - cnt[ps_])
+                        nflex = sum(sc_.values()) - len(pls) - len(miss) - len(need)
+                        lineup_gaps[f"{yr}|{row.get('matchupPeriodId')}|{o}"] =                             miss + need + ["FLEX"] * max(0, nflex)
 for season in SLEEPER_SEASONS:
     ro = season_ro.get(season)
     if not ro:
@@ -1089,7 +1117,7 @@ def player_key(name, pos):
 
 variant_counts = defaultdict(Counter)
 for lu in lineups.values():
-    for nm, pos, pts in lu:
+    for nm, pos, pts, *_ in lu:
         variant_counts[player_key(nm, pos)][nm] += 1
 canon_name = {}
 for k, c in variant_counts.items():
@@ -1152,7 +1180,9 @@ team_delta = defaultdict(float)   # (yr, w, owner) -> +points at 0.5 PPR
 for key, lu in lineups.items():
     yr_s, w_s, o = key.split("|")
     yr, w = int(yr_s), int(w_s)
-    for nm, pos, pts in lu:
+    if (yr, w) in AGG_WEEKS:
+        continue
+    for nm, pos, pts, *_ in lu:
         bump = 0.5 * rec_of(yr, w, nm) if yr <= 2018 else 0.0
         if yr <= 2023:
             bump += rush_bonus_of(yr, w, nm)
@@ -1492,6 +1522,7 @@ payload = dict(
     draft=draft_payload,
     shame=shame,
     lineups=lineups,
+    lineup_gaps=lineup_gaps,
     divisions=divhist,
     pubs=(json.load(open("data/feeds.json", encoding="utf-8")).get("feeds", [])
           if Path("data/feeds.json").exists() else []),

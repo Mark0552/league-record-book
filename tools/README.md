@@ -16,3 +16,7 @@ the pipeline.
   matching each lineup's missing points against nflverse weekly stats under
   that season's scoring, constrained to the open lineup slot and the team's
   own draft/other-week starters; fills unique matches only.
+- `fill2014.py` — second 2014 pass: rebuilds K, D/ST and skill scoring from
+  nflverse stats and play-by-play at the league's 2014 ESPN settings, then
+  fills archive-dropped starters where a single answer fits (unique score
+  match, week-to-week continuity, or a season-long kicker sequence).

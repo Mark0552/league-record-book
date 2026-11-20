@@ -442,6 +442,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const G = DATA.games; // [year, week, type(R/P/C), a, sa, b, sb]
+const wkLabel = g => g[7] ? `wks ${g[1]*2-14}–${g[1]*2-13}` : `wk${g[1]}`;   // 2014's two-week playoff rounds
 const YEARS = [...new Set(G.map(g=>g[0]))].sort((a,b)=>b-a);
 $('sub').textContent = 'League record book · last updated ' + (DATA.built_ts
   ? new Date(DATA.built_ts).toLocaleString(undefined, {month:'long', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'}) + ' local'
@@ -1208,7 +1209,7 @@ function renderSeason(){
   const lastPOwk = Math.max(0, ...po.map(g=>g[1]));
   $('ss_playoffs').innerHTML = po.length ? po.map(g=>{
     const isFinal = champ && g[1]===lastPOwk && ((g[4]>g[6]?g[3]:g[5])===champ.owner);
-    return `<div class="meet"><span>wk${g[1]}${isFinal?' · <span style="color:var(--bwb);font-weight:700">Buck Wong Bowl</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
+    return `<div class="meet lurow" style="cursor:pointer;gap:12px" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><span>${wkLabel(g)}${isFinal?' · <span style="color:var(--bwb);font-weight:700">Buck Wong Bowl</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
   }).join('')
     : '<div class="note">No playoff games recorded for this season yet.</div>';
   // consolation
@@ -1217,7 +1218,7 @@ function renderSeason(){
   $('ss_consol').innerHTML = co.length ? co.map(g=>{
     const loser = g[4]<g[6]?g[3]:g[5];
     const isCup = shame && g[1]===lastCOwk && loser===shame.owner;
-    return `<div class="meet"><span>wk${g[1]}${isCup?' · <span style="color:var(--red);font-weight:700">Lerch Cup</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
+    return `<div class="meet lurow" style="cursor:pointer;gap:12px" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><span>${wkLabel(g)}${isCup?' · <span style="color:var(--red);font-weight:700">Lerch Cup</span>':''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>`;
   }).join('')
     : '<div class="note">No consolation games recorded.</div>';
 }
@@ -1376,22 +1377,32 @@ function renderGames(){
   const lim = gShowAll ? rows.length : 120;
   const typ = {R:'',P:' <span class="badge gold">PO</span>',C:' <span class="badge">cons</span>'};
   $('gTable').innerHTML = '<tr><th>When</th><th>Result</th></tr>' + rows.slice(0,lim).map(g=>
-    `<tr class="grow" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><td style="color:var(--ink3)">${g[0]} wk${g[1]}${typ[g[2]]}</td><td class="num" style="text-align:left"><span class="${g[4]>g[6]?'wk-w':'wk-l'}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'wk-w':'wk-l'}">${f2(g[6])} ${esc(g[5])}</span></td></tr>`).join('');
+    `<tr class="grow" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><td style="color:var(--ink3)">${g[0]} ${wkLabel(g)}${typ[g[2]]}</td><td class="num" style="text-align:left"><span class="${g[4]>g[6]?'wk-w':'wk-l'}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'wk-w':'wk-l'}">${f2(g[6])} ${esc(g[5])}</span></td></tr>`).join('');
   $('gCount').textContent = `${rows.length} games match` + (rows.length>lim?` (showing ${lim})`:'') + ' · tap a game for starting lineups';
   $('gMore').style.display = rows.length>lim ? 'block':'none';
 }
-const GSCORE = {};   // official team score per game, to expose archive gaps in lineups
-for(const g of G){ if(!g[7]){ GSCORE[`${g[0]}|${g[1]}|${g[3]}`]=g[4]; GSCORE[`${g[0]}|${g[1]}|${g[5]}`]=g[6]; } }
+const GSCORE = {}, GAGG = {};   // official team score per game, to expose archive gaps in lineups
+for(const g of G){ GSCORE[`${g[0]}|${g[1]}|${g[3]}`]=g[4]; GSCORE[`${g[0]}|${g[1]}|${g[5]}`]=g[6]; if(g[7]) GAGG[`${g[0]}|${g[1]}`]=1; }
+const SLOTNAME = {DEF:'D/ST'};
 function lineupSide(y, w, o){
   const lu = (DATA.lineups||{})[`${y}|${w}|${o}`];
   if(!lu) return `<div class="note">No lineup data for ${esc(o)}.</div>`;
   const off = GSCORE[`${y}|${w}|${o}`];
   const gap = off!=null ? off - lu.reduce((s,p)=>s+p[2],0) : 0;
+  const slots = (DATA.lineup_gaps||{})[`${y}|${w}|${o}`];
+  const what = slots && slots.length ? slots.map(x=>SLOTNAME[x]||x).join(' + ') : 'starter(s)';
+  const recon = lu.some(p=>p[3]);
+  const PORD = {QB:0, RB:1, WR:2, TE:3, K:4, DEF:5};
+  // ESPN-era archives list starters in no particular order; Sleeper's are already in slot order
+  const shown = y < 2020 ? lu.slice().sort((p,q)=>(PORD[p[1]]??9)-(PORD[q[1]]??9)) : lu;
+  const row = (l, r, st) => `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0;${st||''}"><span>${l}</span><span style="font-variant-numeric:tabular-nums">${r}</span></div>`;
   return `<div style="flex:1;min-width:150px"><b style="font-size:13px">${esc(o)}</b>` +
-    lu.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0"><span><span style="color:var(--ink3)">${esc(p[1])}</span> ${esc(p[0])}</span><span style="font-variant-numeric:tabular-nums">${p[2].toFixed(1)}</span></div>`).join('') +
-    (Math.abs(gap) > 0.5 ? `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0;color:var(--ink3);font-style:italic"><span>unrecorded starter(s) — lost from ESPN's archive</span><span style="font-variant-numeric:tabular-nums">${gap.toFixed(1)}</span></div>` : '') + '</div>';
+    shown.map(p=>row(`<span style="color:var(--ink3)">${esc(p[1])}</span> ${esc(p[0])}${p[3]?'<span title="Reconstructed from NFL stats" style="color:var(--gold)"> †</span>':''}`, p[2].toFixed(1))).join('') +
+    (Math.abs(gap) > 0.5 || (slots && slots.length)
+      ? row(Math.abs(gap) > 0.5 ? `${esc(what)} — not in ESPN's archive` : `${esc(what)} — left empty or a 0-point starter`, gap.toFixed(1), 'color:var(--ink3);font-style:italic') : '') +
+    (recon ? `<div style="font-size:11px;color:var(--ink3);padding-top:3px">† missing from ESPN's archive; identified from that week's NFL stats</div>` : '') + '</div>';
 }
-const lineupPanel = (y,w,a,b) => `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${lineupSide(y,w,a)}${lineupSide(y,w,b)}</div>`;
+const lineupPanel = (y,w,a,b) => (GAGG[`${y}|${w}`] ? `<div class="note" style="padding:2px">Two-week playoff round — each player's points are his total across both weeks; more than nine names means the lineup changed between weeks.</div>` : '') + `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${lineupSide(y,w,a)}${lineupSide(y,w,b)}</div>`;
 $('gTable').addEventListener('click', e=>{
   const tr = e.target.closest('tr.grow');
   if(!tr) return;

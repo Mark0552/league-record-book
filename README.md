@@ -47,11 +47,17 @@ live APIs). Immutable snapshot: the `archive-2026-11-13` release.
   (three phantoms — cancelled or pre-draft offers — were excluded this way).
   Waiver logs never existed, so pre-2020 pickups remain forensic ("started a
   player they didn't draft", cross-checked against the trade log).
-- **Ghost starters**: ESPN's archive drops players it no longer lists, leaving
-  some 2014–2016 lineups short. 33 were restored (10 named by recap e-mails,
-  23 reconstructed by matching missing points against nflverse weekly stats,
-  unique matches only — `tools/ghostfill.py`). Remaining gaps are mostly
-  K/D-ST, shown on the site as explicit "unrecorded starter" rows.
+- **Ghost starters**: ESPN's archive silently drops some starters from its
+  2014–2016 box scores, leaving lineups short. 53 have been restored: 10 named
+  by recap e-mails, 23 matched against nflverse weekly stats
+  (`tools/ghostfill.py`), and 20 more 2014 kickers, D/STs and skill players
+  identified by re-scoring nflverse data at the league's exact 2014 settings
+  (`tools/fill2014.py`; the model reproduces 99% of the starters the archive
+  still holds). A slot is filled only when one answer fits; restored starters
+  carry a dagger on the site, and anything unresolved is shown as an explicit
+  "not in ESPN's archive" row naming the open slot.
+- **2014 playoff rosters** come from the archive's two-week matchup periods:
+  each player's points are his total across both weeks of the round.
 - Two-week 2014 playoff rounds (semis NFL wks 14–15, final 16–17) are stored
   as aggregates flagged `agg`, excluded from single-game records.
 - Transaction weeks follow the league convention that a week ends after
