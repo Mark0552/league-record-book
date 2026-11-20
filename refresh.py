@@ -1332,6 +1332,11 @@ if weeks_left:
         divnames=[DIVNAME[1], DIVNAME[2]],
         torder=[OWNER[t] for t in TEAMS],
         played=last_scored,
+        # games already final on the field (every starter done): the machine
+        # shows them locked — their result counts automatically, picks can't flip them
+        final={f"{w}|{OWNER[a]}|{OWNER[b]}": OWNER[decided[frozenset((a, b))]]
+               for w in weeks_left for a, b in future[w]
+               if frozenset((a, b)) in decided},
     )
 now = dict(
     asof=(f"entering week {cur_week}, {season}" if weeks_left
