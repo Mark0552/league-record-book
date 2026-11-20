@@ -104,35 +104,35 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 99.7
-  },
-  {
-   "owner": "Lerch",
-   "pct": 96.1
+   "pct": 99.8
   },
   {
    "owner": "Austin",
-   "pct": 95.5
+   "pct": 96.7
+  },
+  {
+   "owner": "Lerch",
+   "pct": 95.4
   },
   {
    "owner": "Cliff",
-   "pct": 87.4
-  },
-  {
-   "owner": "Martin",
-   "pct": 77.0
+   "pct": 85.8
   },
   {
    "owner": "Clancy",
-   "pct": 76.1
+   "pct": 79.6
+  },
+  {
+   "owner": "Martin",
+   "pct": 76.5
   },
   {
    "owner": "Mark",
-   "pct": 33.9
+   "pct": 34.9
   },
   {
    "owner": "Steve",
-   "pct": 33.6
+   "pct": 30.7
   },
   {
    "owner": "Sam",
@@ -151,44 +151,44 @@
    "pct": 0.0
   }
  ],
- "oddsnote": "100,000 full-season simulations (regular season + playoff bracket). Weekly player projections are a Sleeper + ESPN + FantasyPros ensemble, averaged wherever each source expects the player to play and scored at this league's settings. Optimized lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free agent average). League tiebreakers applied.",
+ "oddsnote": "100,000 full-season simulations (regular season + playoff bracket). Weekly player projections are a Sleeper + ESPN + FantasyPros ensemble, averaged wherever each source expects the player to play and scored at this league's settings. Optimized lineups (no K/DEF), bye and injury holes filled with a waiver add (top-5 free agent average). League tiebreakers applied. This week's finished games are locked in: those starters count at their actual points in their actual slots, and only players who haven't kicked off are projected.",
  "week": 11,
  "matchups": [
   {
    "a": "Will",
-   "pa": 67.2,
+   "pa": 84.7,
    "b": "Sam",
-   "pb": 94.1
+   "pb": 111.2
   },
   {
    "a": "Timmy",
-   "pa": 80.4,
+   "pa": 90.1,
    "b": "Lerch",
-   "pb": 87.9
+   "pb": 93.4
   },
   {
    "a": "Bob",
-   "pa": 80.5,
+   "pa": 97.2,
    "b": "Luke",
-   "pb": 91.4
+   "pb": 99.6
   },
   {
    "a": "Austin",
-   "pa": 98.8,
+   "pa": 115.4,
    "b": "Cliff",
-   "pb": 89.5
+   "pb": 97.2
   },
   {
    "a": "Clancy",
-   "pa": 97.4,
+   "pa": 115.0,
    "b": "Steve",
-   "pb": 98.2
+   "pb": 112.3
   },
   {
    "a": "Mark",
-   "pa": 86.9,
+   "pa": 105.7,
    "b": "Martin",
-   "pb": 94.0
+   "pb": 110.3
   }
  ],
  "elim": [
@@ -560,32 +560,32 @@
   },
   "11": {
    "playoffs": {
-    "Mark": 33.9,
-    "Clancy": 76.1,
+    "Mark": 34.9,
+    "Clancy": 79.6,
     "Will": 0.0,
     "Sam": 0.6,
-    "Steve": 33.6,
+    "Steve": 30.7,
     "Timmy": 0.0,
-    "Bob": 99.7,
-    "Lerch": 96.1,
-    "Martin": 77.0,
+    "Bob": 99.8,
+    "Lerch": 95.4,
+    "Martin": 76.5,
     "Luke": 0.1,
-    "Austin": 95.5,
-    "Cliff": 87.4
+    "Austin": 96.7,
+    "Cliff": 85.8
    },
    "champ": {
-    "Mark": 4.66,
-    "Clancy": 10.81,
+    "Mark": 4.85,
+    "Clancy": 11.23,
     "Will": 0.0,
-    "Sam": 0.07,
-    "Steve": 4.38,
+    "Sam": 0.08,
+    "Steve": 4.07,
     "Timmy": 0.0,
-    "Bob": 14.64,
-    "Lerch": 21.5,
-    "Martin": 10.86,
+    "Bob": 14.72,
+    "Lerch": 21.64,
+    "Martin": 10.73,
     "Luke": 0.01,
-    "Austin": 18.02,
-    "Cliff": 15.05
+    "Austin": 18.07,
+    "Cliff": 14.61
    }
   }
  },
@@ -875,7 +875,7 @@
   ],
   "proj": {
    "Mark": {
-    "11": 86.9,
+    "11": 105.7,
     "12": 92.2,
     "13": 90.6,
     "14": 92.7,
@@ -884,7 +884,7 @@
     "17": 92.0
    },
    "Clancy": {
-    "11": 97.4,
+    "11": 115.0,
     "12": 94.2,
     "13": 92.7,
     "14": 93.7,
@@ -893,7 +893,7 @@
     "17": 93.6
    },
    "Will": {
-    "11": 67.2,
+    "11": 84.7,
     "12": 86.6,
     "13": 89.4,
     "14": 86.2,
@@ -902,7 +902,7 @@
     "17": 91.8
    },
    "Sam": {
-    "11": 94.1,
+    "11": 111.2,
     "12": 94.3,
     "13": 87.2,
     "14": 83.0,
@@ -911,7 +911,7 @@
     "17": 95.4
    },
    "Steve": {
-    "11": 98.2,
+    "11": 112.3,
     "12": 94.1,
     "13": 82.5,
     "14": 94.7,
@@ -920,7 +920,7 @@
     "17": 97.5
    },
    "Timmy": {
-    "11": 80.4,
+    "11": 90.1,
     "12": 80.5,
     "13": 73.3,
     "14": 81.6,
@@ -929,7 +929,7 @@
     "17": 80.9
    },
    "Bob": {
-    "11": 80.5,
+    "11": 97.2,
     "12": 101.5,
     "13": 92.2,
     "14": 86.5,
@@ -938,7 +938,7 @@
     "17": 93.6
    },
    "Lerch": {
-    "11": 87.9,
+    "11": 93.4,
     "12": 104.4,
     "13": 87.6,
     "14": 90.9,
@@ -947,7 +947,7 @@
     "17": 100.0
    },
    "Martin": {
-    "11": 94.0,
+    "11": 110.3,
     "12": 92.9,
     "13": 96.0,
     "14": 94.5,
@@ -956,7 +956,7 @@
     "17": 99.2
    },
    "Luke": {
-    "11": 91.4,
+    "11": 99.6,
     "12": 92.7,
     "13": 92.1,
     "14": 96.0,
@@ -965,7 +965,7 @@
     "17": 90.0
    },
    "Austin": {
-    "11": 98.8,
+    "11": 115.4,
     "12": 90.5,
     "13": 97.1,
     "14": 89.9,
@@ -974,7 +974,7 @@
     "17": 98.5
    },
    "Cliff": {
-    "11": 89.5,
+    "11": 97.2,
     "12": 94.8,
     "13": 90.4,
     "14": 98.5,
@@ -997,7 +997,20 @@
    "Austin": 19.9,
    "Cliff": 19.3
   },
-  "sdw": null,
+  "sdw": {
+   "Mark": 42.4,
+   "Clancy": 12.0,
+   "Will": 22.4,
+   "Sam": 28.7,
+   "Steve": 12.3,
+   "Timmy": 21.6,
+   "Bob": 24.8,
+   "Lerch": 22.2,
+   "Martin": 34.8,
+   "Luke": 15.3,
+   "Austin": 19.9,
+   "Cliff": 19.3
+  },
   "tradepool": {
    "Mark": [
     {
