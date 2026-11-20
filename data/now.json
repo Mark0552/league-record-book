@@ -112,7 +112,7 @@
   },
   {
    "owner": "Lerch",
-   "pct": 95.7
+   "pct": 95.8
   },
   {
    "owner": "Cliff",
@@ -124,11 +124,11 @@
   },
   {
    "owner": "Martin",
-   "pct": 77.6
+   "pct": 77.5
   },
   {
    "owner": "Mark",
-   "pct": 33.7
+   "pct": 33.9
   },
   {
    "owner": "Steve",
@@ -136,7 +136,7 @@
   },
   {
    "owner": "Sam",
-   "pct": 0.6
+   "pct": 0.5
   },
   {
    "owner": "Luke",
@@ -156,25 +156,25 @@
  "matchups": [
   {
    "a": "Will",
-   "pa": 81.9,
+   "pa": 84.4,
    "b": "Sam",
    "pb": 111.2
   },
   {
    "a": "Timmy",
-   "pa": 86.7,
+   "pa": 86.2,
    "b": "Lerch",
    "pb": 93.4
   },
   {
    "a": "Bob",
-   "pa": 102.6,
+   "pa": 102.3,
    "b": "Luke",
    "pb": 99.6
   },
   {
    "a": "Austin",
-   "pa": 113.6,
+   "pa": 113.4,
    "b": "Cliff",
    "pb": 97.2
   },
@@ -186,9 +186,9 @@
   },
   {
    "a": "Mark",
-   "pa": 105.7,
+   "pa": 105.8,
    "b": "Martin",
-   "pb": 113.8
+   "pb": 113.2
   }
  ],
  "elim": [
@@ -243,7 +243,7 @@
   {
    "owner": "Sam",
    "rec": "3-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.6%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.5%."
   },
   {
    "owner": "Timmy",
@@ -560,32 +560,32 @@
   },
   "11": {
    "playoffs": {
-    "Mark": 33.7,
+    "Mark": 33.9,
     "Clancy": 79.6,
     "Will": 0.0,
-    "Sam": 0.6,
+    "Sam": 0.5,
     "Steve": 30.4,
     "Timmy": 0.0,
     "Bob": 99.8,
-    "Lerch": 95.7,
-    "Martin": 77.6,
+    "Lerch": 95.8,
+    "Martin": 77.5,
     "Luke": 0.1,
     "Austin": 96.4,
     "Cliff": 86.0
    },
    "champ": {
-    "Mark": 4.65,
-    "Clancy": 11.24,
+    "Mark": 4.66,
+    "Clancy": 11.23,
     "Will": 0.0,
     "Sam": 0.07,
-    "Steve": 4.01,
+    "Steve": 3.99,
     "Timmy": 0.0,
     "Bob": 14.89,
-    "Lerch": 21.77,
-    "Martin": 10.88,
+    "Lerch": 21.81,
+    "Martin": 10.86,
     "Luke": 0.01,
-    "Austin": 17.86,
-    "Cliff": 14.61
+    "Austin": 17.84,
+    "Cliff": 14.64
    }
   }
  },
@@ -875,7 +875,7 @@
   ],
   "proj": {
    "Mark": {
-    "11": 105.7,
+    "11": 105.8,
     "12": 92.2,
     "13": 90.6,
     "14": 92.7,
@@ -893,7 +893,7 @@
     "17": 93.6
    },
    "Will": {
-    "11": 81.9,
+    "11": 84.4,
     "12": 86.6,
     "13": 89.4,
     "14": 86.2,
@@ -920,7 +920,7 @@
     "17": 97.5
    },
    "Timmy": {
-    "11": 86.7,
+    "11": 86.2,
     "12": 80.5,
     "13": 73.3,
     "14": 81.6,
@@ -929,7 +929,7 @@
     "17": 80.9
    },
    "Bob": {
-    "11": 102.6,
+    "11": 102.3,
     "12": 101.5,
     "13": 92.2,
     "14": 86.5,
@@ -947,7 +947,7 @@
     "17": 100.0
    },
    "Martin": {
-    "11": 113.8,
+    "11": 113.2,
     "12": 92.9,
     "13": 96.0,
     "14": 94.5,
@@ -965,7 +965,7 @@
     "17": 90.0
    },
    "Austin": {
-    "11": 113.6,
+    "11": 113.4,
     "12": 90.5,
     "13": 97.1,
     "14": 89.9,
@@ -1000,13 +1000,13 @@
   "sdw": {
    "Mark": 42.4,
    "Clancy": 12.0,
-   "Will": 22.0,
+   "Will": 21.9,
    "Sam": 28.7,
    "Steve": 12.3,
    "Timmy": 21.1,
    "Bob": 24.3,
    "Lerch": 22.2,
-   "Martin": 32.6,
+   "Martin": 32.4,
    "Luke": 15.3,
    "Austin": 19.5,
    "Cliff": 19.3
@@ -1074,7 +1074,7 @@
      "pos": "WR",
      "n": "Malik Washington",
      "pw": {
-      "11": 6.6,
+      "11": 6.5,
       "12": 7.5,
       "13": 6.8,
       "14": 7.7,
@@ -1088,7 +1088,7 @@
      "pos": "RB",
      "n": "Ollie Gordon II",
      "pw": {
-      "11": 11.6,
+      "11": 11.7,
       "12": 14.7,
       "13": 11.6,
       "14": 12.2,
@@ -2538,7 +2538,7 @@
      "pos": "TE",
      "n": "Dalton Kincaid",
      "pw": {
-      "11": 7.7,
+      "11": 7.6,
       "12": 7.9,
       "13": 7.5,
       "14": 7.2,
