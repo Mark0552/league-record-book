@@ -108,7 +108,7 @@
   },
   {
    "owner": "Lerch",
-   "pct": 97.3
+   "pct": 97.4
   },
   {
    "owner": "Austin",
@@ -120,7 +120,7 @@
   },
   {
    "owner": "Clancy",
-   "pct": 78.2
+   "pct": 77.3
   },
   {
    "owner": "Martin",
@@ -132,7 +132,7 @@
   },
   {
    "owner": "Steve",
-   "pct": 32.1
+   "pct": 33.0
   },
   {
    "owner": "Sam",
@@ -140,7 +140,7 @@
   },
   {
    "owner": "Luke",
-   "pct": 0.2
+   "pct": 0.1
   },
   {
    "owner": "Will",
@@ -174,19 +174,19 @@
   },
   {
    "a": "Austin",
-   "pa": 111.1,
+   "pa": 111.0,
    "b": "Cliff",
    "pb": 94.0
   },
   {
    "a": "Clancy",
-   "pa": 114.6,
+   "pa": 113.6,
    "b": "Steve",
-   "pb": 112.7
+   "pb": 112.8
   },
   {
    "a": "Mark",
-   "pa": 105.9,
+   "pa": 106.0,
    "b": "Martin",
    "pb": 102.6
   }
@@ -240,7 +240,7 @@
   {
    "owner": "Luke",
    "rec": "3-7",
-   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more. That leaves a 7-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Luke (980.2) must out-score 3 of the 6 \u2014 at minimum overtaking Lerch, currently 172.3 points ahead. Simulated odds: 0.2%."
+   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more. That leaves a 7-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Luke (980.2) must out-score 3 of the 6 \u2014 at minimum overtaking Lerch, currently 172.3 points ahead. Simulated odds: 0.1%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -548,31 +548,31 @@
   "11": {
    "playoffs": {
     "Mark": 36.4,
-    "Clancy": 78.2,
+    "Clancy": 77.3,
     "Will": 0.0,
     "Sam": 0.6,
-    "Steve": 32.1,
+    "Steve": 33.0,
     "Timmy": 0.0,
     "Bob": 99.7,
-    "Lerch": 97.3,
+    "Lerch": 97.4,
     "Martin": 74.3,
-    "Luke": 0.2,
+    "Luke": 0.1,
     "Austin": 96.3,
     "Cliff": 84.9
    },
    "champ": {
     "Mark": 4.87,
-    "Clancy": 10.96,
+    "Clancy": 10.82,
     "Will": 0.0,
     "Sam": 0.07,
-    "Steve": 4.07,
+    "Steve": 4.17,
     "Timmy": 0.0,
-    "Bob": 14.31,
+    "Bob": 14.33,
     "Lerch": 23.2,
     "Martin": 10.49,
     "Luke": 0.01,
-    "Austin": 18.21,
-    "Cliff": 13.82
+    "Austin": 18.23,
+    "Cliff": 13.8
    }
   }
  },
@@ -862,7 +862,7 @@
   ],
   "proj": {
    "Mark": {
-    "11": 105.9,
+    "11": 106.0,
     "12": 92.0,
     "13": 90.5,
     "14": 92.7,
@@ -871,7 +871,7 @@
     "17": 91.9
    },
    "Clancy": {
-    "11": 114.6,
+    "11": 113.6,
     "12": 94.2,
     "13": 92.7,
     "14": 93.7,
@@ -898,7 +898,7 @@
     "17": 95.3
    },
    "Steve": {
-    "11": 112.7,
+    "11": 112.8,
     "12": 94.0,
     "13": 83.4,
     "14": 94.8,
@@ -952,7 +952,7 @@
     "17": 90.1
    },
    "Austin": {
-    "11": 111.1,
+    "11": 111.0,
     "12": 90.6,
     "13": 97.2,
     "14": 90.0,
@@ -1033,7 +1033,7 @@
      "pos": "RB",
      "n": "Bucky Irving",
      "pw": {
-      "11": 15.9,
+      "11": 16.0,
       "12": 18.2,
       "13": 16.8,
       "14": 15.0,
@@ -2637,7 +2637,7 @@
      "pos": "RB",
      "n": "Jahmyr Gibbs",
      "pw": {
-      "11": 20.6,
+      "11": 20.7,
       "12": 21.7,
       "13": 22.9,
       "14": 23.4,
@@ -2808,7 +2808,7 @@
      "pos": "QB",
      "n": "Jared Goff",
      "pw": {
-      "11": 15.6,
+      "11": 15.7,
       "12": 18.5,
       "13": 19.0,
       "14": 19.8,
@@ -3275,7 +3275,7 @@
   },
   "replw": {
    "11": {
-    "QB": 14.6,
+    "QB": 14.7,
     "RB": 6.1,
     "WR": 6.8,
     "TE": 5.9
