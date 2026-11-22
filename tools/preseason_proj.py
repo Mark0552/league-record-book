@@ -5,7 +5,8 @@ Sources, averaged per player where more than one lists him:
   * FantasyPros consensus projections (itself an average of several projection
     sites: CBS, ESPN, numberFire, FFToday, NFL.com, ... the mix varies by year)
     as archived by the Wayback Machine in the weeks before each season's kickoff;
-  * ESPN's own preseason season projections (2018 on, finished seasons only).
+  * ESPN's own preseason season projections (2018 on, finished seasons only;
+    for 2016-2017 the archived projections page, top 120 overall + top 40 per position).
 Both carry raw projected stats, so points are recomputed with the league's
 scoring instead of trusting either site's fantasy-point column:
   2014-2018 standard (no points per reception), 2019+ half-PPR;
@@ -114,6 +115,35 @@ def espn(y, ppr):
         out[f"{norm(pl['fullName'])}|{pos}"] = round(pts, 1)
     return out if sum(1 for v in out.values() if v > 150) >= 50 else {}
 
+def espn_archived(y, ppr):
+    """ESPN's preseason projections page as archived just before kickoff (used for
+    2016-2017, which ESPN's API no longer serves): the overall top 120 plus the
+    top 40 at each position.  Columns: rank, player, C/A, pass yds/TD/INT,
+    rush att/yds/TD, rec/yds/TD, pts."""
+    out = {}
+    for q in ("", "&startIndex=40", "&startIndex=80", "&slotCategoryId=0", "&slotCategoryId=2",
+              "&slotCategoryId=4", "&slotCategoryId=6"):
+        try:
+            final, html = get(f"https://web.archive.org/web/{y}0903000000/http://games.espn.com/ffl/tools/projections?{q}")
+        except Exception as e:
+            print(f"   ESPN archive {y} {q or 'top 40'}: {e!r}")
+            continue
+        time.sleep(5)
+        m = re.search(r"/web/(\d{14})", final)
+        t = re.search(r"<title>(.*?)</title>", html, re.S)
+        if not (m and f"{y}0701" <= m.group(1)[:8] <= f"{y}0912" and t and t.group(1).strip().startswith(str(y))):
+            continue
+        for tr in re.findall(r'<tr[^>]*class="pncPlayerRow[^>]*>(.*?)</tr>', html, re.S):
+            c = [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", x)).replace("&nbsp;", " ").strip()
+                 for x in re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)]
+            mm = re.match(r"(.+?) , \w+ (QB|RB|WR|TE)(?![A-Za-z])", c[1]) if len(c) >= 13 else None
+            if not mm:
+                continue
+            f = lambda i: float(c[i]) if re.fullmatch(r"-?\d+(\.\d+)?", c[i]) else 0.0
+            pts = (f(3) * 0.04 + f(4) * 4 - f(5) * 2 + f(7) * 0.1 + f(8) * 6 + f(9) * ppr + f(10) * 0.1 + f(11) * 6)
+            out[f"{norm(mm.group(1))}|{mm.group(2)}"] = round(pts, 1)
+    return out
+
 def fp(y, ppr):
     """FantasyPros consensus from the archived preseason pages: ({player: pts}, {pos: snapshot date})"""
     players, snaps = {}, {}
@@ -143,6 +173,8 @@ def main():
         ppr = 0.0 if y <= 2018 else 0.5
         a, snaps = fp(y, ppr)
         b = {}
+        if y in (2016, 2017):
+            b = espn_archived(y, ppr)
         if 2018 <= y < this_year:
             try:
                 b = espn(y, ppr)
