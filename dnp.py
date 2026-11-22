@@ -1,6 +1,6 @@
 """Top-pick availability: NFL games missed by each owner's early-round draft picks.
 
-For every pick in rounds 1-ROUNDS, walk the weeks the fantasy season was played
+For every pick in rounds 1-ROUNDS (currently 3), walk the weeks the fantasy season was played
 and record each week the player's NFL team played and he did not, with the
 reason taken from that week's NFL roster status (IR, suspended, holdout, ...).
 A miss counts for the drafter whether or not the player was still on his squad.
@@ -14,17 +14,19 @@ import csv, io, json, os, re, time, urllib.request
 from collections import defaultdict
 from pathlib import Path
 
-ROUNDS = 5
+ROUNDS = 3
 CACHE = Path("data/dnp.json")
+PROJ = Path("data/preseason_proj.json")
 BASE = "https://github.com/nflverse/nflverse-data/releases/download"
 FILES = {
     "roster": ("weekly_rosters", "roster_weekly_{y}.csv"),
     "stats": ("stats_player", "stats_player_week_{y}.csv"),
     "snaps": ("snap_counts", "snap_counts_{y}.csv"),
+    "injuries": ("injuries", "injuries_{y}.csv"),
 }
 GAMES_URL = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
 STALE_S = 20 * 3600
-VERSION = 3   # bump to force every season to recompute
+VERSION = 5   # bump to force every season to recompute
 
 # roster files spell some clubs differently from the schedule file
 TEAM = {"CLV": "CLE", "BLT": "BAL", "HST": "HOU", "ARZ": "ARI", "SL": "STL", "JAC": "JAX",
@@ -45,6 +47,8 @@ OVERRIDE = {
     (2016, "leveonbell"): {1: "Suspended", 2: "Suspended", 3: "Suspended"},
     (2016, "tombrady"): {1: "Suspended", 2: "Suspended", 3: "Suspended", 4: "Suspended"},
     (2016, "arianfoster"): {w: "Retired" for w in range(8, 18)},
+    (2014, "cjspiller"): {w: "IR" for w in range(8, 16)},          # IR, designated to return
+    (2016, "alshonjeffery"): {w: "Suspended" for w in range(11, 15)},
 }
 
 def norm(s):
@@ -119,6 +123,18 @@ def _season(y, picks, last_week):
         roster[r["gsis_id"]][int(r["week"])] = (TEAM.get(r["team"], r["team"]), st)
         info[r["gsis_id"]] = (r["full_name"], r["position"])
 
+    # the NFL's weekly injury reports: gsis -> week -> body part
+    hurt = defaultdict(dict)
+    try:
+        for r in _rows("injuries", y):
+            if r["game_type"] != "REG" or not r["gsis_id"]:
+                continue
+            part = (r["report_primary_injury"] or r["practice_primary_injury"] or "").strip()
+            if part and not re.search(r"not injury|rest|personal|coach|illness", part, re.I):
+                hurt[r["gsis_id"]][int(r["week"])] = part.lower()
+    except Exception as e:
+        print(f"dnp: {y} injury reports unavailable ({e!r})")
+
     # the season in progress only counts weeks that are finished AND published
     through = last_week
     done = [w for w in range(1, last_week + 1)
@@ -159,14 +175,16 @@ def _season(y, picks, last_week):
             poss += 1
             if w in stat_rows[gid] or (norm(info[gid][0]), w) in snap:
                 continue
-            if st is None:
-                why = "Inactive"                           # on the club, no roster row that week
-            elif st in ON_FIELD:
-                why = "Did not play" if has_ina else "Inactive"
+            if st is None or st in ON_FIELD or st == "INA":
+                # on the club but not in uniform: injured if the week's report lists him
+                why = "Injured" if w in hurt[gid] else "Did not play"
+            elif st == "RES" and y <= 2016 and w in hurt[gid]:
+                why = "Injured"      # old roster files mark some short absences as reserve; IR players aren't on injury reports
             else:
                 why = REASON.get(st, st)
             why = OVERRIDE.get((y, norm(name)), {}).get(w, why)
-            miss.append([w, why])
+            part = hurt[gid].get(w)
+            miss.append([w, why, part] if part and why == "Injured" else [w, why])
         team_now = rw[max(rw)][0] if rw else ""
         out[key] = dict(g=poss, miss=miss, t=team_now)
     return out, through
@@ -206,6 +224,11 @@ def compute(picks, weeks, current):
             print(f"dnp: {y} not refreshed ({e!r}); using cached data" if c else f"dnp: {y} unavailable ({e!r})")
     if changed:
         json.dump(cache, open(CACHE, "w", encoding="utf-8"), separators=(",", ":"))
+    # preseason projections under league scoring (tools/preseason_proj.py) -> points per game
+    try:
+        proj = json.load(open(PROJ, encoding="utf-8"))
+    except Exception:
+        proj = {}
     seasons = {}
     for y, ds in sorted(by_season.items()):
         c = cache["seasons"].get(str(y))
@@ -216,7 +239,26 @@ def compute(picks, weeks, current):
             v = c["picks"].get(f'{norm(d["player"])}|{d["pos"]}')
             if not v:
                 continue
-            rows.append(dict(o=d["owner"], p=d["player"], pos=d["pos"], rd=d["round"], pick=d["pick"],
-                             g=v["g"], miss=v["miss"], **({"u": 1} if v.get("u") else {})))
+            row = dict(o=d["owner"], p=d["player"], pos=d["pos"], rd=d["round"], pick=d["pick"],
+                       g=v["g"], miss=v["miss"], **({"u": 1} if v.get("u") else {}))
+            sp = (proj.get(str(y)) or {}).get("players", {}).get(f'{norm(d["player"])}|{d["pos"]}')
+            if sp is not None:
+                row["pp"] = round(sp / (16 if y <= 2020 else 17), 2)   # NFL games that season
+            rows.append(row)
         seasons[str(y)] = dict(weeks=c["through"], picks=rows)
+    # no archived projection (2016, 2017, the odd player): estimate from what picks at the
+    # same position and round were projected for in seasons with the same scoring
+    era = lambda y: int(y) <= 2018            # standard through 2018, half-PPR after
+    pool = defaultdict(list)
+    for y, S in seasons.items():
+        for r in S["picks"]:
+            if "pp" in r:
+                pool[(era(y), r["pos"], r["rd"])].append(r["pp"])
+                pool[(era(y), r["pos"], 0)].append(r["pp"])
+    for y, S in seasons.items():
+        for r in S["picks"]:
+            if "pp" not in r:
+                v = pool.get((era(y), r["pos"], r["rd"])) or pool.get((era(y), r["pos"], 0))
+                if v:
+                    r["pp"], r["est"] = round(sum(v) / len(v), 2), 1
     return dict(rounds=ROUNDS, seasons=seasons)

@@ -142,7 +142,7 @@ for y, S in dn.items():
     for p in S["picks"]:
         check(p["o"] in OWNERS, f"dnp: unknown owner {p['o']!r} in {y}")
         check(len(p["miss"]) <= p["g"] <= S["weeks"], f"dnp: {y} {p['p']} missed {len(p['miss'])} of {p['g']}")
-        check(1 <= p["rd"] <= 5, f"dnp: {y} {p['p']} round {p['rd']}")
+        check(1 <= p["rd"] <= 3, f"dnp: {y} {p['p']} round {p['rd']}")
 
 # ---- committed data files parse ----
 for f in ("data/now.json", "data/values.json", "data/feeds.json", "data/espn2014.json",

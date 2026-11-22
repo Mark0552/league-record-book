@@ -29,7 +29,8 @@ era-adjusted), money, luck, trades, and the halls of fame & shame.
 | `data/espn2014.json` | The recovered 2014 season (games, draft, divisions, playoffs) |
 | `data/espn_trades.json` | ESPN-era trade log recovered from league notification e-mails |
 | `data/players_min.json` | Committed snapshot of the Sleeper player database — the pipeline's fallback if Sleeper ever disappears |
-| `data/dnp.json` | NFL games missed by every round 1–5 draft pick (Luck tab), computed by `dnp.py` from nflverse weekly rosters, player stats, snap counts and the schedule. Finished seasons are computed once; the current season refreshes at most once every 20 hours and falls back to this file if nflverse is unreachable |
+| `data/preseason_proj.json` | Preseason season projections re-scored under league rules (FantasyPros consensus from Wayback Machine snapshots, averaged with ESPN's preseason projections where both exist), built by `tools/preseason_proj.py`. Run that tool once after each draft. 2016, 2017 and 2026 have no archived non-QB projections; the site estimates those from the same position and round in other seasons |
+| `data/dnp.json` | NFL games missed by every round 1–3 draft pick (Luck tab), with reasons from roster status and the NFL injury reports, computed by `dnp.py` from nflverse weekly rosters, player stats, snap counts and the schedule. Finished seasons are computed once; the current season refreshes at most once every 20 hours and falls back to this file if nflverse is unreachable |
 | `data/now.json`, `data/odds_history.json`, `data/values.json`, `data/feeds.json`, `data/fp_proj.json` | Live-state files refreshed by the pipeline |
 
 A failed upstream fetch fails the run **before** the commit step, so cached
