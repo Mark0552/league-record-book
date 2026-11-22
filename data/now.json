@@ -112,7 +112,7 @@
   },
   {
    "owner": "Austin",
-   "pct": 96.3
+   "pct": 96.5
   },
   {
    "owner": "Cliff",
@@ -120,11 +120,11 @@
   },
   {
    "owner": "Clancy",
-   "pct": 77.7
+   "pct": 77.6
   },
   {
    "owner": "Martin",
-   "pct": 73.9
+   "pct": 73.7
   },
   {
    "owner": "Mark",
@@ -132,15 +132,15 @@
   },
   {
    "owner": "Steve",
-   "pct": 32.6
+   "pct": 32.7
   },
   {
    "owner": "Sam",
-   "pct": 0.6
+   "pct": 0.5
   },
   {
    "owner": "Luke",
-   "pct": 0.1
+   "pct": 0.2
   },
   {
    "owner": "Will",
@@ -158,13 +158,13 @@
    "a": "Will",
    "pa": 79.8,
    "b": "Sam",
-   "pb": 113.1
+   "pb": 112.9
   },
   {
    "a": "Timmy",
-   "pa": 81.2,
+   "pa": 81.1,
    "b": "Lerch",
-   "pb": 103.6
+   "pb": 103.3
   },
   {
    "a": "Bob",
@@ -174,15 +174,15 @@
   },
   {
    "a": "Austin",
-   "pa": 111.7,
+   "pa": 112.3,
    "b": "Cliff",
-   "pb": 94.1
+   "pb": 94.0
   },
   {
    "a": "Clancy",
    "pa": 113.9,
    "b": "Steve",
-   "pb": 112.6
+   "pb": 112.7
   },
   {
    "a": "Mark",
@@ -230,7 +230,7 @@
   {
    "owner": "Sam",
    "rec": "3-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.6%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.5%."
   },
   {
    "owner": "Timmy",
@@ -240,7 +240,7 @@
   {
    "owner": "Luke",
    "rec": "3-7",
-   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more. That leaves a 7-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Luke (980.2) must out-score 3 of the 6 \u2014 at minimum overtaking Lerch, currently 172.3 points ahead. Simulated odds: 0.1%."
+   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more. That leaves a 7-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Luke (980.2) must out-score 3 of the 6 \u2014 at minimum overtaking Lerch, currently 172.3 points ahead. Simulated odds: 0.2%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -548,31 +548,31 @@
   "11": {
    "playoffs": {
     "Mark": 36.9,
-    "Clancy": 77.7,
+    "Clancy": 77.6,
     "Will": 0.0,
-    "Sam": 0.6,
-    "Steve": 32.6,
+    "Sam": 0.5,
+    "Steve": 32.7,
     "Timmy": 0.0,
     "Bob": 99.7,
     "Lerch": 97.4,
-    "Martin": 73.9,
-    "Luke": 0.1,
-    "Austin": 96.3,
+    "Martin": 73.7,
+    "Luke": 0.2,
+    "Austin": 96.5,
     "Cliff": 84.8
    },
    "champ": {
-    "Mark": 4.93,
-    "Clancy": 10.86,
+    "Mark": 4.88,
+    "Clancy": 10.72,
     "Will": 0.0,
     "Sam": 0.07,
-    "Steve": 4.12,
+    "Steve": 4.06,
     "Timmy": 0.0,
-    "Bob": 14.33,
-    "Lerch": 23.23,
-    "Martin": 10.42,
+    "Bob": 14.05,
+    "Lerch": 23.04,
+    "Martin": 10.28,
     "Luke": 0.01,
-    "Austin": 18.27,
-    "Cliff": 13.76
+    "Austin": 19.17,
+    "Cliff": 13.71
    }
   }
  },
@@ -881,7 +881,7 @@
    },
    "Will": {
     "11": 79.8,
-    "12": 86.5,
+    "12": 86.6,
     "13": 89.4,
     "14": 86.3,
     "15": 89.3,
@@ -889,16 +889,16 @@
     "17": 92.0
    },
    "Sam": {
-    "11": 113.1,
+    "11": 112.9,
     "12": 94.2,
-    "13": 87.3,
+    "13": 87.2,
     "14": 82.9,
     "15": 94.6,
     "16": 96.1,
     "17": 95.3
    },
    "Steve": {
-    "11": 112.6,
+    "11": 112.7,
     "12": 94.0,
     "13": 83.4,
     "14": 94.8,
@@ -907,17 +907,17 @@
     "17": 97.5
    },
    "Timmy": {
-    "11": 81.2,
-    "12": 79.1,
+    "11": 81.1,
+    "12": 79.2,
     "13": 73.2,
-    "14": 80.6,
+    "14": 80.7,
     "15": 77.0,
     "16": 77.5,
-    "17": 79.9
+    "17": 80.0
    },
    "Bob": {
     "11": 103.3,
-    "12": 101.8,
+    "12": 102.0,
     "13": 92.1,
     "14": 86.4,
     "15": 97.1,
@@ -925,7 +925,7 @@
     "17": 93.5
    },
    "Lerch": {
-    "11": 103.6,
+    "11": 103.3,
     "12": 104.8,
     "13": 87.8,
     "14": 91.1,
@@ -944,30 +944,30 @@
    },
    "Luke": {
     "11": 117.0,
-    "12": 92.6,
+    "12": 92.7,
     "13": 92.0,
     "14": 95.9,
-    "15": 83.8,
+    "15": 83.7,
     "16": 89.4,
     "17": 90.1
    },
    "Austin": {
-    "11": 111.7,
-    "12": 90.5,
-    "13": 97.2,
-    "14": 90.0,
-    "15": 97.0,
-    "16": 98.4,
-    "17": 98.6
+    "11": 112.3,
+    "12": 91.1,
+    "13": 97.8,
+    "14": 90.5,
+    "15": 97.6,
+    "16": 99.1,
+    "17": 99.1
    },
    "Cliff": {
-    "11": 94.1,
-    "12": 94.9,
-    "13": 90.3,
-    "14": 98.5,
-    "15": 93.2,
-    "16": 92.1,
-    "17": 98.7
+    "11": 94.0,
+    "12": 95.1,
+    "13": 90.5,
+    "14": 98.6,
+    "15": 93.3,
+    "16": 92.2,
+    "17": 98.8
    }
   },
   "sd": {
@@ -1026,7 +1026,8 @@
       "15": 12.6,
       "16": 14.7,
       "17": 12.9
-     }
+     },
+     "ir": true
     },
     {
      "id": "11584",
@@ -1177,11 +1178,10 @@
       "12": 0,
       "13": 0,
       "14": 0,
-      "15": 12.7,
-      "16": 9.1,
-      "17": 10.7
-     },
-     "ir": true
+      "15": 0,
+      "16": 0,
+      "17": 0
+     }
     },
     {
      "id": "9756",
@@ -1275,7 +1275,7 @@
      "n": "George Kittle",
      "pw": {
       "11": 10.6,
-      "12": 9.9,
+      "12": 9.8,
       "13": 11.2,
       "14": 10.6,
       "15": 11.3,
@@ -1302,7 +1302,7 @@
      "pos": "WR",
      "n": "Justin Jefferson",
      "pw": {
-      "11": 15.6,
+      "11": 15.5,
       "12": 15.8,
       "13": 14.4,
       "14": 15.2,
@@ -1319,9 +1319,9 @@
       "11": 0,
       "12": 4.0,
       "13": 3.0,
-      "14": 3.3,
+      "14": 3.2,
       "15": 2.8,
-      "16": 2.0,
+      "16": 1.9,
       "17": 2.2
      }
     },
@@ -1601,7 +1601,7 @@
      "pos": "RB",
      "n": "Cam Skattebo",
      "pw": {
-      "11": 14.0,
+      "11": 13.9,
       "12": 15.9,
       "13": 13.0,
       "14": 11.0,
@@ -1615,7 +1615,7 @@
      "pos": "QB",
      "n": "Tyler Shough",
      "pw": {
-      "11": 15.4,
+      "11": 15.3,
       "12": 16.3,
       "13": 15.4,
       "14": 15.5,
@@ -1657,7 +1657,7 @@
      "pos": "WR",
      "n": "CeeDee Lamb",
      "pw": {
-      "11": 19.7,
+      "11": 19.6,
       "12": 16.0,
       "13": 14.3,
       "14": 0,
@@ -1671,7 +1671,7 @@
      "pos": "RB",
      "n": "Chuba Hubbard",
      "pw": {
-      "11": 16.3,
+      "11": 16.5,
       "12": 13.7,
       "13": 14.7,
       "14": 18.0,
@@ -1699,7 +1699,7 @@
      "pos": "WR",
      "n": "Chris Olave",
      "pw": {
-      "11": 12.0,
+      "11": 11.9,
       "12": 12.2,
       "13": 12.6,
       "14": 11.7,
@@ -1771,7 +1771,7 @@
      "pos": "WR",
      "n": "Ryan Flournoy",
      "pw": {
-      "11": 8.3,
+      "11": 8.2,
       "12": 7.4,
       "13": 6.4,
       "14": 0,
@@ -1785,7 +1785,7 @@
      "pos": "RB",
      "n": "Bhayshul Tuten",
      "pw": {
-      "11": 15.0,
+      "11": 15.1,
       "12": 15.7,
       "13": 14.4,
       "14": 13.2,
@@ -1985,13 +1985,13 @@
      "pos": "WR",
      "n": "Makai Lemon",
      "pw": {
-      "11": 5.8,
-      "12": 7.3,
-      "13": 6.2,
-      "14": 6.4,
-      "15": 4.9,
-      "16": 6.4,
-      "17": 6.0
+      "11": 5.9,
+      "12": 7.9,
+      "13": 6.7,
+      "14": 7.0,
+      "15": 5.3,
+      "16": 7.0,
+      "17": 6.5
      }
     },
     {
@@ -2027,7 +2027,7 @@
      "pos": "QB",
      "n": "Dak Prescott",
      "pw": {
-      "11": 21.3,
+      "11": 21.2,
       "12": 18.7,
       "13": 15.1,
       "14": 0,
@@ -2057,11 +2057,11 @@
      "pw": {
       "11": 7.2,
       "12": 7.6,
-      "13": 8.9,
-      "14": 7.5,
+      "13": 9.0,
+      "14": 7.6,
       "15": 6.2,
-      "16": 7.1,
-      "17": 7.2
+      "16": 7.2,
+      "17": 7.3
      }
     },
     {
@@ -2156,7 +2156,7 @@
      "n": "Elic Ayomanor",
      "pw": {
       "11": 8.0,
-      "12": 6.0,
+      "12": 6.1,
       "13": 6.4,
       "14": 6.5,
       "15": 6.5,
@@ -2175,7 +2175,7 @@
       "14": 4.8,
       "15": 5.1,
       "16": 3.5,
-      "17": 4.0
+      "17": 3.9
      }
     },
     {
@@ -2184,12 +2184,12 @@
      "n": "Davante Adams",
      "pw": {
       "11": 0,
-      "12": 11.8,
-      "13": 11.0,
-      "14": 11.8,
-      "15": 13.1,
-      "16": 9.7,
-      "17": 10.7
+      "12": 0,
+      "13": 0,
+      "14": 12.9,
+      "15": 14.8,
+      "16": 11.2,
+      "17": 12.3
      },
      "ir": true
     },
@@ -2254,7 +2254,7 @@
      "pos": "TE",
      "n": "Juwan Johnson",
      "pw": {
-      "11": 6.1,
+      "11": 6.0,
       "12": 6.8,
       "13": 5.7,
       "14": 6.3,
@@ -2274,7 +2274,7 @@
       "14": 0,
       "15": 13.4,
       "16": 13.8,
-      "17": 16.2
+      "17": 16.3
      }
     },
     {
@@ -2283,12 +2283,12 @@
      "n": "Kyren Williams",
      "pw": {
       "11": 0,
-      "12": 14.8,
+      "12": 15.0,
       "13": 12.9,
       "14": 13.3,
-      "15": 17.0,
+      "15": 16.9,
       "16": 11.6,
-      "17": 12.0
+      "17": 11.9
      }
     },
     {
@@ -2467,7 +2467,7 @@
      "pos": "TE",
      "n": "Trey McBride",
      "pw": {
-      "11": 10.4,
+      "11": 10.2,
       "12": 13.3,
       "13": 11.5,
       "14": 0,
@@ -2609,7 +2609,7 @@
      "pos": "WR",
      "n": "George Pickens",
      "pw": {
-      "11": 13.2,
+      "11": 13.1,
       "12": 11.2,
       "13": 9.7,
       "14": 0,
@@ -2629,7 +2629,7 @@
       "14": 19.1,
       "15": 20.6,
       "16": 18.9,
-      "17": 20.4
+      "17": 20.5
      }
     },
     {
@@ -2637,7 +2637,7 @@
      "pos": "RB",
      "n": "Jahmyr Gibbs",
      "pw": {
-      "11": 20.7,
+      "11": 20.8,
       "12": 21.7,
       "13": 22.9,
       "14": 23.4,
@@ -2709,7 +2709,7 @@
      "pos": "QB",
      "n": "J.J. McCarthy",
      "pw": {
-      "11": 13.6,
+      "11": 13.5,
       "12": 17.0,
       "13": 15.1,
       "14": 11.9,
@@ -2724,8 +2724,8 @@
      "n": "Blake Corum",
      "pw": {
       "11": 0,
-      "12": 12.1,
-      "13": 10.3,
+      "12": 12.2,
+      "13": 10.2,
       "14": 10.5,
       "15": 13.7,
       "16": 9.2,
@@ -2751,7 +2751,7 @@
      "pos": "WR",
      "n": "Germie Bernard",
      "pw": {
-      "11": 4.6,
+      "11": 5.6,
       "12": 5.6,
       "13": 6.3,
       "14": 5.9,
@@ -2808,7 +2808,7 @@
      "pos": "QB",
      "n": "Jared Goff",
      "pw": {
-      "11": 15.7,
+      "11": 15.8,
       "12": 18.5,
       "13": 19.0,
       "14": 19.8,
@@ -2822,7 +2822,7 @@
      "pos": "RB",
      "n": "Saquon Barkley",
      "pw": {
-      "11": 11.4,
+      "11": 11.5,
       "12": 14.8,
       "13": 13.9,
       "14": 14.3,
@@ -2836,7 +2836,7 @@
      "pos": "RB",
      "n": "D'Andre Swift",
      "pw": {
-      "11": 16.4,
+      "11": 16.3,
       "12": 14.1,
       "13": 12.9,
       "14": 15.7,
@@ -2880,7 +2880,7 @@
      "pos": "WR",
      "n": "Rome Odunze",
      "pw": {
-      "11": 9.5,
+      "11": 9.4,
       "12": 10.4,
       "13": 9.7,
       "14": 10.1,
@@ -2937,7 +2937,7 @@
      "n": "Carnell Tate",
      "pw": {
       "11": 10.7,
-      "12": 9.5,
+      "12": 9.6,
       "13": 9.9,
       "14": 10.2,
       "15": 10.1,
@@ -2993,7 +2993,7 @@
      "pos": "RB",
      "n": "Christian McCaffrey",
      "pw": {
-      "11": 17.6,
+      "11": 17.5,
       "12": 15.9,
       "13": 19.1,
       "14": 17.2,
@@ -3021,13 +3021,13 @@
      "pos": "RB",
      "n": "Tony Pollard",
      "pw": {
-      "11": 16.1,
-      "12": 10.7,
-      "13": 12.8,
-      "14": 11.7,
-      "15": 13.2,
-      "16": 14.5,
-      "17": 10.9
+      "11": 16.9,
+      "12": 11.3,
+      "13": 13.4,
+      "14": 12.2,
+      "15": 13.9,
+      "16": 15.2,
+      "17": 11.4
      }
     },
     {
@@ -3049,7 +3049,7 @@
      "pos": "TE",
      "n": "Isaiah Likely",
      "pw": {
-      "11": 11.3,
+      "11": 11.2,
       "12": 10.8,
       "13": 10.3,
       "14": 9.0,
@@ -3108,7 +3108,7 @@
      "pos": "QB",
      "n": "Caleb Williams",
      "pw": {
-      "11": 19.6,
+      "11": 19.5,
       "12": 19.8,
       "13": 16.8,
       "14": 19.5,
@@ -3150,7 +3150,7 @@
      "pos": "TE",
      "n": "Colston Loveland",
      "pw": {
-      "11": 9.8,
+      "11": 9.7,
       "12": 10.4,
       "13": 9.0,
       "14": 10.3,
@@ -3207,12 +3207,12 @@
      "n": "DeVonta Smith",
      "pw": {
       "11": 10.8,
-      "12": 11.8,
-      "13": 10.5,
-      "14": 10.6,
-      "15": 8.6,
-      "16": 10.6,
-      "17": 10.0
+      "12": 11.9,
+      "13": 10.6,
+      "14": 10.8,
+      "15": 8.7,
+      "16": 10.7,
+      "17": 10.2
      }
     },
     {
@@ -3235,7 +3235,7 @@
      "n": "James Cook III",
      "pw": {
       "11": 18.8,
-      "12": 15.4,
+      "12": 15.3,
       "13": 16.8,
       "14": 17.1,
       "15": 16.9,
@@ -3278,12 +3278,12 @@
     "QB": 14.8,
     "RB": 6.1,
     "WR": 6.8,
-    "TE": 6.0
+    "TE": 5.9
    },
    "12": {
     "QB": 15.0,
     "RB": 7.6,
-    "WR": 6.5,
+    "WR": 6.6,
     "TE": 6.4
    },
    "13": {
@@ -3301,19 +3301,19 @@
    "15": {
     "QB": 16.8,
     "RB": 7.0,
-    "WR": 7.0,
+    "WR": 6.7,
     "TE": 6.4
    },
    "16": {
     "QB": 15.7,
     "RB": 6.8,
-    "WR": 7.0,
+    "WR": 6.7,
     "TE": 6.4
    },
    "17": {
     "QB": 15.0,
     "RB": 6.9,
-    "WR": 6.7,
+    "WR": 6.5,
     "TE": 6.5
    }
   },
