@@ -72,6 +72,9 @@ input.flt{width:100%;padding:9px 10px;border-radius:10px;background:var(--surfac
 td{padding:7px 6px;border-top:1px solid var(--line);white-space:nowrap}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:480px){#ss_stand td,#ss_stand th{padding-left:3px;padding-right:3px}}
+.detailrow>td{white-space:normal}
+.detailrow .dwrap{position:sticky;left:0;box-sizing:border-box}
 /* wide tables keep their identifying first column pinned while scrolling */
 #master th:first-child, #master td:first-child,
 #d_grades th:first-child, #d_grades td:first-child,
@@ -1223,6 +1226,17 @@ function renderSeason(){
     : '<div class="note">No consolation games recorded.</div>';
 }
 // season roster usage: who started for an owner in a given year
+// expanded rows live inside side-scrolling tables: pin the panel to the visible width
+// so its right-hand numbers never sit off-screen
+function fitDetail(d){
+  const td = d.firstElementChild, sc = d.closest('.tscroll');
+  const w = document.createElement('div'); w.className = 'dwrap';
+  while(td.firstChild) w.appendChild(td.firstChild);
+  td.appendChild(w);
+  if(sc) w.style.maxWidth = (sc.clientWidth - 12) + 'px';
+}
+addEventListener('resize', ()=>document.querySelectorAll('.detailrow .dwrap').forEach(w=>{
+  const sc = w.closest('.tscroll'); if(sc) w.style.maxWidth = (sc.clientWidth - 12) + 'px'; }));
 function seasonRosterHTML(year, o){
   const agg = {};
   for(const [k, lu] of Object.entries(DATA.lineups||{})){
@@ -1235,7 +1249,7 @@ function seasonRosterHTML(year, o){
   }
   const rows = Object.entries(agg).sort((x,y)=>y[1].pts-x[1].pts);
   const gapNote = (year>=2014&&year<=2016)
-    ? '<div class="note" style="margin-top:4px">A few starters from this season are missing — ESPN\'s archive no longer lists some since-retired players.</div>' : '';
+    ? '<div class="note" style="margin-top:4px">A few starters from this season are missing — ESPN\'s archive dropped some lineup entries.</div>' : '';
   return `<b style="font-size:13px">${esc(o)}'s ${year} starters</b>` +
     (rows.length ? rows.map(([nm,a])=>
       `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0">
@@ -1253,7 +1267,7 @@ $('ss_stand').addEventListener('click', e=>{
   const d = document.createElement('tr');
   d.className = 'detailrow';
   d.innerHTML = `<td colspan="5" style="background:var(--surface2)">${seasonRosterHTML(+$('seasonSel').value, tr.dataset.o)}</td>`;
-  tr.after(d);
+  tr.after(d); fitDetail(d);
 });
 $('seasonSel').addEventListener('change', renderSeason);
 
@@ -1377,7 +1391,7 @@ function renderGames(){
   const lim = gShowAll ? rows.length : 120;
   const typ = {R:'',P:' <span class="badge gold">PO</span>',C:' <span class="badge">cons</span>'};
   $('gTable').innerHTML = '<tr><th>When</th><th>Result</th></tr>' + rows.slice(0,lim).map(g=>
-    `<tr class="grow" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><td style="color:var(--ink3)">${g[0]} ${wkLabel(g)}${typ[g[2]]}</td><td class="num" style="text-align:left"><span class="${g[4]>g[6]?'wk-w':'wk-l'}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'wk-w':'wk-l'}">${f2(g[6])} ${esc(g[5])}</span></td></tr>`).join('');
+    `<tr class="grow" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><td style="color:var(--ink3);white-space:normal">${g[0]} ${wkLabel(g)}${typ[g[2]]}</td><td class="num" style="text-align:left"><span class="${g[4]>g[6]?'wk-w':'wk-l'}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'wk-w':'wk-l'}">${f2(g[6])} ${esc(g[5])}</span></td></tr>`).join('');
   $('gCount').textContent = `${rows.length} games match` + (rows.length>lim?` (showing ${lim})`:'') + ' · tap a game for starting lineups';
   $('gMore').style.display = rows.length>lim ? 'block':'none';
 }
@@ -1412,7 +1426,7 @@ $('gTable').addEventListener('click', e=>{
   const d = document.createElement('tr');
   d.className = 'detailrow';
   d.innerHTML = `<td colspan="2" style="background:var(--surface2)">${lineupPanel(y,w,a,b)}</td>`;
-  tr.after(d);
+  tr.after(d); fitDetail(d);
   tr.classList.add('open');
 });
 // generic div/li-based lineup rows (record lists, finals histories)
@@ -2084,7 +2098,7 @@ $('profile').addEventListener('click', e=>{
   const d = document.createElement('tr');
   d.className = 'detailrow';
   d.innerHTML = `<td colspan="4" style="background:var(--surface2)">${seasonRosterHTML(+tr.dataset.y, $('profSel').value)}</td>`;
-  tr.after(d);
+  tr.after(d); fitDetail(d);
 });
 renderProfile();
 
