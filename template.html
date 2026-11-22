@@ -398,10 +398,10 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Each row: that team's record if it had played the column team's schedule (their own scores, the other guy's opponents). Diagonal = actual record. Green = better than reality, red = worse.</div></div>
     <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
       <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
-    <div class="card"><h2 id="dnp_hdr">Early picks missing games</h2>
+    <div class="card"><h2 id="dnp_hdr">Draft rounds 1–3: games missed</h2>
       <div class="selrow"><select id="dnpYear"></select></div><div class="tscroll"><table id="dnp_season"></table></div>
       <div class="note" id="dnp_note"></div></div>
-    <div class="card"><h2>Early picks missing games — all time</h2><div class="tscroll"><table id="dnp_career"></table></div>
+    <div class="card"><h2>Draft rounds 1–3: games missed — all time</h2><div class="tscroll"><table id="dnp_career"></table></div>
       <div class="note">Every season's top-three-round picks added up, ranked by projected points lost per season. Tap an owner for the season-by-season breakdown.</div></div>
   </section>
 
@@ -1983,7 +1983,7 @@ document.addEventListener('click', e=>{
 
 /* ---------------- ALL-TIME ---------------- */
 const at = DATA.alltime;
-/* ---------------- EARLY PICKS MISSING GAMES (Luck tab) ---------------- */
+/* ---------------- DRAFT ROUNDS 1-3: GAMES MISSED (Luck tab) ---------------- */
 const DNP = DATA.dnp || {seasons:{}, rounds:5};
 // [[wk,reason],...] -> "IR wks 3–8, 10–16 · Inactive wk 2"
 function dnpWhy(miss){
@@ -2008,14 +2008,14 @@ function dnpOwners(picks){
 }
 function renderDnp(){
   const year = $('dnpYear').value, S = DNP.seasons[year];
-  $('dnp_hdr').textContent = `${year} early picks missing games`;
+  $('dnp_hdr').textContent = `${year} draft rounds 1–${DNP.rounds}: games missed`;
   if(!S){ $('dnp_season').innerHTML = ''; $('dnp_note').textContent = 'No draft data for this season.'; return; }
   const rows = dnpOwners(S.picks).sort((a,b)=>b.pts-a.pts || b.m-a.m || a.o.localeCompare(b.o));
-  $('dnp_season').innerHTML = '<tr><th>Owner</th><th class="num">Missed</th><th class="num">Pts lost</th><th>Biggest loss</th></tr>' +
+  $('dnp_season').innerHTML = '<tr><th>Owner</th><th class="num">Missed</th><th class="num">Proj. pts lost</th><th>Biggest loss</th></tr>' +
     rows.map(r=>{ const worst = r.picks.slice().sort((a,b)=>b.miss.length*(b.pp||0)-a.miss.length*(a.pp||0) || b.miss.length-a.miss.length)[0];
       return `<tr class="drow" style="cursor:pointer" data-o="${esc(r.o)}"><td><b>${esc(r.o)}</b></td><td class="num" style="${r.m?'':'color:var(--ink3)'}">${r.m}</td><td class="num">${r.pts?r.pts.toFixed(0):'<span style="color:var(--ink3)">0</span>'}</td><td style="white-space:normal">${worst&&worst.miss.length?`${esc(worst.p)} <span style="color:var(--ink3)">${worst.miss.length} gm</span>`:'<span style="color:var(--ink3)">—</span>'}</td></tr>`; }).join('');
   $('dnp_note').textContent = `Games missed by each owner's round 1–${DNP.rounds} picks while the fantasy season was on (NFL weeks 1–${S.weeks}` +
-    `${+year===YEARS[0]?' so far':''}). A miss is any week the player's NFL team played and he didn't — injury, suspension, holdout or cut — and it counts for whoever drafted him, even after a drop or trade. Byes don't count; defenses are left out. A player hurt mid-game still counts as having played. Pts lost = missed games × the player's preseason projected points per game (FantasyPros consensus of several projection sites, re-scored under that season's league rules).` + (S.picks.some(p=>p.est) ? ` No preseason projections survive for ${S.picks.every(p=>p.est||p.pp==null)?'this season':'some of these players'}, so those use an estimate (~): the average projection for that position and round in other seasons.` : '') + ' Tap an owner for the players.';
+    `${+year===YEARS[0]?' so far':''}). A miss is any week the player's NFL team played and he didn't — injury, suspension, holdout or cut — and it counts for whoever drafted him, even after a drop or trade. Byes don't count; defenses are left out. A player hurt mid-game still counts as having played. Proj. pts lost = missed games × the player's preseason projected points per game (FantasyPros consensus of several projection sites, re-scored under that season's league rules).` + (S.picks.some(p=>p.est) ? ` No preseason projections survive for ${S.picks.every(p=>p.est||p.pp==null)?'this season':'some of these players'}, so those use an estimate (~): the average projection for that position and round in other seasons.` : '') + ' Tap an owner for the players.';
 }
 $('dnp_season').addEventListener('click', e=>{
   const tr = e.target.closest('tr.drow'); if(!tr) return;
@@ -2034,7 +2034,7 @@ $('dnp_season').addEventListener('click', e=>{
     a.m += r.m; a.g += r.g; a.pts += r.pts; a.yrs.push({y, m:r.m, g:r.g, pts:r.pts, picks:r.picks}); a.picks.push(...r.picks);
   }
   const rows = Object.values(all).sort((a,b)=>b.pts/b.yrs.length-a.pts/a.yrs.length);
-  $('dnp_career').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="num">Missed</th><th class="num">Pts lost</th><th class="num">Pts/yr</th><th>Worst year</th></tr>' +
+  $('dnp_career').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="num">Missed</th><th class="num">Proj. pts lost</th><th class="num">Per yr</th><th>Worst year</th></tr>' +
     rows.map(r=>{ const w = r.yrs.slice().sort((a,b)=>b.pts-a.pts)[0];
       return `<tr class="drow" style="cursor:pointer" data-o="${esc(r.o)}"><td><b>${esc(r.o)}</b></td><td class="num">${r.yrs.length}</td><td class="num">${r.m}</td><td class="num">${r.pts.toFixed(0)}</td><td class="num">${(r.pts/r.yrs.length).toFixed(0)}</td><td>${w.y} <span style="color:var(--ink3)">${w.pts.toFixed(0)}</span></td></tr>`; }).join('');
   $('dnp_career').addEventListener('click', e=>{
