@@ -2105,11 +2105,11 @@ document.getElementById('players').addEventListener('click', e=>{
   $('pCareer').scrollIntoView({behavior:'smooth', block:'start'});
 });
 renderPlayersTab();
-// Records tab: career starter points, top 5 at each position
+// Records tab: career starter points, top 10 at each position
 (function(){
   if(!PIDX) buildPlayerIndex();
   for(const pos of ['QB','RB','WR','TE','K','DEF']){
-    const top = Object.entries(PIDX).filter(([n,e])=>e.pos===pos).sort((a,b)=>b[1].pts-a[1].pts).slice(0,5);
+    const top = Object.entries(PIDX).filter(([n,e])=>e.pos===pos).sort((a,b)=>b[1].pts-a[1].pts).slice(0,10);
     $('r_pos_'+pos).innerHTML = top.map(([n,e])=>{
       const own = Object.entries(e.own).sort((a,b)=>b[1].pts-a[1].pts).slice(0,2).map(([o,v])=>`${esc(o)} ${v.pts.toFixed(0)}`).join(', ');
       const more = Object.keys(e.own).length - 2;
