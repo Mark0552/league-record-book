@@ -135,9 +135,18 @@ if mach:
         parts = k.split("|")
         check(len(parts) == 3 and wnr in parts[1:], f"machine: bad final-game entry {k} -> {wnr}")
 
+# ---- early-pick availability ----
+dn = (D.get("dnp") or {}).get("seasons") or {}
+check(len(dn) >= 13, f"dnp: only {len(dn)} seasons")
+for y, S in dn.items():
+    for p in S["picks"]:
+        check(p["o"] in OWNERS, f"dnp: unknown owner {p['o']!r} in {y}")
+        check(len(p["miss"]) <= p["g"] <= S["weeks"], f"dnp: {y} {p['p']} missed {len(p['miss'])} of {p['g']}")
+        check(1 <= p["rd"] <= 5, f"dnp: {y} {p['p']} round {p['rd']}")
+
 # ---- committed data files parse ----
 for f in ("data/now.json", "data/values.json", "data/feeds.json", "data/espn2014.json",
-          "data/espn_trades.json", "data/odds_history.json"):
+          "data/espn_trades.json", "data/odds_history.json", "data/dnp.json"):
     if Path(f).exists():
         try:
             json.load(open(f, encoding="utf-8"))

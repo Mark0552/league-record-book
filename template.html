@@ -398,6 +398,10 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="note">Each row: that team's record if it had played the column team's schedule (their own scores, the other guy's opponents). Diagonal = actual record. Green = better than reality, red = worse.</div></div>
     <div class="card"><h2>Career luck</h2><div class="tscroll"><table id="l_career"></table></div>
       <div class="note">Lucky W = wins with a bottom-half score. Unlucky L = losses with a top-half score.</div></div>
+    <div class="card"><h2 id="dnp_hdr">Early picks missing games</h2><div class="tscroll"><table id="dnp_season"></table></div>
+      <div class="note" id="dnp_note"></div></div>
+    <div class="card"><h2>Early picks missing games — all time</h2><div class="tscroll"><table id="dnp_career"></table></div>
+      <div class="note">Every season's round 1–5 picks added up. Per yr = missed games per season drafted. Tap an owner for the season-by-season breakdown.</div></div>
   </section>
 
   <section id="players">
@@ -1334,7 +1338,7 @@ function renderSched(){
     ['📉 Biggest downgrade', `${esc(down.x)} would go <b>${fmtRec(R[down.x+'|'+down.y])}</b> with ${esc(down.y)}'s schedule (actual ${fmtRec(R[down.x+'|'+down.x])}, ${down.v.toFixed(1)} W)`],
   ].map(([t,d])=>`<div class="meet"><span style="flex:none;font-weight:700">${t}</span><span style="text-align:right;color:var(--ink2)">${d}</span></div>`).join('');
 }
-$('luckYear').addEventListener('change', ()=>{ renderLuckSeason(); renderSched(); });
+$('luckYear').addEventListener('change', ()=>{ renderLuckSeason(); renderSched(); renderDnp(); });
 renderSched();
 renderSeason();
 
@@ -1977,6 +1981,74 @@ document.addEventListener('click', e=>{
 
 /* ---------------- ALL-TIME ---------------- */
 const at = DATA.alltime;
+/* ---------------- EARLY PICKS MISSING GAMES (Luck tab) ---------------- */
+const DNP = DATA.dnp || {seasons:{}, rounds:5};
+// [[wk,reason],...] -> "IR wks 3–8, 10–16 · Inactive wk 2"
+function dnpWhy(miss){
+  const by = {};
+  for(const [w,r] of miss) (by[r] = by[r] || []).push(w);
+  return Object.entries(by).sort((a,b)=>a[1][0]-b[1][0]).map(([r,ws])=>{
+    const runs = []; let s = ws[0], e = ws[0];
+    for(const w of ws.slice(1)){ if(w === e+1) e = w; else { runs.push([s,e]); s = e = w; } }
+    runs.push([s,e]);
+    return `${esc(r)} wk${ws.length>1?'s':''} ${runs.map(([a,b])=>a===b?a:`${a}–${b}`).join(', ')}`;
+  }).join(' · ');
+}
+const dnpTally = picks => { const t = {}; for(const p of picks) for(const m of p.miss) t[m[1]] = (t[m[1]]||0)+1;
+  return Object.entries(t).sort((a,b)=>b[1]-a[1]).map(([r,n])=>`${esc(r)} ${n}`).join(' · '); };
+const dnpPickRow = p => `<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0">
+    <span><span style="color:var(--ink3)">R${p.rd} ${esc(p.pos)}</span> ${esc(p.p)}${p.miss.length?`<br><span style="color:var(--ink3);font-size:11.5px">${dnpWhy(p.miss)}</span>`:''}</span>
+    <span style="font-variant-numeric:tabular-nums;white-space:nowrap;${p.miss.length?'':'color:var(--ink3)'}">${p.u?'no NFL record':p.miss.length+' of '+p.g}</span></div>`;
+function dnpOwners(picks){
+  const by = {};
+  for(const p of picks){ const o = by[p.o] = by[p.o] || {o:p.o, picks:[], m:0, g:0}; o.picks.push(p); o.m += p.miss.length; o.g += p.g; }
+  return Object.values(by);
+}
+function renderDnp(){
+  const year = $('luckYear').value, S = DNP.seasons[year];
+  $('dnp_hdr').textContent = `${year} early picks missing games`;
+  if(!S){ $('dnp_season').innerHTML = ''; $('dnp_note').textContent = 'No draft data for this season.'; return; }
+  const rows = dnpOwners(S.picks).sort((a,b)=>b.m-a.m || a.o.localeCompare(b.o));
+  $('dnp_season').innerHTML = '<tr><th>Owner</th><th class="num">Missed</th><th class="num">Of</th><th>Biggest loss</th></tr>' +
+    rows.map(r=>{ const worst = r.picks.slice().sort((a,b)=>b.miss.length-a.miss.length)[0];
+      return `<tr class="drow" style="cursor:pointer" data-o="${esc(r.o)}"><td><b>${esc(r.o)}</b></td><td class="num" style="${r.m?'':'color:var(--ink3)'}">${r.m}</td><td class="num" style="color:var(--ink3)">${r.g}</td><td style="white-space:normal">${worst&&worst.miss.length?`${esc(worst.p)} <span style="color:var(--ink3)">${worst.miss.length}</span>`:'<span style="color:var(--ink3)">—</span>'}</td></tr>`; }).join('');
+  $('dnp_note').textContent = `Games missed by each owner's round 1–${DNP.rounds} picks while the fantasy season was on (NFL weeks 1–${S.weeks}` +
+    `${+year===YEARS[0]?' so far':''}). A miss is any week the player's NFL team played and he didn't — injury, suspension, holdout or cut — and it counts for whoever drafted him, even after a drop or trade. Byes don't count; defenses are left out. A player hurt mid-game still counts as having played. Tap an owner for the players.`;
+}
+$('dnp_season').addEventListener('click', e=>{
+  const tr = e.target.closest('tr.drow'); if(!tr) return;
+  const next = tr.nextElementSibling;
+  if(next && next.classList.contains('detailrow')){ next.remove(); return; }
+  const S = DNP.seasons[$('luckYear').value];
+  const ps = S.picks.filter(p=>p.o===tr.dataset.o);
+  const d = document.createElement('tr'); d.className = 'detailrow';
+  d.innerHTML = `<td colspan="4" style="background:var(--surface2)">${ps.map(dnpPickRow).join('')}</td>`;
+  tr.after(d); fitDetail(d);
+});
+(function(){
+  const all = {};
+  for(const [y,S] of Object.entries(DNP.seasons)) for(const r of dnpOwners(S.picks)){
+    const a = all[r.o] = all[r.o] || {o:r.o, m:0, g:0, yrs:[], picks:[]};
+    a.m += r.m; a.g += r.g; a.yrs.push({y, m:r.m, g:r.g, picks:r.picks}); a.picks.push(...r.picks);
+  }
+  const rows = Object.values(all).sort((a,b)=>b.m-a.m);
+  $('dnp_career').innerHTML = '<tr><th>Owner</th><th class="num">Yrs</th><th class="num">Missed</th><th class="num">Per yr</th><th class="num">% out</th><th>Worst year</th></tr>' +
+    rows.map(r=>{ const w = r.yrs.slice().sort((a,b)=>b.m-a.m)[0];
+      return `<tr class="drow" style="cursor:pointer" data-o="${esc(r.o)}"><td><b>${esc(r.o)}</b></td><td class="num">${r.yrs.length}</td><td class="num">${r.m}</td><td class="num">${(r.m/r.yrs.length).toFixed(1)}</td><td class="num">${r.g?(100*r.m/r.g).toFixed(0):0}%</td><td>${w.y} <span style="color:var(--ink3)">${w.m}</span></td></tr>`; }).join('');
+  $('dnp_career').addEventListener('click', e=>{
+    const tr = e.target.closest('tr.drow'); if(!tr) return;
+    const next = tr.nextElementSibling;
+    if(next && next.classList.contains('detailrow')){ next.remove(); return; }
+    const a = all[tr.dataset.o];
+    const d = document.createElement('tr'); d.className = 'detailrow';
+    d.innerHTML = `<td colspan="6" style="background:var(--surface2)"><div style="font-size:12px;color:var(--ink3);padding-bottom:4px">${dnpTally(a.picks)||'No missed games'}</div>` +
+      a.yrs.slice().sort((x,y)=>y.y-x.y).map(s=>{ const hurt = s.picks.filter(p=>p.miss.length).sort((p,q)=>q.miss.length-p.miss.length);
+        return `<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0"><span><b>${s.y}</b> <span style="color:var(--ink3)">${hurt.length?hurt.map(p=>`${esc(p.p)} ${p.miss.length}`).join(', '):'full health'}</span></span><span style="font-variant-numeric:tabular-nums;white-space:nowrap">${s.m} of ${s.g}</span></div>`; }).join('') + '</td>';
+    tr.after(d); fitDetail(d);
+  });
+})();
+renderDnp();
+
 const luckBy = {}; DATA.luck.career.forEach(r=>luckBy[r.owner]=r);
 const highBy = {}; DATA.money.counts.forEach(c=>highBy[c.owner]=c.n);
 const shameBy = {}; DATA.shame.forEach(s=>shameBy[s.owner]=(shameBy[s.owner]||0)+1);

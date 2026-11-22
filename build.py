@@ -1007,6 +1007,18 @@ draft_payload = dict(
 )
 draft_payload["grades"].sort(key=lambda g: -g["total"])
 
+# ---- top-pick availability: NFL games missed by each owner's round 1-5 picks ----
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))   # found even under python -I
+import dnp
+_fw = {}
+for g in games:
+    # the 2014 two-week rounds: matchup period 14 = NFL wks 14-15, 15 = wks 16-17
+    nfl_wk = g["week"] * 2 - 13 if g.get("agg") else g["week"]
+    _fw[g["year"]] = max(_fw.get(g["year"], 0), nfl_wk)
+dnp_payload = dnp.compute([d for d in draft_data if d["round"] <= dnp.ROUNDS and d["pos"] != "DEF"],
+                          _fw, CUR_SEASON)
+
 # ================= HALL OF SHAME =================
 shame_raw = read_transposed(RAW / "sheet" / "hall_of_shame.csv")
 shame_rows = list(csv.reader(open(RAW / "sheet" / "hall_of_shame.csv", encoding="utf-8")))
@@ -1520,6 +1532,7 @@ payload = dict(
     bench=bench,
     moves=moves,
     draft=draft_payload,
+    dnp=dnp_payload,
     shame=shame,
     lineups=lineups,
     lineup_gaps=lineup_gaps,
