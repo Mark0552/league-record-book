@@ -310,7 +310,13 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="tscroll"><table id="gTable"></table></div>
       <button class="btn" id="gMore" style="display:none">Show all matching games</button>
       <div class="note" id="gCount"></div>
-      <div class="note">Pick two owners for their career head-to-head. Tap any game for starting lineups.</div></div>
+      <div class="note">Pick two owners for their full rivalry page: series record, streaks, notable games, playoff meetings, trades with each other. Tap any game for starting lineups.</div></div>
+    <div class="card swcard" data-sw="0" id="rivcard"><h2>Rivalries</h2>
+      <div class="swtabs"><button class="swtab on">Most lopsided</button><button class="swtab">Dead even</button><button class="swtab">Playoff rivals</button></div>
+      <div class="swpane on"><ol class="rec" id="riv_lop"></ol></div>
+      <div class="swpane"><ol class="rec" id="riv_even"></ol></div>
+      <div class="swpane"><ol class="rec" id="riv_po"></ol></div>
+      <div class="note">Regular season and playoffs, consolation games ignored. Lopsided and even lists need at least 8 meetings. Tap a pair for their rivalry page.</div></div>
   </section>
 
   <section id="records">
@@ -548,6 +554,14 @@ function deepLink(h, p){
     if(!PIDX) buildPlayerIndex();
     if(PIDX[p[0]]){ showPlayer(p[0]); return $('pCareer').closest('.card'); }
   }
+  if(h==='games' && / *-vs-/.test(p[0])){
+    const [a,b] = p[0].split('-vs-');
+    if(owners.includes(a) && owners.includes(b)){
+      $('gOwner').value = a; $('gOpp').value = b; $('gYear').value = ''; $('gType').value = ''; gShowAll = false; renderGames();
+      return $('h2hsummary').closest('.card');
+    }
+    return null;
+  }
   if(h==='games' && /^\d{4}-\d+-/.test(p[0])){
     const [y,w,a,b] = p[0].split('-');
     const g = G.find(g=>g[0]===+y && g[1]===+w && ((g[3]===a&&g[5]===b)||(g[3]===b&&g[5]===a)));
@@ -616,6 +630,8 @@ const encP = s => encodeURIComponent(s);
 function cardLink(card){
   const sec = card.closest('section').id;
   if(sec === 'owners') return 'owners/' + encP($('profSel').value);
+  if(sec === 'games' && card.contains($('h2hsummary')) && $('gOwner').value && $('gOpp').value && $('gOwner').value !== $('gOpp').value)
+    return 'games/' + encP($('gOwner').value) + '-vs-' + encP($('gOpp').value);
   if(card.id === 'gLinked') return 'games/' + card.dataset.g.split('-').map(encP).join('-');
   if(sec === 'players' && card.contains($('pCareer')) && $('pCareer').innerHTML && window._curPlayer) return 'players/' + encP(window._curPlayer);
   let s = sec + (sec === 'seasons' ? '/' + $('seasonSel').value : '') + '/' + card.dataset.link;
@@ -1471,6 +1487,59 @@ $('gOwner').innerHTML = anyOpt('Any owner') + owners.map(o=>`<option>${esc(o)}</
 $('gOpp').innerHTML = anyOpt('vs anyone') + owners.map(o=>`<option>${esc(o)}</option>`).join('');
 $('gYear').innerHTML = anyOpt('All years') + YEARS.map(y=>`<option>${y}</option>`).join('');
 let gShowAll = false;
+function rivalryHTML(o, p, rows){
+  // rows: this pair's games under the active filters, newest first
+  const mine = g => g[3]===o ? [g[4], g[6]] : [g[6], g[4]];
+  const won = g => { const [a,b] = mine(g); return a>b ? o : b>a ? p : null; };
+  const gm = (label, g, extra) => g ? `<div class="meet lurow" style="cursor:pointer;gap:10px;flex-wrap:wrap" data-y="${g[0]}" data-w="${g[1]}" data-a="${esc(g[3])}" data-b="${esc(g[5])}"><span>${label}${extra?` <span style="color:var(--ink3)">${extra}</span>`:''}</span><span style="color:var(--ink2)">${g[0]} ${wkLabel(g)} · <span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f1(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f1(g[6])} ${esc(g[5])}</span></span></div>` : '';
+  const sub = t => `<div class="trgrp">${t}</div>`;
+  // streaks
+  const seq = rows.map(won).filter(Boolean);
+  let cur = 0; while(cur < seq.length && seq[cur] === seq[0]) cur++;
+  const longest = who => { let best = 0, run = 0; for(const w of seq){ run = w===who ? run+1 : 0; if(run > best) best = run; } return best; };
+  const margin = g => { const [a,b] = mine(g); return a-b; };
+  const single = rows.filter(g=>!g[7]);
+  const bigO = single.filter(g=>margin(g)>0).sort((x,y)=>margin(y)-margin(x))[0];
+  const bigP = single.filter(g=>margin(g)<0).sort((x,y)=>margin(x)-margin(y))[0];
+  const close = single.slice().sort((x,y)=>Math.abs(margin(x))-Math.abs(margin(y)))[0];
+  const high = single.slice().sort((x,y)=>(y[4]+y[6])-(x[4]+x[6]))[0];
+  const topO = single.slice().sort((x,y)=>mine(y)[0]-mine(x)[0])[0], topP = single.slice().sort((x,y)=>mine(y)[1]-mine(x)[1])[0];
+  let h = `<div class="tiles" style="margin-bottom:6px">
+      <div class="tile"><div class="v">${seq.length?esc(seq[0])+' ×'+cur:'—'}</div><div class="k">current streak</div></div>
+      <div class="tile"><div class="v">${longest(o)} / ${longest(p)}</div><div class="k">longest streak · ${esc(o)} / ${esc(p)}</div></div>
+    </div>`;
+  h += sub('Notable games') + gm(`${esc(o)}'s biggest win`, bigO, bigO&&'+'+f1(margin(bigO))) + gm(`${esc(p)}'s biggest win`, bigP, bigP&&'+'+f1(-margin(bigP)))
+    + gm('Closest game', close, close&&'by '+f2(Math.abs(margin(close)))) + gm('Highest-scoring', high, high&&f1(high[4]+high[6])+' combined')
+    + gm(`${esc(o)}'s best score`, topO) + gm(`${esc(p)}'s best score`, topP);
+  // playoff meetings
+  const po = rows.filter(g=>g[2]==='P');
+  if(po.length) h += sub(`Playoff meetings (${po.filter(g=>won(g)===o).length}–${po.filter(g=>won(g)===p).length})`) + po.map(g=>{
+    const c = DATA.champs.find(c=>c.year===g[0]);
+    const lastWk = Math.max(...G.filter(x=>x[0]===g[0] && x[2]==='P').map(x=>x[1]));
+    const fin = c && g[1]===lastWk && won(g)===c.owner;
+    return gm(fin ? '<span style="color:var(--bwb);font-weight:700">🏆 Buck Wong Bowl</span>' : 'Playoffs', g); }).join('');
+  // seasons side by side (regular-season finish)
+  let hi = 0, lo = 0, both = 0;
+  for(const y of YEARS){ if(!seasonDone(y)) continue;
+    const st = regStandings(y), i = st.findIndex(r=>r.o===o), j = st.findIndex(r=>r.o===p);
+    if(i<0 || j<0) continue; both++; i<j ? hi++ : lo++; }
+  const tO = DATA.champs.filter(c=>c.owner===o).length, tP = DATA.champs.filter(c=>c.owner===p).length;
+  if(both) h += sub('Seasons side by side') + `<div class="meet"><span>Finished higher in the standings</span><span><b>${esc(o)} ${hi}</b> — <b>${lo} ${esc(p)}</b> <span style="color:var(--ink3)">(${both} shared seasons)</span></span></div>
+    <div class="meet"><span>Titles</span><span><b>${esc(o)} ${tO}</b> — <b>${tP} ${esc(p)}</b></span></div>`;
+  // trades between them
+  const tr = DATA.moves.trades.filter(t=>t.sides.length===2 && t.sides.some(s=>s.owner===o) && t.sides.some(s=>s.owner===p));
+  h += sub(`Trades with each other (${tr.length})`) + (tr.length ? tr.slice().sort((a,b)=>b.year-a.year || b.week-a.week).map(t=>{
+    const so = t.sides.find(s=>s.owner===o), sp = t.sides.find(s=>s.owner===p);
+    const side = s => `<b>${esc(s.owner)}</b> got ${s.got.length ? s.got.map(esc).join(', ') : 'nothing recorded'}${s.pts ? ` <span style="color:var(--ink3)">(${s.pts.toFixed(0)} pts after)</span>` : ''}`;
+    return `<div class="meet" style="display:block"><span style="color:var(--ink3)">${t.year} wk${t.week}</span><div style="font-size:12.5px;margin-top:2px">${side(so)}<br>${side(sp)}</div></div>`; }).join('')
+    : '<div class="note">They have never traded with each other.</div>');
+  // players who suited up for both
+  if(!PIDX) buildPlayerIndex();
+  const shared = Object.entries(PIDX).filter(([n,e])=>e.own[o] && e.own[p] && e.pos!=='DEF' && e.pos!=='K')
+    .sort((x,y)=>Math.min(y[1].own[o].starts, y[1].own[p].starts)-Math.min(x[1].own[o].starts, x[1].own[p].starts));
+  if(shared.length) h += sub(`Started for both (${shared.length} players)`) + `<div class="note" style="margin-top:0">${shared.slice(0,6).map(([n,e])=>`${esc(n)} <span style="color:var(--ink3)">${e.own[o].starts}/${e.own[p].starts}</span>`).join(' · ')}${shared.length>6?' …':''} <span style="color:var(--ink3)">(starts for ${esc(o)}/${esc(p)})</span></div>`;
+  return h;
+}
 function renderGames(){
   const o=$('gOwner').value, p=$('gOpp').value, y=$('gYear').value, ty=$('gType').value;
   const rows = [];
@@ -1505,8 +1574,8 @@ function renderGames(){
         <div class="tile"><div class="v">${wA}-${wB}</div><div class="k">regular season</div></div>
         <div class="tile"><div class="v">${pwA}-${pwB}</div><div class="k">playoffs</div></div>
         <div class="tile"><div class="v">${f1(pfA/n)} – ${f1(pfB/n)}</div><div class="k">avg score</div></div>
-        <div class="tile"><div class="v">${best>0?'+'+f1(best):'—'}</div><div class="k">${esc(o)}'s biggest win</div></div>
-      </div>` : '<div class="note">These two have never played.</div>';
+        <div class="tile"><div class="v">${f1(pfA)} – ${f1(pfB)}</div><div class="k">total points</div></div>
+      </div>` + rivalryHTML(o, p, rows) + '<div class="trgrp">Every meeting</div>' : '<div class="note">These two have never played.</div>';
   } else {
     $('h2hsummary').innerHTML = '';
   }
@@ -1568,6 +1637,28 @@ document.addEventListener('click', e=>{
 ['gOwner','gOpp','gYear','gType'].forEach(id=>$(id).addEventListener('change', ()=>{gShowAll=false; renderGames();}));
 $('gMore').addEventListener('click', ()=>{gShowAll=true; renderGames();});
 renderGames();
+
+/* league-wide rivalry boards (winner's bracket + regular season; consolation ignored) */
+(function(){
+  const P = {};
+  for(const g of G){
+    if(g[2]==='C' || g[4]===g[6]) continue;
+    const [a,b] = [g[3],g[5]].sort(), k = a+'|'+b;
+    const r = P[k] = P[k] || {a, b, wa:0, wb:0, po:0, n:0, m:0};
+    (g[4]>g[6] ? g[3] : g[5])===a ? r.wa++ : r.wb++;
+    r.n++; if(!g[7]) r.m += Math.abs(g[4]-g[6]); if(g[2]==='P') r.po++;
+  }
+  const all = Object.values(P).map(r=>r.wa>=r.wb ? {...r, hi:r.a, lo:r.b, w:r.wa, l:r.wb} : {...r, hi:r.b, lo:r.a, w:r.wb, l:r.wa});
+  const row = (r, v, d) => `<li class="rivrow" style="cursor:pointer" data-a="${esc(r.hi)}" data-b="${esc(r.lo)}"><span class="v">${v}</span><span><b>${esc(r.hi)}</b> <span class="d">${r.w===r.l?'vs':'over'}</span> <b>${esc(r.lo)}</b> <span class="d">· ${d}</span></span></li>`;
+  const vets = all.filter(r=>r.n>=8);
+  $('riv_lop').innerHTML = vets.slice().sort((x,y)=>y.w/y.n-x.w/x.n || y.n-x.n).slice(0,10).map(r=>row(r, `${r.w}–${r.l}`, `${(100*r.w/r.n).toFixed(0)}% of ${r.n} meetings`)).join('');
+  $('riv_even').innerHTML = vets.slice().sort((x,y)=>(x.w-x.l)-(y.w-y.l) || x.m/x.n-y.m/y.n).slice(0,10).map(r=>row(r, `${r.w}–${r.l}`, `avg margin ${(r.m/r.n).toFixed(1)}`)).join('');
+  $('riv_po').innerHTML = all.filter(r=>r.po>1).sort((x,y)=>y.po-x.po || y.n-x.n).slice(0,10).map(r=>row(r, r.po+'×', `playoff meetings · ${r.w}–${r.l} overall`)).join('');
+  $('rivcard').addEventListener('click', e=>{
+    const li = e.target.closest('.rivrow'); if(!li) return;
+    location.hash = '#games/' + encodeURIComponent(li.dataset.a) + '-vs-' + encodeURIComponent(li.dataset.b);
+  });
+})();
 
 /* ---------------- PLAYER LEAGUE CAREERS ---------------- */
 let PIDX = null;
