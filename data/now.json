@@ -108,7 +108,7 @@
   },
   {
    "owner": "Lerch",
-   "pct": 99.0
+   "pct": 99.1
   },
   {
    "owner": "Austin",
@@ -120,15 +120,15 @@
   },
   {
    "owner": "Cliff",
-   "pct": 80.9
+   "pct": 80.8
   },
   {
    "owner": "Clancy",
-   "pct": 74.8
+   "pct": 73.6
   },
   {
    "owner": "Steve",
-   "pct": 39.5
+   "pct": 40.8
   },
   {
    "owner": "Mark",
@@ -136,7 +136,7 @@
   },
   {
    "owner": "Sam",
-   "pct": 0.7
+   "pct": 0.8
   },
   {
    "owner": "Luke",
@@ -156,39 +156,39 @@
  "matchups": [
   {
    "a": "Will",
-   "pa": 65.5,
+   "pa": 65.3,
    "b": "Sam",
-   "pb": 130.9
+   "pb": 130.7
   },
   {
    "a": "Timmy",
-   "pa": 75.7,
+   "pa": 73.3,
    "b": "Lerch",
    "pb": 109.4
   },
   {
    "a": "Bob",
-   "pa": 97.6,
+   "pa": 97.2,
    "b": "Luke",
    "pb": 108.4
   },
   {
    "a": "Austin",
-   "pa": 91.6,
+   "pa": 91.1,
    "b": "Cliff",
-   "pb": 77.0
+   "pb": 76.7
   },
   {
    "a": "Clancy",
-   "pa": 130.0,
+   "pa": 128.9,
    "b": "Steve",
-   "pb": 133.5
+   "pb": 133.4
   },
   {
    "a": "Mark",
-   "pa": 93.4,
+   "pa": 93.0,
    "b": "Martin",
-   "pb": 107.1
+   "pb": 106.6
   }
  ],
  "elim": [
@@ -230,7 +230,7 @@
   {
    "owner": "Sam",
    "rec": "3-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.7%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Lerch (7-3) can't win again; Austin (7-3) can't win again; Clancy (6-4) can win at most 1 more; Martin (6-4) can win at most 1 more; Mark (5-5) can win at most 2 more; Steve (5-5) can win at most 2 more; Luke (3-7) can win at most 4 more. That leaves a 8-way tie at 7-7 for the last 4 spots. The tie crosses divisions, so it falls to season points-for: Sam (1047.8) must out-score 4 of the 7 \u2014 at minimum overtaking Lerch, currently 104.8 points ahead. Simulated odds: 0.8%."
   },
   {
    "owner": "Timmy",
@@ -548,31 +548,31 @@
   "11": {
    "playoffs": {
     "Mark": 23.6,
-    "Clancy": 74.8,
+    "Clancy": 73.6,
     "Will": 0.0,
-    "Sam": 0.7,
-    "Steve": 39.5,
+    "Sam": 0.8,
+    "Steve": 40.8,
     "Timmy": 0.0,
     "Bob": 99.8,
-    "Lerch": 99.0,
+    "Lerch": 99.1,
     "Martin": 82.5,
     "Luke": 0.1,
     "Austin": 98.9,
-    "Cliff": 80.9
+    "Cliff": 80.8
    },
    "champ": {
-    "Mark": 2.57,
-    "Clancy": 9.78,
+    "Mark": 2.54,
+    "Clancy": 9.63,
     "Will": 0.0,
-    "Sam": 0.08,
-    "Steve": 4.66,
+    "Sam": 0.09,
+    "Steve": 4.8,
     "Timmy": 0.0,
-    "Bob": 13.54,
-    "Lerch": 24.73,
-    "Martin": 11.54,
+    "Bob": 13.49,
+    "Lerch": 24.78,
+    "Martin": 11.57,
     "Luke": 0.01,
-    "Austin": 21.25,
-    "Cliff": 11.85
+    "Austin": 21.27,
+    "Cliff": 11.8
    }
   }
  },
@@ -862,7 +862,7 @@
   ],
   "proj": {
    "Mark": {
-    "11": 93.4,
+    "11": 93.0,
     "12": 91.8,
     "13": 85.4,
     "14": 89.1,
@@ -871,7 +871,7 @@
     "17": 88.2
    },
    "Clancy": {
-    "11": 130.0,
+    "11": 128.9,
     "12": 93.9,
     "13": 92.7,
     "14": 93.7,
@@ -880,16 +880,16 @@
     "17": 93.6
    },
    "Will": {
-    "11": 65.5,
+    "11": 65.3,
     "12": 86.2,
-    "13": 89.4,
+    "13": 89.6,
     "14": 86.3,
     "15": 89.3,
     "16": 91.5,
     "17": 92.0
    },
    "Sam": {
-    "11": 130.9,
+    "11": 130.7,
     "12": 94.6,
     "13": 87.3,
     "14": 83.0,
@@ -898,16 +898,16 @@
     "17": 95.3
    },
    "Steve": {
-    "11": 133.5,
+    "11": 133.4,
     "12": 93.8,
-    "13": 83.4,
+    "13": 83.3,
     "14": 94.8,
     "15": 92.3,
     "16": 98.1,
     "17": 97.5
    },
    "Timmy": {
-    "11": 75.7,
+    "11": 73.3,
     "12": 79.8,
     "13": 73.4,
     "14": 80.9,
@@ -916,7 +916,7 @@
     "17": 80.3
    },
    "Bob": {
-    "11": 97.6,
+    "11": 97.2,
     "12": 102.3,
     "13": 92.4,
     "14": 86.4,
@@ -934,7 +934,7 @@
     "17": 100.2
    },
    "Martin": {
-    "11": 107.1,
+    "11": 106.6,
     "12": 93.6,
     "13": 96.1,
     "14": 94.6,
@@ -952,7 +952,7 @@
     "17": 90.1
    },
    "Austin": {
-    "11": 91.6,
+    "11": 91.1,
     "12": 91.8,
     "13": 98.4,
     "14": 91.7,
@@ -961,7 +961,7 @@
     "17": 100.2
    },
    "Cliff": {
-    "11": 77.0,
+    "11": 76.7,
     "12": 94.8,
     "13": 90.5,
     "14": 98.6,
@@ -985,18 +985,18 @@
    "Cliff": 19.3
   },
   "sdw": {
-   "Mark": 23.8,
+   "Mark": 23.6,
    "Clancy": 7.7,
-   "Will": 10.4,
+   "Will": 10.3,
    "Sam": 13.2,
-   "Steve": 5.7,
+   "Steve": 5.6,
    "Timmy": 14.4,
-   "Bob": 16.2,
+   "Bob": 16.1,
    "Lerch": 10.5,
-   "Martin": 11.1,
+   "Martin": 10.9,
    "Luke": 0.0,
-   "Austin": 6.4,
-   "Cliff": 6.2
+   "Austin": 6.3,
+   "Cliff": 6.1
   },
   "tradepool": {
    "Mark": [
@@ -1953,20 +1953,6 @@
    ],
    "Timmy": [
     {
-     "id": "11603",
-     "pos": "TE",
-     "n": "AJ Barner",
-     "pw": {
-      "11": 0,
-      "12": 6.1,
-      "13": 6.7,
-      "14": 6.1,
-      "15": 5.6,
-      "16": 5.4,
-      "17": 6.5
-     }
-    },
-    {
      "id": "11635",
      "pos": "WR",
      "n": "Ladd McConkey",
@@ -2066,6 +2052,20 @@
      }
     },
     {
+     "id": "4147",
+     "pos": "RB",
+     "n": "Samaje Perine",
+     "pw": {
+      "11": 6.8,
+      "12": 6.8,
+      "13": 6.2,
+      "14": 5.6,
+      "15": 6.5,
+      "16": 6.6,
+      "17": 5.8
+     }
+    },
+    {
      "id": "5022",
      "pos": "TE",
      "n": "Dallas Goedert",
@@ -2091,6 +2091,20 @@
       "15": 9.5,
       "16": 8.9,
       "17": 10.5
+     }
+    },
+    {
+     "id": "6001",
+     "pos": "TE",
+     "n": "Drew Sample",
+     "pw": {
+      "11": 3.3,
+      "12": 3.5,
+      "13": 3.1,
+      "14": 3.0,
+      "15": 3.0,
+      "16": 3.4,
+      "17": 3.2
      }
     },
     {
@@ -2133,20 +2147,6 @@
       "15": 2.3,
       "16": 2.5,
       "17": 2.6
-     }
-    },
-    {
-     "id": "8126",
-     "pos": "WR",
-     "n": "Wan'Dale Robinson",
-     "pw": {
-      "11": 0,
-      "12": 0,
-      "13": 0,
-      "14": 0,
-      "15": 0,
-      "16": 0,
-      "17": 0
      }
     }
    ],
@@ -3262,43 +3262,43 @@
   "replw": {
    "11": {
     "QB": 15.0,
-    "RB": 6.6,
+    "RB": 6.3,
     "WR": 6.4,
     "TE": 5.9
    },
    "12": {
     "QB": 15.1,
-    "RB": 7.5,
+    "RB": 7.2,
     "WR": 6.4,
-    "TE": 6.5
+    "TE": 6.6
    },
    "13": {
     "QB": 15.1,
-    "RB": 7.3,
+    "RB": 7.2,
     "WR": 6.6,
-    "TE": 6.4
+    "TE": 6.7
    },
    "14": {
     "QB": 15.5,
     "RB": 6.4,
     "WR": 6.7,
-    "TE": 6.4
+    "TE": 6.5
    },
    "15": {
     "QB": 16.8,
-    "RB": 7.0,
+    "RB": 6.8,
     "WR": 6.5,
     "TE": 6.6
    },
    "16": {
     "QB": 15.7,
-    "RB": 6.8,
+    "RB": 6.6,
     "WR": 6.4,
     "TE": 6.5
    },
    "17": {
     "QB": 15.0,
-    "RB": 6.9,
+    "RB": 6.8,
     "WR": 6.4,
     "TE": 6.7
    }
