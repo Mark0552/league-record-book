@@ -419,6 +419,20 @@ for pts, pid, owner, season, w in player_games[:15]:
         pos = info.get("position", "?")
     top_players.append(dict(pts=round(pts, 2), name=nm, pos=pos,
                             owner=owner, year=season, week=w))
+# the ten biggest starter games at each position
+REC_POS = ("QB", "RB", "WR", "TE", "K", "DEF")
+def _rpos(p): return "DEF" if p in ("D/ST", "DST") else p
+top_players_pos = {p: [] for p in REC_POS}
+for pts, pid, owner, season, w in player_games:
+    if isinstance(pid, tuple):
+        nm, pos = pid[1], pid[2]
+    else:
+        info = players.get(pid) or {}
+        nm = info.get("full_name") or (info.get("last_name") or pid)
+        pos = info.get("position", "?")
+    lst = top_players_pos.get(_rpos(pos))
+    if lst is not None and len(lst) < 10:
+        lst.append(dict(pts=round(pts, 2), name=nm, pos=_rpos(pos), owner=owner, year=season, week=w))
 bench_games = sorted(bench_games, key=lambda b: -b["pts"])[:10]
 
 # ================= MONEY =================
@@ -1150,6 +1164,8 @@ if canon_name:
             if it.get(field) in canon_name:
                 it[field] = canon_name[it[field]]
     _remap(top_players, "name")
+    for _l in top_players_pos.values():
+        _remap(_l, "name")
     _remap(bench_games, "name")
     _remap(espn_pickups)
     _remap(espn_swaps)
@@ -1188,6 +1204,7 @@ def rush_bonus_of(yr, w, name):
     return 4.0 if ry >= 200 else (2.0 if ry >= 100 else 0.0)
 
 adj_player_entries = []
+adj_pos_entries = defaultdict(list)
 team_delta = defaultdict(float)   # (yr, w, owner) -> +points at 0.5 PPR
 for key, lu in lineups.items():
     yr_s, w_s, o = key.split("|")
@@ -1199,6 +1216,8 @@ for key, lu in lineups.items():
         if yr <= 2023:
             bump += rush_bonus_of(yr, w, nm)
         team_delta[(yr, w, o)] += bump
+        if _rpos(pos) in REC_POS and pts + bump > 0:
+            adj_pos_entries[_rpos(pos)].append((pts + bump, nm, _rpos(pos), o, yr, w))
         if pts + bump > 30:
             adj_player_entries.append((pts + bump, nm, pos, o, yr, w))
 adj_player_entries.sort(key=lambda e: -e[0])
@@ -1233,6 +1252,8 @@ adj = dict(
               year=e[4]["year"], week=e[4]["week"],
               note=worst_notes.get((e[4]["year"], e[4]["week"], e[1]), "")) for e in adj_low],
     players=adj_players,
+    players_pos={p: [dict(pts=round(e[0], 1), name=e[1], pos=e[2], owner=e[3], year=e[4], week=e[5])
+                     for e in sorted(adj_pos_entries[p], key=lambda e: -e[0])[:10]] for p in REC_POS},
     season_high=sorted(adj_season_rows, key=lambda r: -r["ppg"])[:10],
     season_low=sorted(adj_season_rows, key=lambda r: r["ppg"])[:10],
 )
@@ -1520,6 +1541,7 @@ payload = dict(
         loss_high=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in loss_high],
         win_low=[dict(pts=e[0], owner=e[1], opp=e[3], opp_pts=e[2], year=e[4]["year"], week=e[4]["week"]) for e in win_low],
         players=top_players,
+        players_pos=top_players_pos,
         bench_games=bench_games,
         adj=adj,
         clinches={k: two_tiers(v, key=lambda r: r["spare"]) for k, v in clinch_rows.items()},

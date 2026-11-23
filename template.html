@@ -301,11 +301,16 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
       <div class="swpane"><ol class="rec" id="r_low"></ol>
         <div class="note">Consolation games don't count here &mdash; those rosters often weren't even set, and a forfeit isn't a record.</div></div></div>
     <div class="card swcard" data-sw="0"><h2>Best player games</h2>
-      <div class="swtabs"><button class="swtab on">Starters</button><button class="swtab">Left on the bench</button></div>
-      <div class="swpane on"><ol class="rec" id="r_players"></ol>
-        <div class="note">Scored under that season's league settings (ESPN era 2015-2019, Sleeper era 2020+).</div></div>
+      <div class="swtabs"><button class="swtab on">QB</button><button class="swtab">RB</button><button class="swtab">WR</button><button class="swtab">TE</button><button class="swtab">K</button><button class="swtab">D/ST</button><button class="swtab">Bench</button></div>
+      <div class="swpane on"><ol class="rec" id="r_pg_QB"></ol></div>
+      <div class="swpane"><ol class="rec" id="r_pg_RB"></ol></div>
+      <div class="swpane"><ol class="rec" id="r_pg_WR"></ol></div>
+      <div class="swpane"><ol class="rec" id="r_pg_TE"></ol></div>
+      <div class="swpane"><ol class="rec" id="r_pg_K"></ol></div>
+      <div class="swpane"><ol class="rec" id="r_pg_DEF"></ol></div>
       <div class="swpane"><ol class="rec" id="r_benchgames"></ol>
-        <div class="note">The biggest games ever left on a bench (Sleeper era 2020+ &mdash; ESPN kept no bench scores). The what-if swaps him in for the lowest-scoring starter he could legally replace.</div></div></div>
+        <div class="note">Left on the bench, any position: the biggest games ever left on a bench (Sleeper era 2020+ &mdash; ESPN kept no bench scores). The what-if swaps him in for the lowest-scoring starter he could legally replace.</div></div>
+      <div class="note">Position tabs: the ten biggest single games by a starter at each position, scored under that season's league settings (or re-scored, in adjusted mode).</div></div>
     <div class="card swcard" data-sw="0" id="r_poscard"><h2>All-time top scorers by position</h2>
       <div class="swtabs"><button class="swtab on">QB</button><button class="swtab">RB</button><button class="swtab">WR</button><button class="swtab">TE</button><button class="swtab">K</button><button class="swtab">D/ST</button></div>
       <div class="swpane on"><ol class="rec" id="r_pos_QB"></ol></div>
@@ -1543,7 +1548,8 @@ function renderRecordLists(){
   const lu = e => `class="lurow" style="cursor:pointer" data-y="${e.year}" data-w="${e.week}" data-a="${esc(e.owner)}" data-b="${esc(e.opp)}"`;
   $('r_top').innerHTML = M.top.map(e=>`<li ${lu(e)}><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">vs ${esc(e.opp)} · ${e.year} wk${e.week}</span></span></li>`).join('');
   $('r_low').innerHTML = M.low.map(e=>`<li ${lu(e)}><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">vs ${esc(e.opp)} · ${e.year} wk${e.week}${e.note?' · '+esc(e.note):''}</span></span></li>`).join('');
-  $('r_players').innerHTML = M.players.map(p=>`<li><span class="v">${f1(p.pts)}</span><span><b>${esc(p.name)}</b> <span class="d">${esc(p.pos)} · ${esc(p.owner)} · ${p.year} wk${p.week}</span></span></li>`).join('');
+  for(const pos of ['QB','RB','WR','TE','K','DEF'])
+    $('r_pg_'+pos).innerHTML = ((M.players_pos||{})[pos]||[]).map(p=>`<li><span class="v">${f1(p.pts)}</span><span><b>${esc(p.name)}</b> <span class="d">${esc(p.owner)} · ${p.year} wk${p.week}</span></span></li>`).join('');
   if(adjMode){
     $('r_seasonhi').innerHTML = M.season_high.map(e=>`<li><span class="v">${e.ppg.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · per game (adj. total ${e.pf.toFixed(0)} over ${e.g})</span></span></li>`).join('');
     $('r_seasonlo').innerHTML = M.season_low.map(e=>`<li><span class="v">${e.ppg.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · per game (adj. total ${e.pf.toFixed(0)} over ${e.g})</span></span></li>`).join('');
