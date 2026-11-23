@@ -1,6 +1,6 @@
 """Build data/draft_teams.json: the NFL team each drafted player was on in week 1
 of the season he was drafted (nflverse weekly rosters), for the owner
-"tendencies" block (favourite NFL team to draft from).
+"tendencies" block (favourite NFL team to draft from).  Defenses map to their own club.
 
 Reads the picks from the built page (site/index.html), so build first.
 Run once per season after the draft (needs network, or DNP_LOCAL=<dir of
@@ -17,6 +17,19 @@ BASE = "https://github.com/nflverse/nflverse-data/releases/download"
 FIX = {"CLV": "CLE", "BLT": "BAL", "HST": "HOU", "ARZ": "ARI", "SL": "LA", "STL": "LA", "LAR": "LA",
        "JAC": "JAX", "SD": "LAC", "OAK": "LV"}
 POSMAP = {"FB": "RB", "HB": "RB"}
+NICK = {"cardinals": "ARI", "falcons": "ATL", "ravens": "BAL", "bills": "BUF", "panthers": "CAR", "bears": "CHI",
+        "bengals": "CIN", "browns": "CLE", "cowboys": "DAL", "broncos": "DEN", "lions": "DET", "packers": "GB",
+        "texans": "HOU", "colts": "IND", "jaguars": "JAX", "chiefs": "KC", "rams": "LA", "chargers": "LAC",
+        "raiders": "LV", "dolphins": "MIA", "vikings": "MIN", "patriots": "NE", "saints": "NO", "giants": "NYG",
+        "jets": "NYJ", "eagles": "PHI", "steelers": "PIT", "seahawks": "SEA", "49ers": "SF", "niners": "SF",
+        "buccaneers": "TB", "titans": "TEN", "redskins": "WAS", "commanders": "WAS", "washington": "WAS",
+        "footballteam": "WAS"}
+def defense_team(name):
+    up = name.strip().upper()          # Sleeper names a defense by its club code
+    if up in FIX or up in set(NICK.values()):
+        return FIX.get(up, up)
+    low = name.lower()
+    return next((t for n, t in NICK.items() if n in low.replace(" ", "")), None)
 
 def norm(s):
     return re.sub(r"[^a-z]", "", re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", (s or "").lower()))
@@ -55,9 +68,16 @@ def main():
             byname.setdefault(n, []).append(t)
         res, miss = {}, []
         for p in picks:
-            if p["season"] != y or p["pos"] == "DEF":
+            if p["season"] != y:
                 continue
             n = norm(p["player"])
+            if p["pos"] == "DEF":
+                tm = defense_team(p["player"])
+                if tm:
+                    res[f"{n}|DEF"] = tm
+                else:
+                    miss.append(p["player"])
+                continue
             hit = first.get((n, p["pos"]))
             tm = hit[1] if hit else (byname[n][0] if len(byname.get(n, [])) == 1 else None)
             if tm:
