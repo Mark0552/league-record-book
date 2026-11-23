@@ -182,6 +182,28 @@ li.lurow.open::after, .meet.lurow.open::after, #champlist .champ.open::after, #s
 .bmed{position:absolute;top:1px;height:14px;width:2px;background:var(--accent)}
 .blab{width:92px;font-size:10.5px;color:var(--ink3);text-align:right;flex:none;font-variant-numeric:tabular-nums}
 .rk{font-size:9.5px;color:var(--ink2);font-weight:400}
+.card{position:relative;scroll-margin-top:64px}
+.card>h2{padding-right:26px}
+.shr{position:absolute;top:8px;right:6px;background:none;border:0;color:var(--ink3);font-size:13px;line-height:1;cursor:pointer;padding:6px;opacity:.55;filter:grayscale(1)}
+.shr:hover{opacity:1}
+.shr2{background:none;border:1px solid var(--line);border-radius:8px;color:var(--ink2);font-size:11.5px;cursor:pointer;padding:4px 9px;margin-top:6px}
+.card.flash{animation:cflash 1.6s ease-out}
+@keyframes cflash{0%{box-shadow:0 0 0 2px var(--accent)}100%{box-shadow:0 0 0 2px transparent}}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:var(--surface);font-size:13px;font-weight:600;padding:8px 16px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99}
+#toast.on{opacity:.95}
+.trgrp{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin:12px 0 5px}
+.trophies{display:flex;flex-wrap:wrap;gap:6px}
+.trophy{display:flex;gap:8px;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:6px 10px 6px 8px;font-size:12px;max-width:100%}
+.trophy .ic{font-size:19px;flex:none}
+.trophy b{display:block;font-size:12.5px}
+.trophy .s{color:var(--ink3);font-size:11px}
+.trophy.gold{border-color:var(--bwb)}
+.trophy.joke{border-style:dashed}
+#newrec{border-color:var(--bwb)}
+#newrec a{color:inherit;text-decoration:none;display:flex;gap:10px;align-items:baseline;padding:5px 0;border-top:1px solid var(--line);font-size:13px}
+#newrec a:first-of-type{border-top:0}
+#newrec .rk2{font-weight:800;color:var(--bwb);min-width:30px;font-variant-numeric:tabular-nums}
+.newtag{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.5px;color:var(--bwb);border:1px solid var(--bwb);border-radius:5px;padding:0 4px;margin-left:5px;vertical-align:1px}
 footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4px}
 </style>
 </head>
@@ -209,6 +231,8 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
 </nav>
 <main>
   <section id="now">
+    <div class="card" id="newrec" style="display:none"><h2 id="newrec_h">New in the record book</h2><div id="newrec_list"></div>
+      <div class="note">Anything from the latest completed week that cracked an all-time top 10. Tap one to see the list.</div></div>
     <div class="card swcard" data-sw="0"><h2>Standings</h2>
       <div class="swtabs"><button class="swtab on">Overall</button><button class="swtab">Divisions</button></div>
       <div class="swpane on"><div class="tscroll"><table id="standings"></table></div>
@@ -274,6 +298,7 @@ footer{text-align:center;font-size:11.5px;color:var(--ink3);padding:18px 16px 4p
   </section>
 
   <section id="games">
+    <div class="card" id="gLinked" style="display:none"><h2>Linked game</h2><div id="gLinkedBody"></div></div>
     <div class="card"><h2>Head-to-head &amp; every game since 2015</h2>
       <div class="selrow">
         <select id="gOwner"></select><select id="gOpp"></select>
@@ -516,16 +541,93 @@ document.addEventListener('touchend', e=>{
   _swC=null;
 }, {passive:true});
 
+function deepLink(h, p){
+  const sec = document.getElementById(h);
+  if(h==='owners'){ if(owners.includes(p[0])){ $('profSel').value = p[0]; renderProfile(); } return sec.querySelector('.card'); }
+  if(h==='players'){
+    if(!PIDX) buildPlayerIndex();
+    if(PIDX[p[0]]){ showPlayer(p[0]); return $('pCareer').closest('.card'); }
+  }
+  if(h==='games' && /^\d{4}-\d+-/.test(p[0])){
+    const [y,w,a,b] = p[0].split('-');
+    const g = G.find(g=>g[0]===+y && g[1]===+w && ((g[3]===a&&g[5]===b)||(g[3]===b&&g[5]===a)));
+    if(!g) return null;
+    const c = $('gLinked');
+    c.dataset.g = p[0]; c.style.display = '';
+    $('gLinkedBody').innerHTML = `<div class="meet" style="gap:12px"><span>${g[0]} ${wkLabel(g)} · ${({R:'Regular season',P:'Playoffs',C:'Consolation'})[g[2]]||''}</span><span><span class="${g[4]>g[6]?'w':''}">${esc(g[3])} ${f2(g[4])}</span> — <span class="${g[6]>g[4]?'w':''}">${f2(g[6])} ${esc(g[5])}</span></span></div>` + lineupPanel(g[0], g[1], g[3], g[5]);
+    return c;
+  }
+  if(h==='seasons' && /^\d{4}$/.test(p[0])){
+    if(YEARS.includes(+p[0])){ $('seasonSel').value = p[0]; renderSeason(); }
+    p = p.slice(1);
+    if(!p.length) return null;
+  }
+  const card = [...sec.querySelectorAll('.card')].find(c=>c.dataset.link===p[0]);
+  if(card && p[1] && card.classList.contains('swcard')) swSet(card, +p[1]);
+  return card || null;
+}
 function show(){
-  let h = (location.hash||'#now').slice(1);
+  const parts = (location.hash||'#now').slice(1).split('/').map(s=>{ try{ return decodeURIComponent(s); }catch(e){ return s; } });
+  let h = parts[0];
   if(h === 'h2h') h = 'games';
   if(h === 'champs') h = 'alltime';
-  if(!document.getElementById(h)) h = 'now';
+  if(!document.getElementById(h) || document.getElementById(h).tagName !== 'SECTION') h = 'now';
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id===h));
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+h));
-  window.scrollTo(0,0);
+  const target = parts.length > 1 && parts[1] ? deepLink(h, parts.slice(1)) : null;
+  if(target && target.style.display !== 'none'){
+    requestAnimationFrame(()=>{ target.scrollIntoView({block:'start'});
+      target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash'); });
+  } else window.scrollTo(0,0);
 }
 addEventListener('hashchange', show);
+
+/* shareable links: every card gets a stable name (from its heading) and a copy-link button */
+document.querySelectorAll('main section').forEach(sec=>{
+  const seen = {};
+  sec.querySelectorAll('.card').forEach(card=>{
+    const h = card.querySelector(':scope > h2');
+    let s = (h ? h.textContent : card.id || 'card').toLowerCase().replace(/&/g,' ').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    seen[s] = (seen[s]||0) + 1;
+    if(seen[s] > 1) s += '-' + seen[s];
+    card.dataset.link = s;
+    const b = document.createElement('button');
+    b.className = 'shr'; b.title = 'Copy a link to this'; b.setAttribute('aria-label', 'Copy link'); b.textContent = '🔗';
+    card.appendChild(b);
+  });
+});
+const SHARE_BASE = (location.hostname.endsWith('github.io') || location.protocol === 'file:')
+  ? location.href.split('#')[0] : 'https://mark0552.github.io/league-record-book/';
+function toast(msg){
+  let t = $('toast');
+  if(!t){ t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('on'), 1600);
+}
+function copyLink(path){
+  const url = SHARE_BASE + '#' + path;
+  const old = ()=>{ const ta = document.createElement('textarea'); ta.value = url; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); let ok = false; try{ ok = document.execCommand('copy'); }catch(e){}
+    ta.remove(); ok ? toast('Link copied') : prompt('Copy this link', url); };
+  if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(()=>toast('Link copied'), old);
+  else old();
+}
+const encP = s => encodeURIComponent(s);
+function cardLink(card){
+  const sec = card.closest('section').id;
+  if(sec === 'owners') return 'owners/' + encP($('profSel').value);
+  if(card.id === 'gLinked') return 'games/' + card.dataset.g.split('-').map(encP).join('-');
+  if(sec === 'players' && card.contains($('pCareer')) && $('pCareer').innerHTML && window._curPlayer) return 'players/' + encP(window._curPlayer);
+  let s = sec + (sec === 'seasons' ? '/' + $('seasonSel').value : '') + '/' + card.dataset.link;
+  if(card.classList.contains('swcard') && +card.dataset.sw > 0) s += '/' + card.dataset.sw;
+  return s;
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest('.shr, .shr2');
+  if(!b) return;
+  e.preventDefault();
+  copyLink(b.dataset.share || cardLink(b.closest('.card')));
+});
 
 /* ---------------- NOW ---------------- */
 const now = DATA.now || {};
@@ -1436,7 +1538,7 @@ function lineupSide(y, w, o){
       ? row(Math.abs(gap) > 0.5 ? `${esc(what)} — not in ESPN's archive` : `${esc(what)} — left empty or a 0-point starter`, gap.toFixed(1), 'color:var(--ink3);font-style:italic') : '') +
     (recon ? `<div style="font-size:11px;color:var(--ink3);padding-top:3px">† missing from ESPN's archive; identified from that week's NFL stats</div>` : '') + '</div>';
 }
-const lineupPanel = (y,w,a,b) => (GAGG[`${y}|${w}`] ? `<div class="note" style="padding:2px">Two-week playoff round — each player's points are his total across both weeks; more than nine names means the lineup changed between weeks.</div>` : '') + `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${lineupSide(y,w,a)}${lineupSide(y,w,b)}</div>`;
+const lineupPanel = (y,w,a,b) => (GAGG[`${y}|${w}`] ? `<div class="note" style="padding:2px">Two-week playoff round — each player's points are his total across both weeks; more than nine names means the lineup changed between weeks.</div>` : '') + `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:4px 2px">${lineupSide(y,w,a)}${lineupSide(y,w,b)}</div><div style="text-align:right"><button class="shr2" data-share="games/${y}-${w}-${esc(encodeURIComponent(a))}-${esc(encodeURIComponent(b))}">🔗 Copy link to this game</button></div>`;
 $('gTable').addEventListener('click', e=>{
   const tr = e.target.closest('tr.grow');
   if(!tr) return;
@@ -1500,6 +1602,7 @@ function yearsLabel(set){
 function showPlayer(name){
   const e = PIDX[name];
   if(!e) return;
+  window._curPlayer = name;
   const rings = ringCount(name);
   const ownRows = Object.entries(e.own).sort((a,b)=>b[1].starts-a[1].starts)
     .map(([o,v])=>`<tr><td><b>${esc(o)}</b></td><td class="num">${yearsLabel(v.years)}</td><td class="num">${v.starts}</td><td class="num">${v.pts.toFixed(0)}</td></tr>`).join('');
@@ -1549,7 +1652,7 @@ function renderRecordLists(){
   $('r_top').innerHTML = M.top.map(e=>`<li ${lu(e)}><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">vs ${esc(e.opp)} · ${e.year} wk${e.week}</span></span></li>`).join('');
   $('r_low').innerHTML = M.low.map(e=>`<li ${lu(e)}><span class="v">${f2(e.pts)}</span><span><b>${esc(e.owner)}</b> <span class="d">vs ${esc(e.opp)} · ${e.year} wk${e.week}${e.note?' · '+esc(e.note):''}</span></span></li>`).join('');
   for(const pos of ['QB','RB','WR','TE','K','DEF'])
-    $('r_pg_'+pos).innerHTML = ((M.players_pos||{})[pos]||[]).map(p=>`<li><span class="v">${f1(p.pts)}</span><span><b>${esc(p.name)}</b> <span class="d">${esc(p.owner)} · ${p.year} wk${p.week}</span></span></li>`).join('');
+    $('r_pg_'+pos).innerHTML = ((M.players_pos||{})[pos]||[]).map(p=>`<li data-y="${p.year}" data-w="${p.week}"><span class="v">${f1(p.pts)}</span><span><b>${esc(p.name)}</b> <span class="d">${esc(p.owner)} · ${p.year} wk${p.week}</span></span></li>`).join('');
   if(adjMode){
     $('r_seasonhi').innerHTML = M.season_high.map(e=>`<li><span class="v">${e.ppg.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · per game (adj. total ${e.pf.toFixed(0)} over ${e.g})</span></span></li>`).join('');
     $('r_seasonlo').innerHTML = M.season_low.map(e=>`<li><span class="v">${e.ppg.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · per game (adj. total ${e.pf.toFixed(0)} over ${e.g})</span></span></li>`).join('');
@@ -1557,6 +1660,7 @@ function renderRecordLists(){
     $('r_seasonhi').innerHTML = R.season_high.map(e=>`<li><span class="v">${e.pf.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · ${e.ppg.toFixed(1)}/game over ${e.g} games</span></span></li>`).join('');
     $('r_seasonlo').innerHTML = R.season_low.map(e=>`<li><span class="v">${e.pf.toFixed(1)}</span><span><b>${esc(e.owner)}</b> <span class="d">${e.year} · ${e.ppg.toFixed(1)}/game over ${e.g} games</span></span></li>`).join('');
   }
+  if(window.markNewRecords) markNewRecords();
 }
 $('rMode').addEventListener('change', renderRecordLists);
 const lug = g => `class="lurow" style="cursor:pointer" data-y="${g.year}" data-w="${g.week}" data-a="${esc(g.a)}" data-b="${esc(g.b)}"`;
@@ -1571,7 +1675,7 @@ $('r_benchgames').innerHTML = (R.bench_games||[]).map(b=>{
   const what = b.v==='flip' ? `<span style="color:var(--accent);font-weight:600">starting him flips the ${b.margin.toFixed(1)}-pt loss</span>`
     : b.v==='won' ? 'team won anyway'
     : `still loses by ${(b.margin-b.gain).toFixed(1)}`;
-  return `<li><span class="v">${f2(b.pts)}</span><span><b>${esc(b.name)}</b> <span class="d">${esc(b.pos)} · ${esc(b.owner)}'s bench · ${b.year} wk${b.week} · ${what}</span></span></li>`;
+  return `<li data-y="${b.year}" data-w="${b.week}"><span class="v">${f2(b.pts)}</span><span><b>${esc(b.name)}</b> <span class="d">${esc(b.pos)} · ${esc(b.owner)}'s bench · ${b.year} wk${b.week} · ${what}</span></span></li>`;
 }).join('') || '<li><span class="d">No bench data yet</span></li>';
 // record holder(s) at the top value, then one expandable "N tied" row for the next tier
 const tieDetails = {};
@@ -2130,6 +2234,105 @@ renderPlayersTab();
   });
 })();
 
+/* ---------------- TROPHY CASE ---------------- */
+const seasonDone = y => y !== YEARS[0] || DATA.champs.some(c=>c.year===y);
+let _honors = null;
+function leagueHonors(){
+  if(_honors) return _honors;
+  const H = {div:{}, top:{}, pf:{}, ru:{}, apps:{}, sup:{}};
+  const add = (m, o, v) => (m[o] = m[o] || []).push(v);
+  for(const y of YEARS.slice().reverse()){
+    const st = regStandings(y);
+    for(const o of new Set(G.filter(g=>g[0]===y && g[2]==='P').flatMap(g=>[g[3],g[5]]))) add(H.apps, o, y);
+    if(!seasonDone(y) || !st.length) continue;
+    add(H.top, st[0].o, y);
+    add(H.pf, st.slice().sort((a,b)=>b.pf-a.pf)[0].o, y);
+    const dv = (DATA.divisions||{})[y];
+    if(dv) dv.names.forEach((nm,i)=>{ const w = st.find(r=>dv.owners[r.o]===i+1); if(w) add(H.div, w.o, `${y} ${nm.replace(/ Division$/i,'')}`); });
+    const c = DATA.champs.find(c=>c.year===y), pool = G.filter(g=>g[0]===y && g[2]==='P');
+    if(c && pool.length){
+      const lw = Math.max(...pool.map(g=>g[1]));
+      const g = pool.find(g=>g[1]===lw && (g[4]>g[6]?g[3]:g[5])===c.owner);
+      if(g) add(H.ru, g[4]>g[6]?g[5]:g[3], y);
+    }
+  }
+  // league-wide superlatives: one holder each, owners with 3+ seasons only
+  const vet = o => (at[o]||{}).seasons >= 3;
+  const sup = (ic, title, rows, val, fmt, joke) => {
+    const r = rows.filter(r=>vet(r.o) && val(r) != null && !isNaN(val(r))).sort((a,b)=>val(b)-val(a))[0];
+    if(r) add(H.sup, r.o, {ic, title, s:fmt(r), joke});
+  };
+  const lk = DATA.luck.career.map(r=>({o:r.owner, ...r}));
+  sup('🍀', 'Luckiest owner', lk, r=>r.luck, r=>`+${r.luck.toFixed(1)} wins over expected`);
+  sup('🪦', 'Unluckiest owner', lk, r=>-r.luck, r=>`${r.luck.toFixed(1)} wins vs expected`, 1);
+  const bn = (DATA.bench.career||[]).map(r=>({o:r.owner, ...r}));
+  sup('🧠', 'Best lineup setter', bn, r=>r.eff, r=>`${r.eff.toFixed(1)}% of best-possible points`);
+  sup('🪑', 'Bench warmer', bn, r=>-r.eff, r=>`${r.eff.toFixed(1)}% efficiency · ${r.left.toFixed(0)} pts left on the bench`, 1);
+  const dn = {};
+  for(const S of Object.values(DNP.seasons)){
+    const ys = new Set();
+    for(const p of S.picks){ const d = dn[p.o] = dn[p.o] || {o:p.o, pts:0, m:0, n:0};
+      d.pts += p.miss.length*(p.pp||0); d.m += p.miss.length; if(!ys.has(p.o)){ ys.add(p.o); d.n++; } }
+  }
+  sup('🏥', 'Injury ward', Object.values(dn), r=>r.pts/r.n, r=>`${(r.pts/r.n).toFixed(0)} projected pts lost per year`, 1);
+  const tr = {};
+  for(const t of DATA.moves.trades) for(const s of t.sides){ (tr[s.owner] = tr[s.owner] || {o:s.owner, n:0}).n++; }
+  sup('🤝', 'Wheeler-dealer', Object.values(tr), r=>r.n, r=>`${r.n} trades made`);
+  const dg = DATA.draft.grades.map(r=>({o:r.owner, avg:r.total/Math.max(1, Object.keys(r.years).length)}));
+  sup('📝', 'Draft guru', dg, r=>r.avg, r=>`${r.avg>0?'+':''}${r.avg.toFixed(0)} draft value per year`);
+  sup('🗑️', 'Draft-day disaster', dg, r=>-r.avg, r=>`${r.avg>0?'+':''}${r.avg.toFixed(0)} draft value per year`, 1);
+  const $n = s => parseFloat(String(s).replace(/[$,]/g,''));
+  const mo = DATA.money.payouts.map(r=>({o:r.owner, net:$n(r.net)}));
+  sup('💵', 'Moneybags', mo, r=>r.net, r=>`${r.net<0?'−':'+'}$${Math.abs(r.net).toFixed(0)} career net`);
+  sup('🏧', 'League ATM', mo, r=>-r.net, r=>`−$${Math.abs(r.net).toFixed(0)} career net`, 1);
+  const cl = {};
+  for(const g of G){ if(g[2]==='C' || g[7] || Math.abs(g[4]-g[6]) >= 3 || g[4]===g[6]) continue;
+    const l = g[4]<g[6]?g[3]:g[5]; (cl[l] = cl[l] || {o:l, n:0}).n++; }
+  sup('💔', 'Heartbreak hotel', Object.values(cl), r=>r.n, r=>`${r.n} losses by under 3 points`, 1);
+  return _honors = H;
+}
+function trophyCase(o){
+  const H = leagueHonors();
+  const chip = (ic, title, s, cls) => `<div class="trophy ${cls||''}"><span class="ic">${ic}</span><span><b>${title}</b><span class="s">${s}</span></span></div>`;
+  const multi = (ic, name, list, cls) => list && list.length ? chip(ic, `${name}${list.length>1?' ×'+list.length:''}`, list.join(', '), cls) : '';
+  const titles = DATA.champs.filter(c=>c.owner===o).map(c=>c.year).sort();
+  const lasts = DATA.shame.filter(s=>s.owner===o).map(s=>s.year).sort();
+  const wk = (DATA.money.detail||{})[o] || [];
+  const hard = [
+    multi('🏆', 'Buck Wong Bowl champion', titles, 'gold'),
+    multi('🥈', 'Runner-up', H.ru[o]),
+    multi('🚩', 'Division title', H.div[o]),
+    multi('👑', 'Best regular-season record', H.top[o]),
+    multi('🎯', 'Scoring title', H.pf[o]),
+    H.apps[o] ? chip('🎟️', `Playoff appearances ×${H.apps[o].length}`, H.apps[o].length > 6 ? `${H.apps[o][0]}–${H.apps[o][H.apps[o].length-1]}` : H.apps[o].join(', ')) : '',
+    wk.length ? chip('💰', `Weekly high score ×${wk.length}`, `best ${Math.max(...wk.map(x=>x[2])).toFixed(1)}`) : '',
+    multi('🥄', 'Lerch Cup', lasts, 'joke'),
+  ].filter(Boolean);
+  // record-book entries: the #1 spot on any list
+  const rec = [];
+  const one = (ic, title, e, who, s, joke) => { if(e && who === o) rec.push(chip(ic, title, s, joke?'joke':'')); };
+  const wkOf = e => `${e.year} wk${e.week}`;
+  let e;
+  e = R.top[0]; one('📈', 'Highest team score ever', e, e&&e.owner, e&&`${f2(e.pts)} · ${wkOf(e)}`);
+  e = R.low[0]; one('📉', 'Lowest team score ever', e, e&&e.owner, e&&`${f2(e.pts)} · ${wkOf(e)}`, 1);
+  e = R.blowouts[0]; one('💥', 'Biggest blowout win', e, e&&(e.sa>e.sb?e.a:e.b), e&&`by ${f2(e.margin)} · ${wkOf(e)}`);
+  one('🚑', 'Worst blowout loss', e, e&&(e.sa>e.sb?e.b:e.a), e&&`by ${f2(e.margin)} · ${wkOf(e)}`, 1);
+  e = R.closest[0]; one('😅', 'Closest win ever', e, e&&(e.sa>e.sb?e.a:e.b), e&&`by ${f2(e.margin)} · ${wkOf(e)}`);
+  e = R.season_high[0]; one('🔥', 'Highest-scoring season', e, e&&e.owner, e&&`${e.pf.toFixed(1)} · ${e.year}`);
+  e = R.season_low[0]; one('🧊', 'Lowest-scoring season', e, e&&e.owner, e&&`${e.pf.toFixed(1)} · ${e.year}`, 1);
+  e = R.loss_high[0]; one('😭', 'Most points in a loss', e, e&&e.owner, e&&`${f2(e.pts)} · ${wkOf(e)}`, 1);
+  e = R.win_low[0]; one('🎁', 'Fewest points in a win', e, e&&e.owner, e&&`${f2(e.pts)} · ${wkOf(e)}`);
+  for(const s of R.winstreaks.filter(s=>s.n===R.winstreaks[0].n)) one('⚡', 'Longest win streak', s, s.owner, `${s.n} straight`);
+  for(const s of R.lossstreaks.filter(s=>s.n===R.lossstreaks[0].n)) one('🕳️', 'Longest losing streak', s, s.owner, `${s.n} straight`, 1);
+  for(const [pos, l] of Object.entries(R.players_pos||{})){ e = l[0];
+    one('⭐', `Best ${pos==='DEF'?'D/ST':pos} game ever`, e, e&&e.owner, e&&`${esc(e.name)} ${f1(e.pts)} · ${wkOf(e)}`); }
+  e = (R.bench_games||[])[0]; one('🙈', 'Biggest game left on a bench', e, e&&e.owner, e&&`${esc(e.name)} ${f1(e.pts)} · ${wkOf(e)}`, 1);
+  const sup = (H.sup[o]||[]).map(x=>chip(x.ic, x.title, x.s, x.joke?'joke':''));
+  const grp = (label, chips) => chips.length ? `<div class="trgrp">${label}</div><div class="trophies">${chips.join('')}</div>` : '';
+  return grp('Hardware', hard) + grp('Record holder', rec) + grp('League superlatives', sup)
+    || '<div class="note">Trophy case empty — so far.</div>';
+}
+
 /* ---------------- OWNER PROFILES ---------------- */
 $('profSel').innerHTML = owners.map(o=>`<option>${esc(o)}</option>`).join('');
 $('profSel').value = 'Mark';
@@ -2188,8 +2391,8 @@ function renderProfile(){
       <div class="tile"><div class="v">${lk.luck!=null?(lk.luck>0?'+':'')+lk.luck.toFixed(1):'—'}</div><div class="k">career luck (wins)</div></div>
       ${effTiles}
     </div>
-    ${titles.length?`<div class="note" style="color:var(--bwb)">🏆 Buck Wong Bowls: ${titles.join(', ')}</div>`:''}
-    ${lasts.length?`<div class="note" style="color:var(--red)">🥄 Lerch Cups: ${lasts.join(', ')}</div>`:''}
+    <h2 style="margin:14px 0 0">Trophy case</h2>
+    ${trophyCase(o)}
     <h2 style="margin:14px 0 4px">Season by season</h2>
     <div class="tscroll"><table><tr><th>Year</th><th class="num">Finish</th><th class="num">W-L</th><th class="num">PF</th></tr>${yrRows.join('')}</table></div>
     <h2 style="margin:14px 0 4px">Signature players (most starts)</h2>
@@ -2257,6 +2460,50 @@ $('ringlist').addEventListener('click', e=>{
   row.after(d);
   row.classList.add('open');
 });
+
+/* ---------------- NEW IN THE RECORD BOOK (latest completed week) ---------------- */
+(function(){
+  const y = YEARS[0], wks = G.filter(g=>g[0]===y).map(g=>g[1]);
+  if(!wks.length) return;
+  const w = Math.max(...wks), items = [];
+  const isNew = e => e.year===y && e.week===w;
+  const scan = (list, label, link, text) => (list||[]).forEach((e,i)=>{ if(isNew(e)) items.push({rk:i+1, label, link, text:text(e)}); });
+  const win = g => g.sa>g.sb ? [g.a,g.b] : [g.b,g.a];
+  scan(R.top, 'highest team score', 'records/team-scores', e=>`${esc(e.owner)} ${f2(e.pts)}`);
+  scan(R.low, 'lowest team score', 'records/team-scores/1', e=>`${esc(e.owner)} ${f2(e.pts)}`);
+  ['QB','RB','WR','TE','K','DEF'].forEach((pos,i)=>scan((R.players_pos||{})[pos], `${pos==='DEF'?'D/ST':pos} game`, 'records/best-player-games'+(i?'/'+i:''),
+    e=>`${esc(e.name)} ${f1(e.pts)} (${esc(e.owner)})`));
+  scan(R.bench_games, 'game left on a bench', 'records/best-player-games/6', e=>`${esc(e.name)} ${f1(e.pts)} (${esc(e.owner)})`);
+  scan(R.blowouts, 'biggest blowout', 'records/margins', g=>`${esc(win(g)[0])} over ${esc(win(g)[1])} by ${f2(g.margin)}`);
+  scan(R.closest, 'closest finish', 'records/margins/1', g=>`${esc(win(g)[0])} over ${esc(win(g)[1])} by ${f2(g.margin)}`);
+  scan(R.shootouts, 'highest-scoring matchup', 'records/highest-scoring-matchups', g=>`${esc(g.a)} vs ${esc(g.b)}, ${f1(g.total)} combined`);
+  scan(R.loss_high, 'most points in a loss', 'records/cruel-games', e=>`${esc(e.owner)} ${f2(e.pts)}`);
+  scan(R.win_low, 'fewest points in a win', 'records/cruel-games/1', e=>`${esc(e.owner)} ${f2(e.pts)}`);
+  // career scoring lists: who climbed this week
+  const tot = {}, wk = {};
+  for(const [k, lu] of Object.entries(DATA.lineups||{})){
+    const cur = k.startsWith(`${y}|${w}|`);
+    for(const p of lu){ const id = p[1]+'|'+p[0]; tot[id] = (tot[id]||0) + p[2]; if(cur) wk[id] = (wk[id]||0) + p[2]; }
+  }
+  ['QB','RB','WR','TE','K','DEF'].forEach((pos,i)=>{
+    const ids = Object.keys(tot).filter(id=>id.startsWith(pos+'|'));
+    const nowR = ids.slice().sort((a,b)=>tot[b]-tot[a]).slice(0,10);
+    const before = ids.slice().sort((a,b)=>(tot[b]-(wk[b]||0))-(tot[a]-(wk[a]||0)));
+    nowR.forEach((id,r)=>{ const was = before.indexOf(id);
+      if(wk[id] && r < was && (was >= 10 || r < 3)) items.push({rk:r+1, label:`${pos==='DEF'?'D/ST':pos} career scorer`, link:'records/all-time-top-scorers-by-position'+(i?'/'+i:''),
+        text:`${esc(id.split('|')[1])} ${was>=10?'entered the top 10':'moved up from #'+(was+1)} (${tot[id].toFixed(0)} pts)`}); });
+  });
+  // tag the fresh rows in the lists themselves
+  window.markNewRecords = ()=>document.querySelectorAll('#records ol.rec > li[data-y]').forEach(li=>{
+    if(+li.dataset.y===y && +li.dataset.w===w && !li.querySelector('.newtag')){
+      const b = li.querySelector('b'); if(b) b.insertAdjacentHTML('afterend', '<span class="newtag">NEW</span>'); } });
+  markNewRecords();
+  if(!items.length) return;
+  items.sort((a,b)=>a.rk-b.rk);
+  $('newrec').style.display = '';
+  $('newrec_h').textContent = `New in the record book · week ${w}`;
+  $('newrec_list').innerHTML = items.map(it=>`<a href="#${it.link}"><span class="rk2">#${it.rk}</span><span>${it.rk===1?'<b>New record</b> — ':''}all-time ${it.label}: ${it.text}</span></a>`).join('');
+})();
 
 // every page carries its own title (the menu labels are the source of truth)
 document.querySelectorAll('#nav a').forEach(a=>{
