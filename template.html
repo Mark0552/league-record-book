@@ -2424,6 +2424,39 @@ function trophyCase(o){
     || '<div class="note">Trophy case empty — so far.</div>';
 }
 
+/* ---------------- TENDENCIES ---------------- */
+function tendenciesHTML(o){
+  const T = (DATA.tend||{})[o];
+  const rows = [];
+  const row = (k, v, s) => rows.push(`<div class="meet" style="gap:12px"><span style="color:var(--ink2)">${k}</span><span style="text-align:right"><b>${v}</b>${s?`<div style="font-size:11.5px;color:var(--ink3)">${s}</div>`:''}</span></div>`);
+  const rankOf = (val, all) => all.filter(x=>x>val).length + 1;
+  if(T && Object.keys(T.r1).length){
+    const c = {}; Object.values(T.r1).forEach(p=>c[p]=(c[p]||0)+1);
+    const srt = Object.entries(c).sort((a,b)=>b[1]-a[1]), n = Object.keys(T.r1).length;
+    row('First-round pick', `${srt[0][0]} in ${srt[0][1]} of ${n} drafts`, srt.length>1 ? srt.slice(1).map(([p,k])=>`${p} ${k}`).join(' · ') : '');
+  }
+  if(T && T.teams.length){
+    row('Favorite NFL team to draft', `${T.teams[0][0]} · ${T.teams[0][1]} picks`, `then ${T.teams.slice(1,4).map(([t,k])=>`${t} ${k}`).join(' · ')} <span>(of ${T.picks} picks)</span>`);
+  }
+  const perYr = t => { const v = Object.values(t.adds||{}); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; };
+  if(T && perYr(T) != null){
+    const all = Object.values(DATA.tend).map(perYr).filter(v=>v!=null), mine = perYr(T);
+    const top = Object.entries(T.adds).sort((a,b)=>b[1]-a[1])[0];
+    row('Waiver & free-agent adds', `${mine.toFixed(0)} per season`, `#${rankOf(mine, all)} of ${all.length} most active · busiest ${top[0]} (${top[1]}) · since 2020`);
+  }
+  const tc = {}, partners = {};
+  for(const t of DATA.moves.trades){
+    const os = t.sides.map(s=>s.owner);
+    for(const x of os) tc[x] = (tc[x]||0) + 1;
+    if(os.includes(o)) for(const x of os) if(x!==o) partners[x] = (partners[x]||0) + 1;
+  }
+  if(tc[o]){
+    const fav = Object.entries(partners).sort((a,b)=>b[1]-a[1])[0];
+    row('Trades made', `${tc[o]}`, `#${rankOf(tc[o], Object.values(tc))} of ${Object.keys(tc).length}${fav?` · most often with ${esc(fav[0])} (${fav[1]})`:''}`);
+  } else row('Trades made', '0', 'never made a recorded trade');
+  return rows.join('');
+}
+
 /* ---------------- OWNER PROFILES ---------------- */
 $('profSel').innerHTML = owners.map(o=>`<option>${esc(o)}</option>`).join('');
 $('profSel').value = 'Mark';
@@ -2484,6 +2517,8 @@ function renderProfile(){
     </div>
     <h2 style="margin:14px 0 0">Trophy case</h2>
     ${trophyCase(o)}
+    <h2 style="margin:14px 0 4px">Tendencies</h2>
+    ${tendenciesHTML(o)}
     <h2 style="margin:14px 0 4px">Season by season</h2>
     <div class="tscroll"><table><tr><th>Year</th><th class="num">Finish</th><th class="num">W-L</th><th class="num">PF</th></tr>${yrRows.join('')}</table></div>
     <h2 style="margin:14px 0 4px">Signature players (most starts)</h2>

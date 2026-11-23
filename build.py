@@ -1021,6 +1021,42 @@ draft_payload = dict(
 )
 draft_payload["grades"].sort(key=lambda g: -g["total"])
 
+# ================= OWNER TENDENCIES =================
+# first-round position, favourite NFL teams to draft from (week-1 team of every
+# pick, tools/draft_teams.py), and waiver/free-agent adds per Sleeper season
+try:
+    _dteams = json.load(open("data/draft_teams.json", encoding="utf-8"))
+except Exception:
+    _dteams = {}
+tend = defaultdict(lambda: dict(r1={}, teams=defaultdict(int), picks=0, adds={}, faab={}))
+for d in draft_data:
+    t = tend[d["owner"]]
+    if d["round"] == 1 and not d.get("keeper"):
+        t["r1"][str(d["season"])] = d["pos"]
+    tm = (_dteams.get(str(d["season"])) or {}).get(f'{normname(d["player"])}|{d["pos"]}')
+    if tm:
+        t["teams"][tm] += 1
+        t["picks"] += 1
+for season in SLEEPER_SEASONS:
+    ro = season_ro.get(season)
+    if not ro:
+        continue
+    for w in range(1, 19):
+        for tx_ in load(season, f"transactions_{w}") or []:
+            if tx_.get("type") not in ("waiver", "free_agent") or tx_.get("status") != "complete":
+                continue
+            for pid, rid in (tx_.get("adds") or {}).items():
+                o = ro.get(rid)
+                if not o:
+                    continue
+                t = tend[o]
+                t["adds"][str(season)] = t["adds"].get(str(season), 0) + 1
+                bid = (tx_.get("settings") or {}).get("waiver_bid") or 0
+                t["faab"][str(season)] = t["faab"].get(str(season), 0) + bid
+tend_payload = {o: dict(r1=t["r1"], picks=t["picks"], adds=t["adds"], faab=t["faab"],
+                        teams=sorted(t["teams"].items(), key=lambda kv: (-kv[1], kv[0]))[:5])
+                for o, t in tend.items() if o != "?"}
+
 # ---- top-pick availability: NFL games missed by each owner's round 1-5 picks ----
 import sys as _sys
 _sys.path.insert(0, str(Path(__file__).resolve().parent))   # found even under python -I
@@ -1554,7 +1590,7 @@ payload = dict(
     bench=bench,
     moves=moves,
     draft=draft_payload,
-    dnp=dnp_payload,
+    dnp=dnp_payload, tend=tend_payload,
     shame=shame,
     lineups=lineups,
     lineup_gaps=lineup_gaps,
