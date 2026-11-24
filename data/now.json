@@ -113,27 +113,27 @@
   },
   {
    "owner": "Lerch",
-   "pct": 99.1
+   "pct": 99.2
   },
   {
    "owner": "Martin",
-   "pct": 91.9
+   "pct": 92.0
   },
   {
    "owner": "Cliff",
-   "pct": 79.3
+   "pct": 80.2
   },
   {
    "owner": "Clancy",
-   "pct": 64.5
+   "pct": 64.6
   },
   {
    "owner": "Steve",
-   "pct": 53.4
+   "pct": 53.6
   },
   {
    "owner": "Mark",
-   "pct": 11.6
+   "pct": 10.2
   },
   {
    "owner": "Sam",
@@ -221,7 +221,7 @@
    "needs": [
     "Loses to Steve"
    ],
-   "odds": 1.8
+   "odds": 1.6
   }
  ],
  "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
@@ -571,32 +571,32 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 11.6,
-    "Clancy": 64.5,
+    "Mark": 10.2,
+    "Clancy": 64.6,
     "Will": 0.0,
     "Sam": 1.0,
-    "Steve": 53.4,
+    "Steve": 53.6,
     "Timmy": 0.0,
     "Bob": 99.6,
-    "Lerch": 99.1,
-    "Martin": 91.9,
+    "Lerch": 99.2,
+    "Martin": 92.0,
     "Luke": 0.1,
     "Austin": 99.6,
-    "Cliff": 79.3
+    "Cliff": 80.2
    },
    "champ": {
-    "Mark": 1.06,
-    "Clancy": 8.6,
+    "Mark": 0.65,
+    "Clancy": 8.67,
     "Will": 0.0,
-    "Sam": 0.11,
+    "Sam": 0.12,
     "Steve": 6.88,
     "Timmy": 0.0,
     "Bob": 7.41,
-    "Lerch": 27.41,
-    "Martin": 14.49,
+    "Lerch": 27.53,
+    "Martin": 14.55,
     "Luke": 0.0,
-    "Austin": 23.76,
-    "Cliff": 10.27
+    "Austin": 23.83,
+    "Cliff": 10.36
    }
   }
  },
@@ -877,11 +877,11 @@
   "proj": {
    "Mark": {
     "12": 91.0,
-    "13": 84.1,
-    "14": 89.0,
-    "15": 92.9,
-    "16": 92.3,
-    "17": 86.6
+    "13": 81.4,
+    "14": 84.5,
+    "15": 83.2,
+    "16": 88.8,
+    "17": 81.1
    },
    "Clancy": {
     "12": 95.3,
@@ -1000,19 +1000,6 @@
       "15": 9.3,
       "16": 12.0,
       "17": 11.4
-     }
-    },
-    {
-     "id": "11563",
-     "pos": "QB",
-     "n": "Bo Nix",
-     "pw": {
-      "12": 14.5,
-      "13": 17.5,
-      "14": 18.4,
-      "15": 19.0,
-      "16": 15.6,
-      "17": 16.9
      }
     },
     {
@@ -3078,25 +3065,25 @@
   },
   "replw": {
    "12": {
-    "QB": 15.0,
+    "QB": 15.3,
     "RB": 7.3,
     "WR": 6.7,
     "TE": 6.1
    },
    "13": {
-    "QB": 15.0,
+    "QB": 16.0,
     "RB": 7.1,
     "WR": 6.8,
     "TE": 6.6
    },
    "14": {
-    "QB": 15.6,
+    "QB": 16.3,
     "RB": 6.3,
     "WR": 6.7,
     "TE": 6.4
    },
    "15": {
-    "QB": 17.0,
+    "QB": 17.5,
     "RB": 6.8,
     "WR": 6.8,
     "TE": 6.6
@@ -3108,7 +3095,7 @@
     "TE": 6.5
    },
    "17": {
-    "QB": 14.8,
+    "QB": 15.6,
     "RB": 6.9,
     "WR": 6.7,
     "TE": 6.8
