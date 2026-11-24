@@ -2368,7 +2368,7 @@ function leagueHonors(){
   sup('🏥', 'Injury ward', Object.values(dn), r=>r.pts/r.n, r=>`${(r.pts/r.n).toFixed(0)} projected pts lost per year`, 1);
   const tr = {};
   for(const t of DATA.moves.trades) for(const s of t.sides){ (tr[s.owner] = tr[s.owner] || {o:s.owner, n:0}).n++; }
-  sup('🤝', 'Wheeler-dealer', Object.values(tr), r=>r.n, r=>`${r.n} trades made`);
+  sup('🦃', 'Wheeler-dealer', Object.values(tr), r=>r.n, r=>`${r.n} trades made`);
   const dg = DATA.draft.grades.map(r=>({o:r.owner, avg:r.total/Math.max(1, Object.keys(r.years).length)}));
   sup('📝', 'Draft guru', dg, r=>r.avg, r=>`${r.avg>0?'+':''}${r.avg.toFixed(0)} draft value per year`);
   sup('🗑️', 'Draft-day disaster', dg, r=>-r.avg, r=>`${r.avg>0?'+':''}${r.avg.toFixed(0)} draft value per year`, 1);
