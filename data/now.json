@@ -117,7 +117,7 @@
   },
   {
    "owner": "Martin",
-   "pct": 91.8
+   "pct": 91.7
   },
   {
    "owner": "Cliff",
@@ -125,11 +125,11 @@
   },
   {
    "owner": "Clancy",
-   "pct": 69.3
+   "pct": 69.6
   },
   {
    "owner": "Steve",
-   "pct": 52.6
+   "pct": 52.5
   },
   {
    "owner": "Mark",
@@ -141,7 +141,7 @@
   },
   {
    "owner": "Luke",
-   "pct": 0.2
+   "pct": 0.1
   },
   {
    "owner": "Will",
@@ -157,13 +157,13 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 113.9,
+   "pa": 113.7,
    "b": "Timmy",
    "pb": 97.3
   },
   {
    "a": "Bob",
-   "pa": 110.1,
+   "pa": 109.6,
    "b": "Austin",
    "pb": 111.2
   },
@@ -171,7 +171,7 @@
    "a": "Clancy",
    "pa": 114.4,
    "b": "Martin",
-   "pb": 112.9
+   "pb": 112.4
   },
   {
    "a": "Luke",
@@ -189,7 +189,7 @@
    "a": "Will",
    "pa": 107.8,
    "b": "Lerch",
-   "pb": 117.5
+   "pb": 117.2
   }
  ],
  "elim": [
@@ -234,7 +234,7 @@
   {
    "owner": "Luke",
    "rec": "4-7",
-   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Luke (1088.6) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 134.3 points ahead. Simulated odds: 0.2%."
+   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Luke (1088.6) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 134.3 points ahead. Simulated odds: 0.1%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -572,31 +572,31 @@
   "12": {
    "playoffs": {
     "Mark": 12.4,
-    "Clancy": 69.3,
+    "Clancy": 69.6,
     "Will": 0.0,
     "Sam": 1.2,
-    "Steve": 52.6,
+    "Steve": 52.5,
     "Timmy": 0.0,
     "Bob": 99.6,
     "Lerch": 99.0,
-    "Martin": 91.8,
-    "Luke": 0.2,
+    "Martin": 91.7,
+    "Luke": 0.1,
     "Austin": 99.7,
     "Cliff": 74.1
    },
    "champ": {
     "Mark": 1.12,
-    "Clancy": 8.11,
+    "Clancy": 8.14,
     "Will": 0.0,
     "Sam": 0.15,
-    "Steve": 6.51,
+    "Steve": 6.49,
     "Timmy": 0.0,
-    "Bob": 7.18,
-    "Lerch": 28.62,
-    "Martin": 14.69,
+    "Bob": 7.16,
+    "Lerch": 28.58,
+    "Martin": 14.65,
     "Luke": 0.01,
-    "Austin": 24.04,
-    "Cliff": 9.58
+    "Austin": 24.1,
+    "Cliff": 9.6
    }
   }
  },
@@ -900,7 +900,7 @@
     "17": 90.6
    },
    "Sam": {
-    "12": 113.9,
+    "12": 113.7,
     "13": 88.9,
     "14": 87.5,
     "15": 96.1,
@@ -924,7 +924,7 @@
     "17": 80.1
    },
    "Bob": {
-    "12": 110.1,
+    "12": 109.6,
     "13": 92.9,
     "14": 79.5,
     "15": 91.5,
@@ -932,7 +932,7 @@
     "17": 87.0
    },
    "Lerch": {
-    "12": 117.5,
+    "12": 117.2,
     "13": 87.4,
     "14": 91.0,
     "15": 99.0,
@@ -940,7 +940,7 @@
     "17": 102.0
    },
    "Martin": {
-    "12": 112.9,
+    "12": 112.4,
     "13": 95.4,
     "14": 95.1,
     "15": 97.1,
@@ -993,9 +993,9 @@
    "Sam": 28.1,
    "Steve": 12.0,
    "Timmy": 20.7,
-   "Bob": 24.4,
+   "Bob": 24.3,
    "Lerch": 22.3,
-   "Martin": 33.0,
+   "Martin": 32.9,
    "Luke": 14.8,
    "Austin": 20.7,
    "Cliff": 19.3
