@@ -336,29 +336,29 @@
     "Mark": 11.4,
     "Clancy": 57.4,
     "Will": 0.0,
-    "Sam": 1.4,
-    "Steve": 60.4,
+    "Sam": 1.5,
+    "Steve": 60.6,
     "Timmy": 0.0,
-    "Bob": 99.8,
+    "Bob": 99.9,
     "Lerch": 99.1,
     "Martin": 96.5,
     "Luke": 0.1,
     "Austin": 99.9,
-    "Cliff": 73.8
+    "Cliff": 73.7
    },
    "champ": {
-    "Mark": 0.97,
-    "Clancy": 6.8,
+    "Mark": 0.96,
+    "Clancy": 6.91,
     "Will": 0.0,
-    "Sam": 0.16,
-    "Steve": 7.52,
+    "Sam": 0.18,
+    "Steve": 7.58,
     "Timmy": 0.0,
-    "Bob": 6.55,
-    "Lerch": 28.96,
-    "Martin": 16.01,
+    "Bob": 7.0,
+    "Lerch": 28.95,
+    "Martin": 15.98,
     "Luke": 0.01,
-    "Austin": 23.82,
-    "Cliff": 9.2
+    "Austin": 23.15,
+    "Cliff": 9.27
    }
   }
  }
