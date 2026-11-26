@@ -105,7 +105,7 @@
  "odds": [
   {
    "owner": "Bob",
-   "pct": 99.8
+   "pct": 99.9
   },
   {
    "owner": "Austin",
@@ -117,23 +117,23 @@
   },
   {
    "owner": "Martin",
-   "pct": 92.5
+   "pct": 92.4
   },
   {
    "owner": "Clancy",
-   "pct": 71.0
+   "pct": 72.1
   },
   {
    "owner": "Cliff",
-   "pct": 67.7
+   "pct": 66.1
   },
   {
    "owner": "Steve",
-   "pct": 56.1
+   "pct": 56.3
   },
   {
    "owner": "Mark",
-   "pct": 12.6
+   "pct": 13.0
   },
   {
    "owner": "Sam",
@@ -159,31 +159,31 @@
    "a": "Sam",
    "pa": 108.4,
    "b": "Timmy",
-   "pb": 97.9
+   "pb": 98.0
   },
   {
    "a": "Bob",
    "pa": 112.7,
    "b": "Austin",
-   "pb": 105.4
+   "pb": 105.1
   },
   {
    "a": "Clancy",
    "pa": 114.5,
    "b": "Martin",
-   "pb": 116.4
+   "pb": 115.8
   },
   {
    "a": "Luke",
-   "pa": 109.1,
+   "pa": 120.7,
    "b": "Cliff",
-   "pb": 83.4
+   "pb": 83.8
   },
   {
    "a": "Mark",
    "pa": 108.1,
    "b": "Steve",
-   "pb": 113.3
+   "pb": 112.9
   },
   {
    "a": "Will",
@@ -221,7 +221,7 @@
    "needs": [
     "Loses to Steve"
    ],
-   "odds": 2.9
+   "odds": 3.0
   }
  ],
  "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
@@ -571,32 +571,32 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 12.6,
-    "Clancy": 71.0,
+    "Mark": 13.0,
+    "Clancy": 72.1,
     "Will": 0.0,
     "Sam": 1.1,
-    "Steve": 56.1,
+    "Steve": 56.3,
     "Timmy": 0.0,
-    "Bob": 99.8,
+    "Bob": 99.9,
     "Lerch": 99.2,
-    "Martin": 92.5,
+    "Martin": 92.4,
     "Luke": 0.2,
     "Austin": 99.8,
-    "Cliff": 67.7
+    "Cliff": 66.1
    },
    "champ": {
-    "Mark": 1.1,
-    "Clancy": 8.66,
+    "Mark": 1.15,
+    "Clancy": 8.77,
     "Will": 0.0,
-    "Sam": 0.13,
-    "Steve": 6.98,
+    "Sam": 0.12,
+    "Steve": 6.97,
     "Timmy": 0.0,
-    "Bob": 7.61,
-    "Lerch": 29.79,
-    "Martin": 14.8,
+    "Bob": 7.6,
+    "Lerch": 30.09,
+    "Martin": 14.75,
     "Luke": 0.01,
-    "Austin": 22.71,
-    "Cliff": 8.23
+    "Austin": 22.68,
+    "Cliff": 7.85
    }
   }
  },
@@ -908,7 +908,7 @@
     "17": 97.2
    },
    "Steve": {
-    "12": 113.3,
+    "12": 112.9,
     "13": 82.3,
     "14": 95.4,
     "15": 92.2,
@@ -916,7 +916,7 @@
     "17": 98.7
    },
    "Timmy": {
-    "12": 97.9,
+    "12": 98.0,
     "13": 73.7,
     "14": 81.1,
     "15": 77.6,
@@ -940,7 +940,7 @@
     "17": 102.1
    },
    "Martin": {
-    "12": 116.4,
+    "12": 115.8,
     "13": 95.3,
     "14": 95.0,
     "15": 97.0,
@@ -948,7 +948,7 @@
     "17": 100.2
    },
    "Luke": {
-    "12": 109.1,
+    "12": 120.7,
     "13": 89.8,
     "14": 94.5,
     "15": 81.6,
@@ -956,7 +956,7 @@
     "17": 88.1
    },
    "Austin": {
-    "12": 105.4,
+    "12": 105.1,
     "13": 96.9,
     "14": 92.9,
     "15": 99.2,
@@ -964,7 +964,7 @@
     "17": 100.1
    },
    "Cliff": {
-    "12": 83.4,
+    "12": 83.8,
     "13": 89.7,
     "14": 97.7,
     "15": 92.7,
@@ -996,9 +996,9 @@
    "Bob": 21.6,
    "Lerch": 21.0,
    "Martin": 27.5,
-   "Luke": 12.1,
+   "Luke": 11.9,
    "Austin": 19.8,
-   "Cliff": 16.7
+   "Cliff": 16.6
   },
   "tradepool": {
    "Mark": [
@@ -1231,7 +1231,7 @@
      "pos": "RB",
      "n": "Jonah Coleman",
      "pw": {
-      "12": 15.7,
+      "12": 15.8,
       "13": 15.2,
       "14": 15.3,
       "15": 16.1,
@@ -2314,7 +2314,7 @@
      "pos": "QB",
      "n": "Sam Darnold",
      "pw": {
-      "12": 13.5,
+      "12": 13.4,
       "13": 18.7,
       "14": 14.4,
       "15": 14.1,
