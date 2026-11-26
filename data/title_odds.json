@@ -5,65 +5,65 @@
   {
    "owner": "Lerch",
    "playoffs": 99.02,
-   "bye": 70.13,
-   "final": 50.7,
-   "champ": 28.577
+   "bye": 70.0,
+   "final": 50.71,
+   "champ": 28.573
   },
   {
    "owner": "Austin",
    "playoffs": 99.73,
-   "bye": 46.71,
-   "final": 45.44,
-   "champ": 24.097
+   "bye": 47.23,
+   "final": 45.52,
+   "champ": 24.148
   },
   {
    "owner": "Martin",
-   "playoffs": 91.7,
-   "bye": 15.65,
-   "final": 28.05,
-   "champ": 14.655
+   "playoffs": 91.6,
+   "bye": 15.61,
+   "final": 27.99,
+   "champ": 14.612
   },
   {
    "owner": "Cliff",
-   "playoffs": 74.1,
-   "bye": 25.55,
-   "final": 19.7,
-   "champ": 9.598
+   "playoffs": 74.09,
+   "bye": 25.64,
+   "final": 19.72,
+   "champ": 9.611
   },
   {
    "owner": "Clancy",
-   "playoffs": 69.56,
+   "playoffs": 69.78,
    "bye": 0.06,
-   "final": 19.43,
-   "champ": 8.145
+   "final": 19.48,
+   "champ": 8.178
   },
   {
    "owner": "Bob",
    "playoffs": 99.64,
-   "bye": 37.58,
-   "final": 20.48,
-   "champ": 7.163
+   "bye": 37.1,
+   "final": 20.42,
+   "champ": 7.129
   },
   {
    "owner": "Steve",
-   "playoffs": 52.54,
-   "bye": 2.97,
-   "final": 12.81,
-   "champ": 6.49
+   "playoffs": 52.47,
+   "bye": 2.99,
+   "final": 12.78,
+   "champ": 6.476
   },
   {
    "owner": "Mark",
-   "playoffs": 12.38,
-   "bye": 1.35,
+   "playoffs": 12.36,
+   "bye": 1.36,
    "final": 3.06,
-   "champ": 1.119
+   "champ": 1.12
   },
   {
    "owner": "Sam",
-   "playoffs": 1.18,
+   "playoffs": 1.17,
    "bye": 0.0,
    "final": 0.31,
-   "champ": 0.148
+   "champ": 0.145
   },
   {
    "owner": "Luke",
