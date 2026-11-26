@@ -4,66 +4,66 @@
  "odds": [
   {
    "owner": "Lerch",
-   "playoffs": 98.95,
-   "bye": 69.79,
-   "final": 50.6,
-   "champ": 28.538
+   "playoffs": 98.94,
+   "bye": 69.64,
+   "final": 50.59,
+   "champ": 28.501
   },
   {
    "owner": "Austin",
    "playoffs": 99.77,
-   "bye": 44.51,
-   "final": 44.93,
-   "champ": 23.849
+   "bye": 45.01,
+   "final": 45.06,
+   "champ": 23.937
   },
   {
    "owner": "Martin",
-   "playoffs": 93.35,
-   "bye": 17.42,
-   "final": 28.98,
-   "champ": 15.075
+   "playoffs": 93.26,
+   "bye": 17.41,
+   "final": 28.91,
+   "champ": 15.054
   },
   {
    "owner": "Cliff",
    "playoffs": 74.49,
-   "bye": 25.79,
-   "final": 19.83,
-   "champ": 9.682
+   "bye": 25.89,
+   "final": 19.84,
+   "champ": 9.689
   },
   {
    "owner": "Clancy",
-   "playoffs": 65.57,
+   "playoffs": 65.82,
    "bye": 0.05,
-   "final": 18.32,
-   "champ": 7.669
+   "final": 18.39,
+   "champ": 7.705
   },
   {
    "owner": "Bob",
    "playoffs": 99.67,
-   "bye": 38.02,
-   "final": 20.65,
-   "champ": 7.175
+   "bye": 37.53,
+   "final": 20.53,
+   "champ": 7.126
   },
   {
    "owner": "Steve",
-   "playoffs": 54.12,
-   "bye": 3.04,
+   "playoffs": 54.01,
+   "bye": 3.07,
    "final": 13.17,
-   "champ": 6.681
+   "champ": 6.664
   },
   {
    "owner": "Mark",
-   "playoffs": 12.67,
-   "bye": 1.39,
-   "final": 3.18,
-   "champ": 1.17
+   "playoffs": 12.64,
+   "bye": 1.4,
+   "final": 3.17,
+   "champ": 1.169
   },
   {
    "owner": "Sam",
-   "playoffs": 1.29,
+   "playoffs": 1.27,
    "bye": 0.0,
-   "final": 0.33,
-   "champ": 0.154
+   "final": 0.32,
+   "champ": 0.148
   },
   {
    "owner": "Luke",
