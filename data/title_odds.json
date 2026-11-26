@@ -14,25 +14,25 @@
    "playoffs": 99.7,
    "bye": 44.98,
    "final": 45.12,
-   "champ": 23.925
+   "champ": 23.924
   },
   {
    "owner": "Martin",
    "playoffs": 91.28,
    "bye": 14.64,
    "final": 27.77,
-   "champ": 14.533
+   "champ": 14.536
   },
   {
    "owner": "Cliff",
    "playoffs": 73.93,
-   "bye": 24.89,
+   "bye": 24.88,
    "final": 19.46,
-   "champ": 9.503
+   "champ": 9.501
   },
   {
    "owner": "Clancy",
-   "playoffs": 70.67,
+   "playoffs": 70.66,
    "bye": 0.06,
    "final": 19.89,
    "champ": 8.324
@@ -46,7 +46,7 @@
   },
   {
    "owner": "Steve",
-   "playoffs": 52.17,
+   "playoffs": 52.18,
    "bye": 2.75,
    "final": 12.65,
    "champ": 6.428
