@@ -117,23 +117,23 @@
   },
   {
    "owner": "Martin",
-   "pct": 90.7
+   "pct": 91.3
   },
   {
    "owner": "Cliff",
-   "pct": 73.8
+   "pct": 73.9
   },
   {
    "owner": "Clancy",
-   "pct": 72.1
+   "pct": 70.7
   },
   {
    "owner": "Steve",
-   "pct": 51.6
+   "pct": 52.2
   },
   {
    "owner": "Mark",
-   "pct": 12.1
+   "pct": 12.3
   },
   {
    "owner": "Sam",
@@ -141,7 +141,7 @@
   },
   {
    "owner": "Luke",
-   "pct": 0.2
+   "pct": 0.1
   },
   {
    "owner": "Will",
@@ -171,7 +171,7 @@
    "a": "Clancy",
    "pa": 114.4,
    "b": "Martin",
-   "pb": 106.9
+   "pb": 109.9
   },
   {
    "a": "Luke",
@@ -221,7 +221,7 @@
    "needs": [
     "Loses to Steve"
    ],
-   "odds": 2.2
+   "odds": 2.3
   }
  ],
  "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
@@ -234,7 +234,7 @@
   {
    "owner": "Luke",
    "rec": "4-7",
-   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Luke (1088.6) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 134.3 points ahead. Simulated odds: 0.2%."
+   "text": "Even winning out only gets Luke to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Luke (1088.6) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 134.3 points ahead. Simulated odds: 0.1%."
   }
  ],
  "pathnote": "The easiest surviving world from a search of the remaining schedule, shown for teams under 2% simulated playoff odds. Records include this week's finished games; points-for totals run through the last fully scored week.",
@@ -571,31 +571,31 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 12.1,
-    "Clancy": 72.1,
+    "Mark": 12.3,
+    "Clancy": 70.7,
     "Will": 0.0,
     "Sam": 1.0,
-    "Steve": 51.6,
+    "Steve": 52.2,
     "Timmy": 0.0,
     "Bob": 99.7,
     "Lerch": 99.1,
-    "Martin": 90.7,
-    "Luke": 0.2,
+    "Martin": 91.3,
+    "Luke": 0.1,
     "Austin": 99.7,
-    "Cliff": 73.8
+    "Cliff": 73.9
    },
    "champ": {
-    "Mark": 1.06,
-    "Clancy": 8.47,
+    "Mark": 1.07,
+    "Clancy": 8.3,
     "Will": 0.0,
     "Sam": 0.11,
-    "Steve": 6.38,
+    "Steve": 6.42,
     "Timmy": 0.0,
     "Bob": 7.21,
-    "Lerch": 28.82,
-    "Martin": 14.37,
+    "Lerch": 28.83,
+    "Martin": 14.55,
     "Luke": 0.01,
-    "Austin": 24.07,
+    "Austin": 23.99,
     "Cliff": 9.51
    }
   }
@@ -940,7 +940,7 @@
     "17": 102.0
    },
    "Martin": {
-    "12": 106.9,
+    "12": 109.9,
     "13": 95.4,
     "14": 95.1,
     "15": 97.1,
@@ -1055,16 +1055,16 @@
      }
     },
     {
-     "id": "11630",
-     "pos": "WR",
-     "n": "Roman Wilson",
+     "id": "12469",
+     "pos": "RB",
+     "n": "Dylan Sampson",
      "pw": {
-      "12": 4.4,
-      "13": 4.0,
-      "14": 3.7,
-      "15": 4.1,
-      "16": 3.9,
-      "17": 4.6
+      "12": 8.6,
+      "13": 7.0,
+      "14": 7.1,
+      "15": 6.6,
+      "16": 6.5,
+      "17": 7.3
      }
     },
     {
@@ -3078,37 +3078,37 @@
   "replw": {
    "12": {
     "QB": 13.5,
-    "RB": 6.5,
+    "RB": 6.0,
     "WR": 6.5,
     "TE": 6.7
    },
    "13": {
     "QB": 15.8,
-    "RB": 6.5,
+    "RB": 5.9,
     "WR": 6.6,
     "TE": 7.4
    },
    "14": {
     "QB": 16.4,
-    "RB": 6.4,
+    "RB": 6.1,
     "WR": 6.7,
     "TE": 7.0
    },
    "15": {
     "QB": 17.2,
-    "RB": 6.6,
+    "RB": 6.2,
     "WR": 6.6,
     "TE": 7.2
    },
    "16": {
     "QB": 15.7,
-    "RB": 6.3,
+    "RB": 6.1,
     "WR": 6.5,
     "TE": 7.2
    },
    "17": {
     "QB": 15.0,
-    "RB": 6.4,
+    "RB": 5.9,
     "WR": 6.7,
     "TE": 7.6
    }
