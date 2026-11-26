@@ -117,27 +117,27 @@
   },
   {
    "owner": "Martin",
-   "pct": 91.6
+   "pct": 92.6
   },
   {
    "owner": "Clancy",
-   "pct": 73.1
+   "pct": 70.8
   },
   {
    "owner": "Cliff",
-   "pct": 68.9
+   "pct": 67.5
   },
   {
    "owner": "Steve",
-   "pct": 53.6
+   "pct": 56.4
   },
   {
    "owner": "Mark",
-   "pct": 12.9
+   "pct": 12.5
   },
   {
    "owner": "Sam",
-   "pct": 1.0
+   "pct": 1.1
   },
   {
    "owner": "Luke",
@@ -165,25 +165,25 @@
    "a": "Bob",
    "pa": 112.7,
    "b": "Austin",
-   "pb": 105.9
+   "pb": 105.6
   },
   {
    "a": "Clancy",
    "pa": 114.5,
    "b": "Martin",
-   "pb": 111.6
+   "pb": 117.0
   },
   {
    "a": "Luke",
-   "pa": 105.7,
+   "pa": 110.5,
    "b": "Cliff",
-   "pb": 84.3
+   "pb": 83.3
   },
   {
    "a": "Mark",
    "pa": 108.1,
    "b": "Steve",
-   "pb": 110.0
+   "pb": 113.7
   },
   {
    "a": "Will",
@@ -221,7 +221,7 @@
    "needs": [
     "Loses to Steve"
    ],
-   "odds": 2.7
+   "odds": 2.9
   }
  ],
  "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
@@ -229,7 +229,7 @@
   {
    "owner": "Sam",
    "rec": "4-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Sam (1176.4) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 46.4 points ahead. Simulated odds: 1.0%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Sam (1176.4) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 46.4 points ahead. Simulated odds: 1.1%."
   },
   {
    "owner": "Luke",
@@ -571,32 +571,32 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 12.9,
-    "Clancy": 73.1,
+    "Mark": 12.5,
+    "Clancy": 70.8,
     "Will": 0.0,
-    "Sam": 1.0,
-    "Steve": 53.6,
+    "Sam": 1.1,
+    "Steve": 56.4,
     "Timmy": 0.0,
     "Bob": 99.8,
     "Lerch": 99.2,
-    "Martin": 91.6,
+    "Martin": 92.6,
     "Luke": 0.2,
     "Austin": 99.8,
-    "Cliff": 68.9
+    "Cliff": 67.5
    },
    "champ": {
-    "Mark": 1.13,
-    "Clancy": 8.96,
+    "Mark": 1.1,
+    "Clancy": 8.59,
     "Will": 0.0,
-    "Sam": 0.11,
-    "Steve": 6.67,
+    "Sam": 0.13,
+    "Steve": 7.04,
     "Timmy": 0.0,
-    "Bob": 7.59,
-    "Lerch": 29.62,
-    "Martin": 14.6,
+    "Bob": 7.61,
+    "Lerch": 29.8,
+    "Martin": 14.82,
     "Luke": 0.01,
-    "Austin": 22.85,
-    "Cliff": 8.46
+    "Austin": 22.73,
+    "Cliff": 8.17
    }
   }
  },
@@ -908,7 +908,7 @@
     "17": 97.2
    },
    "Steve": {
-    "12": 110.0,
+    "12": 113.7,
     "13": 82.3,
     "14": 95.4,
     "15": 92.2,
@@ -940,7 +940,7 @@
     "17": 102.1
    },
    "Martin": {
-    "12": 111.6,
+    "12": 117.0,
     "13": 95.3,
     "14": 95.0,
     "15": 97.0,
@@ -948,7 +948,7 @@
     "17": 100.2
    },
    "Luke": {
-    "12": 105.7,
+    "12": 110.5,
     "13": 89.8,
     "14": 94.5,
     "15": 81.6,
@@ -956,7 +956,7 @@
     "17": 88.1
    },
    "Austin": {
-    "12": 105.9,
+    "12": 105.6,
     "13": 96.9,
     "14": 92.9,
     "15": 99.2,
@@ -964,7 +964,7 @@
     "17": 100.1
    },
    "Cliff": {
-    "12": 84.3,
+    "12": 83.3,
     "13": 89.7,
     "14": 97.7,
     "15": 92.7,
@@ -995,10 +995,10 @@
    "Timmy": 20.7,
    "Bob": 21.6,
    "Lerch": 21.0,
-   "Martin": 27.7,
-   "Luke": 12.3,
+   "Martin": 27.6,
+   "Luke": 12.2,
    "Austin": 19.9,
-   "Cliff": 16.9
+   "Cliff": 16.8
   },
   "tradepool": {
    "Mark": [
