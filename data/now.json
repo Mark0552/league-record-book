@@ -117,27 +117,27 @@
   },
   {
    "owner": "Martin",
-   "pct": 96.0
+   "pct": 95.8
   },
   {
    "owner": "Cliff",
-   "pct": 91.3
+   "pct": 91.2
   },
   {
    "owner": "Clancy",
-   "pct": 53.9
+   "pct": 52.7
   },
   {
    "owner": "Steve",
-   "pct": 45.6
+   "pct": 48.6
   },
   {
    "owner": "Mark",
-   "pct": 13.0
+   "pct": 11.7
   },
   {
    "owner": "Sam",
-   "pct": 1.8
+   "pct": 1.7
   },
   {
    "owner": "Will",
@@ -159,31 +159,31 @@
    "a": "Sam",
    "pa": 110.3,
    "b": "Timmy",
-   "pb": 80.5
+   "pb": 82.6
   },
   {
    "a": "Bob",
    "pa": 129.7,
    "b": "Austin",
-   "pb": 117.3
+   "pb": 116.8
   },
   {
    "a": "Clancy",
    "pa": 113.7,
    "b": "Martin",
-   "pb": 129.8
+   "pb": 129.6
   },
   {
    "a": "Luke",
-   "pa": 96.5,
+   "pa": 97.3,
    "b": "Cliff",
-   "pb": 127.1
+   "pb": 126.7
   },
   {
    "a": "Mark",
    "pa": 122.4,
    "b": "Steve",
-   "pb": 108.4
+   "pb": 115.0
   },
   {
    "a": "Will",
@@ -229,7 +229,7 @@
   {
    "owner": "Sam",
    "rec": "4-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Sam (1176.4) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 46.4 points ahead. Simulated odds: 1.8%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Sam (1176.4) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 46.4 points ahead. Simulated odds: 1.7%."
   },
   {
    "owner": "Luke",
@@ -571,32 +571,32 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 13.0,
-    "Clancy": 53.9,
+    "Mark": 11.7,
+    "Clancy": 52.7,
     "Will": 0.0,
-    "Sam": 1.8,
-    "Steve": 45.6,
+    "Sam": 1.7,
+    "Steve": 48.6,
     "Timmy": 0.0,
     "Bob": 99.8,
     "Lerch": 99.0,
-    "Martin": 96.0,
+    "Martin": 95.8,
     "Luke": 0.0,
     "Austin": 99.6,
-    "Cliff": 91.3
+    "Cliff": 91.2
    },
    "champ": {
-    "Mark": 1.14,
-    "Clancy": 7.03,
+    "Mark": 1.03,
+    "Clancy": 6.88,
     "Will": 0.0,
-    "Sam": 0.22,
-    "Steve": 6.08,
+    "Sam": 0.21,
+    "Steve": 6.53,
     "Timmy": 0.0,
-    "Bob": 8.05,
-    "Lerch": 26.11,
-    "Martin": 15.74,
+    "Bob": 8.07,
+    "Lerch": 26.09,
+    "Martin": 15.72,
     "Luke": 0.0,
-    "Austin": 22.14,
-    "Cliff": 13.48
+    "Austin": 22.06,
+    "Cliff": 13.4
    }
   }
  },
@@ -908,7 +908,7 @@
     "17": 97.2
    },
    "Steve": {
-    "12": 108.4,
+    "12": 115.0,
     "13": 82.2,
     "14": 95.4,
     "15": 92.2,
@@ -916,7 +916,7 @@
     "17": 98.7
    },
    "Timmy": {
-    "12": 80.5,
+    "12": 82.6,
     "13": 73.8,
     "14": 81.1,
     "15": 77.6,
@@ -940,7 +940,7 @@
     "17": 102.1
    },
    "Martin": {
-    "12": 129.8,
+    "12": 129.6,
     "13": 95.1,
     "14": 95.0,
     "15": 97.0,
@@ -948,7 +948,7 @@
     "17": 100.2
    },
    "Luke": {
-    "12": 96.5,
+    "12": 97.3,
     "13": 89.7,
     "14": 94.5,
     "15": 81.6,
@@ -956,7 +956,7 @@
     "17": 88.1
    },
    "Austin": {
-    "12": 117.3,
+    "12": 116.8,
     "13": 96.7,
     "14": 92.9,
     "15": 99.2,
@@ -964,7 +964,7 @@
     "17": 100.1
    },
    "Cliff": {
-    "12": 127.1,
+    "12": 126.7,
     "13": 89.7,
     "14": 97.7,
     "15": 92.7,
@@ -991,13 +991,13 @@
    "Clancy": 11.3,
    "Will": 24.4,
    "Sam": 24.8,
-   "Steve": 10.7,
+   "Steve": 10.6,
    "Timmy": 19.6,
    "Bob": 20.0,
    "Lerch": 21.0,
    "Martin": 23.5,
-   "Luke": 8.7,
-   "Austin": 19.0,
+   "Luke": 8.6,
+   "Austin": 18.9,
    "Cliff": 12.1
   },
   "tradepool": {
