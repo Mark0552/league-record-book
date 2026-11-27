@@ -121,19 +121,19 @@
   },
   {
    "owner": "Cliff",
-   "pct": 86.7
+   "pct": 87.9
   },
   {
    "owner": "Clancy",
-   "pct": 54.6
+   "pct": 53.5
   },
   {
    "owner": "Steve",
-   "pct": 51.3
+   "pct": 51.9
   },
   {
    "owner": "Mark",
-   "pct": 11.6
+   "pct": 11.0
   },
   {
    "owner": "Sam",
@@ -163,7 +163,7 @@
   },
   {
    "a": "Bob",
-   "pa": 126.0,
+   "pa": 126.5,
    "b": "Austin",
    "pb": 125.4
   },
@@ -177,11 +177,11 @@
    "a": "Luke",
    "pa": 104.2,
    "b": "Cliff",
-   "pb": 118.2
+   "pb": 121.2
   },
   {
    "a": "Mark",
-   "pa": 117.1,
+   "pa": 115.1,
    "b": "Steve",
    "pb": 113.7
   },
@@ -221,7 +221,7 @@
    "needs": [
     "Loses to Steve"
    ],
-   "odds": 1.2
+   "odds": 1.0
   }
  ],
  "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
@@ -571,32 +571,32 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 11.6,
-    "Clancy": 54.6,
+    "Mark": 11.0,
+    "Clancy": 53.5,
     "Will": 0.0,
     "Sam": 1.5,
-    "Steve": 51.3,
+    "Steve": 51.9,
     "Timmy": 0.0,
     "Bob": 99.8,
     "Lerch": 99.0,
     "Martin": 95.6,
     "Luke": 0.0,
     "Austin": 99.7,
-    "Cliff": 86.7
+    "Cliff": 87.9
    },
    "champ": {
-    "Mark": 1.01,
-    "Clancy": 6.83,
+    "Mark": 0.95,
+    "Clancy": 6.71,
     "Will": 0.0,
     "Sam": 0.18,
-    "Steve": 6.67,
+    "Steve": 6.79,
     "Timmy": 0.0,
-    "Bob": 7.24,
-    "Lerch": 26.9,
-    "Martin": 15.65,
+    "Bob": 7.23,
+    "Lerch": 26.67,
+    "Martin": 15.66,
     "Luke": 0.0,
-    "Austin": 23.18,
-    "Cliff": 12.33
+    "Austin": 23.15,
+    "Cliff": 12.66
    }
   }
  },
@@ -876,7 +876,7 @@
   ],
   "proj": {
    "Mark": {
-    "12": 117.1,
+    "12": 115.1,
     "13": 79.6,
     "14": 86.0,
     "15": 92.5,
@@ -924,7 +924,7 @@
     "17": 80.0
    },
    "Bob": {
-    "12": 126.0,
+    "12": 126.5,
     "13": 92.9,
     "14": 79.3,
     "15": 91.4,
@@ -964,7 +964,7 @@
     "17": 100.1
    },
    "Cliff": {
-    "12": 118.2,
+    "12": 121.2,
     "13": 89.7,
     "14": 97.7,
     "15": 92.7,
