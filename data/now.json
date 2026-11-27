@@ -121,11 +121,11 @@
   },
   {
    "owner": "Cliff",
-   "pct": 80.6
+   "pct": 80.5
   },
   {
    "owner": "Steve",
-   "pct": 58.7
+   "pct": 58.8
   },
   {
    "owner": "Clancy",
@@ -133,11 +133,11 @@
   },
   {
    "owner": "Mark",
-   "pct": 10.5
+   "pct": 10.4
   },
   {
    "owner": "Sam",
-   "pct": 1.4
+   "pct": 1.5
   },
   {
    "owner": "Luke",
@@ -157,31 +157,31 @@
  "matchups": [
   {
    "a": "Sam",
-   "pa": 102.6,
+   "pa": 104.8,
    "b": "Timmy",
    "pb": 90.0
   },
   {
    "a": "Bob",
-   "pa": 128.1,
+   "pa": 127.2,
    "b": "Austin",
    "pb": 125.4
   },
   {
    "a": "Clancy",
-   "pa": 110.9,
+   "pa": 110.7,
    "b": "Martin",
-   "pb": 132.4
+   "pb": 132.1
   },
   {
    "a": "Luke",
-   "pa": 107.5,
+   "pa": 107.1,
    "b": "Cliff",
-   "pb": 110.1
+   "pb": 109.6
   },
   {
    "a": "Mark",
-   "pa": 105.2,
+   "pa": 104.7,
    "b": "Steve",
    "pb": 113.7
   },
@@ -229,7 +229,7 @@
   {
    "owner": "Sam",
    "rec": "4-7",
-   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Sam (1176.4) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 46.4 points ahead. Simulated odds: 1.4%."
+   "text": "Even winning out only gets Sam to 7-7 \u2014 and the path needs the middle to collapse: Martin (7-4) can't win again; Cliff (7-4) can't win again; Clancy (6-5) can win at most 1 more; Steve (6-5) can win at most 1 more; Mark (5-6) can win at most 2 more. That leaves a 6-way tie at 7-7 for the last 3 spots. The tie crosses divisions, so it falls to season points-for: Sam (1176.4) must out-score 3 of the 5 \u2014 at minimum overtaking Mark, currently 46.4 points ahead. Simulated odds: 1.5%."
   },
   {
    "owner": "Luke",
@@ -571,32 +571,32 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 10.5,
+    "Mark": 10.4,
     "Clancy": 53.6,
     "Will": 0.0,
-    "Sam": 1.4,
-    "Steve": 58.7,
+    "Sam": 1.5,
+    "Steve": 58.8,
     "Timmy": 0.0,
     "Bob": 99.9,
     "Lerch": 99.1,
     "Martin": 96.4,
     "Luke": 0.1,
     "Austin": 99.8,
-    "Cliff": 80.6
+    "Cliff": 80.5
    },
    "champ": {
     "Mark": 0.9,
-    "Clancy": 6.59,
+    "Clancy": 6.56,
     "Will": 0.0,
     "Sam": 0.17,
-    "Steve": 7.56,
+    "Steve": 7.57,
     "Timmy": 0.0,
-    "Bob": 7.3,
-    "Lerch": 27.79,
+    "Bob": 7.24,
+    "Lerch": 27.82,
     "Martin": 15.9,
     "Luke": 0.0,
-    "Austin": 22.85,
-    "Cliff": 10.94
+    "Austin": 22.94,
+    "Cliff": 10.89
    }
   }
  },
@@ -876,7 +876,7 @@
   ],
   "proj": {
    "Mark": {
-    "12": 105.2,
+    "12": 104.7,
     "13": 79.7,
     "14": 86.0,
     "15": 92.5,
@@ -884,7 +884,7 @@
     "17": 81.8
    },
    "Clancy": {
-    "12": 110.9,
+    "12": 110.7,
     "13": 91.7,
     "14": 94.1,
     "15": 99.8,
@@ -900,7 +900,7 @@
     "17": 90.4
    },
    "Sam": {
-    "12": 102.6,
+    "12": 104.8,
     "13": 88.5,
     "14": 87.3,
     "15": 95.9,
@@ -924,7 +924,7 @@
     "17": 80.0
    },
    "Bob": {
-    "12": 128.1,
+    "12": 127.2,
     "13": 93.0,
     "14": 79.3,
     "15": 91.4,
@@ -940,7 +940,7 @@
     "17": 102.1
    },
    "Martin": {
-    "12": 132.4,
+    "12": 132.1,
     "13": 95.3,
     "14": 95.0,
     "15": 97.0,
@@ -948,7 +948,7 @@
     "17": 100.2
    },
    "Luke": {
-    "12": 107.5,
+    "12": 107.1,
     "13": 89.8,
     "14": 94.5,
     "15": 81.6,
@@ -964,7 +964,7 @@
     "17": 100.1
    },
    "Cliff": {
-    "12": 110.1,
+    "12": 109.6,
     "13": 89.7,
     "14": 97.7,
     "15": 92.7,
@@ -987,18 +987,18 @@
    "Cliff": 19.3
   },
   "sdw": {
-   "Mark": 39.0,
+   "Mark": 38.9,
    "Clancy": 11.5,
    "Will": 24.4,
    "Sam": 25.2,
    "Steve": 11.3,
    "Timmy": 20.7,
-   "Bob": 20.4,
+   "Bob": 20.3,
    "Lerch": 21.0,
    "Martin": 25.2,
-   "Luke": 10.2,
+   "Luke": 10.1,
    "Austin": 19.5,
-   "Cliff": 13.6
+   "Cliff": 13.5
   },
   "tradepool": {
    "Mark": [
