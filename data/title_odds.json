@@ -4,73 +4,66 @@
  "odds": [
   {
    "owner": "Lerch",
-   "playoffs": 99.05,
-   "bye": 53.61,
-   "final": 46.73,
-   "champ": 26.38
+   "playoffs": 99.06,
+   "bye": 53.51,
+   "final": 46.69,
+   "champ": 26.362
   },
   {
    "owner": "Austin",
-   "playoffs": 99.56,
-   "bye": 30.63,
-   "final": 41.63,
-   "champ": 21.958
+   "playoffs": 99.55,
+   "bye": 30.31,
+   "final": 41.57,
+   "champ": 21.928
   },
   {
    "owner": "Martin",
-   "playoffs": 95.92,
-   "bye": 16.51,
-   "final": 30.28,
-   "champ": 15.753
+   "playoffs": 95.91,
+   "bye": 16.41,
+   "final": 30.27,
+   "champ": 15.75
   },
   {
    "owner": "Cliff",
-   "playoffs": 90.17,
-   "bye": 43.08,
-   "final": 26.29,
-   "champ": 13.235
+   "playoffs": 90.23,
+   "bye": 43.21,
+   "final": 26.3,
+   "champ": 13.238
   },
   {
    "owner": "Bob",
-   "playoffs": 99.85,
-   "bye": 52.84,
-   "final": 23.44,
-   "champ": 8.214
+   "playoffs": 99.84,
+   "bye": 53.26,
+   "final": 23.51,
+   "champ": 8.247
   },
   {
    "owner": "Clancy",
-   "playoffs": 54.15,
+   "playoffs": 54.3,
    "bye": 0.01,
-   "final": 16.43,
-   "champ": 7.124
+   "final": 16.49,
+   "champ": 7.146
   },
   {
    "owner": "Steve",
-   "playoffs": 47.19,
-   "bye": 2.43,
-   "final": 12.34,
-   "champ": 6.277
+   "playoffs": 46.91,
+   "bye": 2.4,
+   "final": 12.29,
+   "champ": 6.268
   },
   {
    "owner": "Mark",
-   "playoffs": 12.31,
-   "bye": 0.88,
-   "final": 2.4,
-   "champ": 0.829
+   "playoffs": 12.38,
+   "bye": 0.89,
+   "final": 2.41,
+   "champ": 0.83
   },
   {
    "owner": "Sam",
-   "playoffs": 1.8,
+   "playoffs": 1.81,
    "bye": 0.0,
-   "final": 0.46,
-   "champ": 0.229
-  },
-  {
-   "owner": "Luke",
-   "playoffs": 0.01,
-   "bye": 0.0,
-   "final": 0.01,
-   "champ": 0.001
+   "final": 0.47,
+   "champ": 0.231
   },
   {
    "owner": "Will",
@@ -82,6 +75,13 @@
   {
    "owner": "Timmy",
    "playoffs": 0.0,
+   "bye": 0.0,
+   "final": 0.0,
+   "champ": 0.0
+  },
+  {
+   "owner": "Luke",
+   "playoffs": 0.01,
    "bye": 0.0,
    "final": 0.0,
    "champ": 0.0
