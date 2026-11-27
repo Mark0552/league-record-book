@@ -109,7 +109,7 @@
   },
   {
    "owner": "Austin",
-   "pct": 99.8
+   "pct": 99.7
   },
   {
    "owner": "Lerch",
@@ -117,23 +117,23 @@
   },
   {
    "owner": "Martin",
-   "pct": 95.3
+   "pct": 95.5
   },
   {
    "owner": "Cliff",
-   "pct": 85.3
-  },
-  {
-   "owner": "Steve",
-   "pct": 55.0
+   "pct": 86.7
   },
   {
    "owner": "Clancy",
-   "pct": 54.3
+   "pct": 55.1
+  },
+  {
+   "owner": "Steve",
+   "pct": 51.1
   },
   {
    "owner": "Mark",
-   "pct": 10.0
+   "pct": 11.6
   },
   {
    "owner": "Sam",
@@ -163,7 +163,7 @@
   },
   {
    "a": "Bob",
-   "pa": 125.4,
+   "pa": 126.0,
    "b": "Austin",
    "pb": 125.4
   },
@@ -177,11 +177,11 @@
    "a": "Luke",
    "pa": 104.2,
    "b": "Cliff",
-   "pb": 115.5
+   "pb": 118.2
   },
   {
    "a": "Mark",
-   "pa": 108.5,
+   "pa": 117.1,
    "b": "Steve",
    "pb": 113.7
   },
@@ -221,7 +221,7 @@
    "needs": [
     "Loses to Steve"
    ],
-   "odds": 1.3
+   "odds": 1.2
   }
  ],
  "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
@@ -571,32 +571,32 @@
   },
   "12": {
    "playoffs": {
-    "Mark": 10.0,
-    "Clancy": 54.3,
+    "Mark": 11.6,
+    "Clancy": 55.1,
     "Will": 0.0,
     "Sam": 1.5,
-    "Steve": 55.0,
+    "Steve": 51.1,
     "Timmy": 0.0,
     "Bob": 99.8,
     "Lerch": 99.0,
-    "Martin": 95.3,
+    "Martin": 95.5,
     "Luke": 0.0,
-    "Austin": 99.8,
-    "Cliff": 85.3
+    "Austin": 99.7,
+    "Cliff": 86.7
    },
    "champ": {
-    "Mark": 0.87,
-    "Clancy": 6.76,
+    "Mark": 1.01,
+    "Clancy": 6.91,
     "Will": 0.0,
     "Sam": 0.18,
-    "Steve": 7.14,
+    "Steve": 6.64,
     "Timmy": 0.0,
-    "Bob": 7.15,
-    "Lerch": 27.08,
-    "Martin": 15.57,
+    "Bob": 7.24,
+    "Lerch": 26.91,
+    "Martin": 15.58,
     "Luke": 0.0,
-    "Austin": 23.24,
-    "Cliff": 12.0
+    "Austin": 23.2,
+    "Cliff": 12.32
    }
   }
  },
@@ -876,7 +876,7 @@
   ],
   "proj": {
    "Mark": {
-    "12": 108.5,
+    "12": 117.1,
     "13": 79.6,
     "14": 86.0,
     "15": 92.5,
@@ -924,7 +924,7 @@
     "17": 80.0
    },
    "Bob": {
-    "12": 125.4,
+    "12": 126.0,
     "13": 92.9,
     "14": 79.3,
     "15": 91.4,
@@ -964,7 +964,7 @@
     "17": 100.1
    },
    "Cliff": {
-    "12": 115.5,
+    "12": 118.2,
     "13": 89.7,
     "14": 97.7,
     "15": 92.7,
