@@ -4,73 +4,66 @@
  "odds": [
   {
    "owner": "Lerch",
-   "playoffs": 99.02,
-   "bye": 53.26,
-   "final": 46.55,
-   "champ": 26.332
+   "playoffs": 99.03,
+   "bye": 52.99,
+   "final": 46.5,
+   "champ": 26.274
   },
   {
    "owner": "Austin",
-   "playoffs": 99.55,
-   "bye": 31.69,
-   "final": 41.68,
-   "champ": 21.974
+   "playoffs": 99.57,
+   "bye": 32.54,
+   "final": 41.88,
+   "champ": 22.056
   },
   {
    "owner": "Martin",
-   "playoffs": 95.72,
-   "bye": 16.51,
-   "final": 30.05,
-   "champ": 15.666
+   "playoffs": 95.92,
+   "bye": 16.89,
+   "final": 30.17,
+   "champ": 15.744
   },
   {
    "owner": "Cliff",
-   "playoffs": 89.95,
-   "bye": 43.32,
-   "final": 26.25,
-   "champ": 13.203
+   "playoffs": 90.18,
+   "bye": 43.6,
+   "final": 26.34,
+   "champ": 13.241
   },
   {
    "owner": "Bob",
-   "playoffs": 99.83,
-   "bye": 51.78,
-   "final": 23.17,
-   "champ": 8.121
+   "playoffs": 99.84,
+   "bye": 50.55,
+   "final": 22.96,
+   "champ": 8.056
   },
   {
    "owner": "Clancy",
-   "playoffs": 54.37,
+   "playoffs": 53.79,
    "bye": 0.01,
-   "final": 16.4,
-   "champ": 7.078
+   "final": 16.23,
+   "champ": 7.013
   },
   {
    "owner": "Steve",
-   "playoffs": 47.33,
-   "bye": 2.52,
-   "final": 12.4,
-   "champ": 6.32
+   "playoffs": 47.31,
+   "bye": 2.5,
+   "final": 12.38,
+   "champ": 6.3
   },
   {
    "owner": "Mark",
-   "playoffs": 12.49,
+   "playoffs": 12.6,
    "bye": 0.9,
-   "final": 3.06,
-   "champ": 1.089
+   "final": 3.09,
+   "champ": 1.098
   },
   {
    "owner": "Sam",
-   "playoffs": 1.72,
+   "playoffs": 1.75,
    "bye": 0.0,
-   "final": 0.43,
-   "champ": 0.216
-  },
-  {
-   "owner": "Luke",
-   "playoffs": 0.01,
-   "bye": 0.0,
-   "final": 0.0,
-   "champ": 0.001
+   "final": 0.44,
+   "champ": 0.218
   },
   {
    "owner": "Will",
@@ -82,6 +75,13 @@
   {
    "owner": "Timmy",
    "playoffs": 0.0,
+   "bye": 0.0,
+   "final": 0.0,
+   "champ": 0.0
+  },
+  {
+   "owner": "Luke",
+   "playoffs": 0.01,
    "bye": 0.0,
    "final": 0.0,
    "champ": 0.0
