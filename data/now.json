@@ -109,27 +109,27 @@
   },
   {
    "owner": "Austin",
-   "pct": 99.6
+   "pct": 99.7
   },
   {
    "owner": "Lerch",
-   "pct": 99.0
+   "pct": 99.1
   },
   {
    "owner": "Martin",
-   "pct": 97.3
+   "pct": 97.4
   },
   {
    "owner": "Cliff",
-   "pct": 91.8
+   "pct": 91.9
   },
   {
    "owner": "Clancy",
-   "pct": 50.0
+   "pct": 49.6
   },
   {
    "owner": "Steve",
-   "pct": 47.3
+   "pct": 47.4
   },
   {
    "owner": "Mark",
@@ -169,13 +169,13 @@
   },
   {
    "a": "Clancy",
-   "pa": 105.8,
+   "pa": 105.1,
    "b": "Martin",
    "pb": 128.4
   },
   {
    "a": "Luke",
-   "pa": 99.9,
+   "pa": 99.7,
    "b": "Cliff",
    "pb": 125.5
   },
@@ -187,7 +187,7 @@
   },
   {
    "a": "Will",
-   "pa": 110.6,
+   "pa": 109.1,
    "b": "Lerch",
    "pb": 120.1
   }
@@ -221,7 +221,7 @@
    "needs": [
     "Loses to Steve"
    ],
-   "odds": 0.7
+   "odds": 0.6
   }
  ],
  "brinknote": "On the brink: those results leave no path to the playoffs without winning a points-for tiebreak. The percentage is the team's playoff odds across 100,000 simulations if the loss happens; under 1% counts as effectively out.",
@@ -572,31 +572,31 @@
   "12": {
    "playoffs": {
     "Mark": 13.2,
-    "Clancy": 50.0,
+    "Clancy": 49.6,
     "Will": 0.0,
     "Sam": 1.8,
-    "Steve": 47.3,
+    "Steve": 47.4,
     "Timmy": 0.0,
     "Bob": 99.9,
-    "Lerch": 99.0,
-    "Martin": 97.3,
+    "Lerch": 99.1,
+    "Martin": 97.4,
     "Luke": 0.0,
-    "Austin": 99.6,
-    "Cliff": 91.8
+    "Austin": 99.7,
+    "Cliff": 91.9
    },
    "champ": {
     "Mark": 0.91,
-    "Clancy": 6.59,
+    "Clancy": 6.5,
     "Will": 0.0,
     "Sam": 0.24,
-    "Steve": 6.41,
+    "Steve": 6.42,
     "Timmy": 0.0,
     "Bob": 8.48,
-    "Lerch": 26.2,
-    "Martin": 16.02,
+    "Lerch": 26.3,
+    "Martin": 16.04,
     "Luke": 0.0,
     "Austin": 21.48,
-    "Cliff": 13.66
+    "Cliff": 13.62
    }
   }
  },
@@ -884,7 +884,7 @@
     "17": 80.9
    },
    "Clancy": {
-    "12": 105.8,
+    "12": 105.1,
     "13": 91.9,
     "14": 94.1,
     "15": 99.8,
@@ -892,7 +892,7 @@
     "17": 94.0
    },
    "Will": {
-    "12": 110.6,
+    "12": 109.1,
     "13": 86.9,
     "14": 84.9,
     "15": 87.0,
@@ -948,7 +948,7 @@
     "17": 100.2
    },
    "Luke": {
-    "12": 99.9,
+    "12": 99.7,
     "13": 90.1,
     "14": 94.5,
     "15": 81.6,
@@ -989,14 +989,14 @@
   "sdw": {
    "Mark": 38.4,
    "Clancy": 10.2,
-   "Will": 22.3,
+   "Will": 22.2,
    "Sam": 24.8,
    "Steve": 9.8,
    "Timmy": 18.2,
    "Bob": 20.0,
    "Lerch": 21.0,
    "Martin": 22.1,
-   "Luke": 5.6,
+   "Luke": 5.5,
    "Austin": 18.3,
    "Cliff": 11.1
   },
